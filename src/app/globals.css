@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/*
+  Design tokens extracted from Figma (Inbox — uET8lmz7lTswi429zz8n8C).
+  Keep this file as the single source of truth for brand colors,
+  typography and shadows. Do not hardcode hex values in components —
+  reference these tokens instead.
+*/
+:root {
+  /* Brand colors */
+  --color-primary: #ff6015; /* primary-color---pantone-021c */
+  --color-secondary: #fe9766; /* secundary-color */
+  --color-secondary-dark: #a9abaa; /* secundary-dark */
+  --color-neutral-bg: #eeeeee;
+  --color-neutral-line: #d9d9d9;
+
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Trebuchet MS is a system font (no license to bundle) — fall back
+     to comparable widely-installed faces on platforms that lack it. */
+  --font-trebuchet: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+
+  /* Shadows (Figma "Cards" effect) */
+  --shadow-card: 0px 4px 2px 0px rgba(0, 0, 0, 0.25);
+  --shadow-card-sm: 0px 2px 2.5px 0px rgba(0, 0, 0, 0.25);
+  --shadow-nav: 0px 3px 5.5px 0px rgba(0, 0, 0, 0.25);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-dark: var(--color-secondary-dark);
+  --color-neutral-bg: var(--color-neutral-bg);
+  --color-neutral-line: var(--color-neutral-line);
+
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-trebuchet);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-card-sm: var(--shadow-card-sm);
+  --shadow-nav: var(--shadow-nav);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-trebuchet);
+}
