@@ -22,6 +22,7 @@ export function Navbar() {
             src="/images/logo-blanco-horizontal.png"
             alt="Inbox"
             fill
+            sizes="220px"
             className="object-contain object-left"
             priority
           />
