@@ -39,11 +39,21 @@ export function AboutUs() {
       <div className="flex w-full flex-col items-center gap-10 lg:flex-row lg:items-stretch">
         <div className="flex w-full flex-col divide-y divide-neutral-line lg:flex-1">
           {CARDS.map((card) => (
-            <div key={card.title} className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:gap-8">
-              <h3 className="w-full shrink-0 font-display text-xl font-bold text-black sm:w-[220px] sm:text-[25px]">
-                {card.title}
-              </h3>
-              <p className="text-xs text-black">{card.description}</p>
+            <div key={card.title} className="group relative flex flex-col justify-center overflow-hidden rounded-md">
+              <Image
+                src="/images/about-card-hover.png"
+                alt=""
+                fill
+                className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+              <div className="relative flex flex-col gap-3 px-0 py-6 transition-[padding] duration-300 group-hover:px-7 group-hover:py-5 sm:flex-row sm:items-center sm:gap-8">
+                <h3 className="w-full shrink-0 font-display text-xl font-bold text-black transition-colors duration-300 group-hover:text-white sm:w-[220px] sm:text-[25px]">
+                  {card.title}
+                </h3>
+                <p className="text-xs text-black transition-colors duration-300 group-hover:text-white">
+                  {card.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
