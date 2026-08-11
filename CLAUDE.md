@@ -207,6 +207,18 @@ cliente para cada demo semanal.
       "sucursal" de "centro de distribución" (`Sucursal.tipo` en
       `src/types/sucursal.ts` es un campo inventado en el frontend, no viene
       de `ListadoOficinas`).
+- [x] **CTA "Tu inbox más cercana" (debajo del mapa)** ya no son solo 2
+      dropdowns decorativos: al elegir un Estado cambia a una tabla real de
+      sucursales (Estatus/Ciudad/Dirección/Teléfono/Oficina/Horario),
+      filtrable también por Ciudad y por texto libre — Figma node
+      `679:20363`. Usa la misma fuente de datos que el mapa
+      (`src/lib/sucursales.ts`), así que también queda listo para conectar
+      sin tocar el componente. El estatus "abierto/cerrado" se calcula en
+      `src/lib/horario.ts` parseando rangos `HH:MM - HH:MM` del campo
+      `Observaciones` real de la API — no distingue día de la semana
+      (limitación documentada en ese archivo). El botón de dirección abre
+      Google Maps con lat/long de la sucursal (o la dirección en texto si no
+      hay coordenadas).
 - [ ] **El resto de Home sigue estático/local** — rastreo, cotización y
       envío aún no llaman a la API SIBOX (ni al BFF, que no existe todavía).
       Siguiente paso lógico: crear `src/lib/api/` con el cliente tipado +
