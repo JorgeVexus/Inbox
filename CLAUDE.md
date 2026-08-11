@@ -219,11 +219,32 @@ cliente para cada demo semanal.
       (limitación documentada en ese archivo). El botón de dirección abre
       Google Maps con lat/long de la sucursal (o la dirección en texto si no
       hay coordenadas).
-- [ ] **El resto de Home sigue estático/local** — rastreo, cotización y
-      envío aún no llaman a la API SIBOX (ni al BFF, que no existe todavía).
-      Siguiente paso lógico: crear `src/lib/api/` con el cliente tipado +
-      Route Handlers, empezando por `wsRastreo` (rastreo del hero) según el
-      plan semana 1.
+- [x] **Chatbot flotante rediseñado** (`src/components/ui/chat-widget.tsx`,
+      montado globalmente en `layout.tsx`, ya no en `page.tsx`) — Figma node
+      `117:8023`, las 3 pestañas (Inicio/Chat/Ayuda) con su propia barra
+      inferior:
+      - **Inicio**: rastreo real de guía dentro del propio widget, ya
+        conectado al seam `src/lib/rastreo.ts` (`rastrearGuia()`), que hoy
+        resuelve contra `src/lib/mock/rastreo.ts` — mismo patrón que
+        `sucursales.ts`, swap a `wsRastreo` sin tocar el componente. Prueba
+        con las guías mock `4003229791` o `4159473741`.
+      - **Chat**: el Figma pide correo pero no dice qué pasa después — no
+        hay endpoint de chat/ticket en la API SIBOX. Decisión tomada: se
+        trata como un formulario de contacto ("déjanos tu correo, un asesor
+        te escribe"), no un chat en vivo simulado. Envío va a
+        `src/lib/soporte.ts` (`enviarContactoChat()`), stub que siempre
+        resuelve `{ ok: true }` — falta decidir con backend/producto si esto
+        termina siendo un lead a CRM, un webhook, o un widget de terceros
+        (Zendesk/Intercom) antes de conectarlo de verdad.
+      - **Ayuda**: buscador + acordeón de categorías con preguntas de
+        ejemplo (`FAQ_TOPICS` hardcodeado en el mismo archivo) — contenido
+        de relleno, pendiente que Inbox entregue las preguntas/respuestas
+        reales.
+- [ ] **El resto de Home sigue estático/local** — la cotización y el envío
+      de guía aún no llaman a la API SIBOX (ni al BFF, que no existe
+      todavía). Siguiente paso lógico: crear `src/lib/api/` con el cliente
+      tipado + Route Handlers reales, empezando por `wsRastreo` (ya tiene el
+      seam listo en dos lugares: hero y chatbot) según el plan semana 1.
 - [ ] Sin páginas adicionales (`/rastreo`, `/cotizar`, `/envio`, `/cobertura`,
       `/somos`, `/soporte`, `/cuenta/iniciar-sesion`) — el Navbar/Footer ya
       enlazan a esas rutas pero no existen todavía (404 en Next hasta que se
