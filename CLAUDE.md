@@ -26,6 +26,13 @@ implementación previa en Webflow, con integración progresiva a las APIs de
 - **Next.js (App Router) + TypeScript**, una sola aplicación (no monorepo).
 - **Tailwind CSS v4** (config vía `@theme` en `src/app/globals.css`, no hay
   `tailwind.config.*`). No instalar otra librería de estilos.
+- **Mapas: `leaflet` + `react-leaflet` sobre tiles de OpenStreetMap** (sin
+  API key). Elegido explícitamente sobre Google Maps/Mapbox para no
+  depender de una cuenta/facturación externa mientras el proyecto no la
+  tenga decidida — si el cliente pide después el look de Google Maps, es un
+  cambio acotado a `src/components/home/cobertura-map.tsx`. Cualquier mapa
+  nuevo debe ser un Client Component cargado con `next/dynamic({ ssr:
+  false })` (Leaflet toca `window` en el import).
 - **Hosting recomendado: Vercel Pro** para el MVP. Cloudflare Workers +
   OpenNext es alternativa válida solo si Inbox ya opera su stack en
   Cloudflare — no usar Cloudflare Pages (no soporta SSR/BFF dinámico que este
@@ -183,15 +190,28 @@ cliente para cada demo semanal.
 - [x] `Navbar` y `Footer` reutilizables en `src/components/layout/`, montados
       en `src/app/layout.tsx` (aparecen en toda página nueva sin más trabajo).
 - [x] Página Home completa (`src/app/page.tsx` + `src/components/home/*`):
-      Hero con carrusel + buscador de rastreo + tarjeta de cotización rápida,
-      Servicios (scroll horizontal de 11 tarjetas), Cobertura (mapa +
+      Hero con carrusel + buscador de rastreo + tarjeta de cotización de 3
+      pasos (origen/destino → tipo de envío → detalle de paquete), Servicios
+      (scroll horizontal de 11 tarjetas), Cobertura (mapa interactivo real +
       indicadores), CTA de cobertura por estado/ciudad, About us, FAQ
       (acordeón), chat flotante.
-- [ ] **Todo en Home es estático/local** — ningún formulario llama todavía a
-      la API SIBOX (ni siquiera al BFF, que no existe aún). Es el siguiente
-      paso lógico: crear `src/lib/api/` con el cliente tipado + Route
-      Handlers, empezando por `wsRastreo` (rastreo del hero) como primer
-      endpoint real, según el plan semana 1.
+- [x] **Cobertura ya no es una imagen estática**: mapa real con
+      `leaflet` + `react-leaflet` (OpenStreetMap, sin API key — decisión del
+      usuario 2026-08-11, ver opciones descartadas: Google Maps/Mapbox
+      requieren cuenta y facturación). Dropdowns Estado→Ciudad, buscador y
+      leyenda de tipo de sucursal ya filtran de verdad contra
+      `src/lib/sucursales.ts`. Ese archivo es el único lugar que sabe que hoy
+      lee de `src/lib/mock/sucursales.ts` — swap a un fetch real contra el
+      BFF (`ListadoOficinas`) sin tocar `cobertura.tsx` ni `cobertura-map.tsx`.
+      Pendiente confirmar con backend si existe el campo que distingue
+      "sucursal" de "centro de distribución" (`Sucursal.tipo` en
+      `src/types/sucursal.ts` es un campo inventado en el frontend, no viene
+      de `ListadoOficinas`).
+- [ ] **El resto de Home sigue estático/local** — rastreo, cotización y
+      envío aún no llaman a la API SIBOX (ni al BFF, que no existe todavía).
+      Siguiente paso lógico: crear `src/lib/api/` con el cliente tipado +
+      Route Handlers, empezando por `wsRastreo` (rastreo del hero) según el
+      plan semana 1.
 - [ ] Sin páginas adicionales (`/rastreo`, `/cotizar`, `/envio`, `/cobertura`,
       `/somos`, `/soporte`, `/cuenta/iniciar-sesion`) — el Navbar/Footer ya
       enlazan a esas rutas pero no existen todavía (404 en Next hasta que se
