@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@/components/auth/auth-provider";
 
 const NAV_LINKS = [
   { label: "Envío", href: "/envio", hasChevron: true },
@@ -13,6 +14,7 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { session, openLogin, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-nav">
@@ -59,12 +61,28 @@ export function Navbar() {
               <Image src="/icons/search.svg" alt="" width={22} height={22} />
             </span>
           </button>
-          <Link
-            href="/cuenta/iniciar-sesion"
-            className="inline-flex items-center justify-center rounded-md border-2 border-white bg-white px-6 py-3 font-display text-base font-bold text-primary transition-colors hover:bg-white/90"
-          >
-            Iniciar sesión
-          </Link>
+          {session ? (
+            <div className="flex items-center gap-3">
+              <span className="font-display text-base font-bold text-white">
+                Hola, {session.nombre}
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="inline-flex items-center justify-center rounded-md border-2 border-white/60 px-4 py-3 font-display text-sm font-bold text-white transition-colors hover:border-white"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={openLogin}
+              className="inline-flex items-center justify-center rounded-md border-2 border-white bg-white px-6 py-3 font-display text-base font-bold text-primary transition-colors hover:bg-white/90"
+            >
+              Iniciar sesión
+            </button>
+          )}
         </div>
 
         <button
@@ -92,13 +110,34 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/cuenta/iniciar-sesion"
-              className="mt-2 inline-flex items-center justify-center rounded-md border-2 border-white bg-white px-6 py-3 font-display text-base font-bold text-primary"
-              onClick={() => setOpen(false)}
-            >
-              Iniciar sesión
-            </Link>
+            {session ? (
+              <div className="mt-2 flex flex-col items-start gap-3">
+                <span className="font-display text-base font-bold text-white">
+                  Hola, {session.nombre}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    logout();
+                    setOpen(false);
+                  }}
+                  className="inline-flex items-center justify-center rounded-md border-2 border-white/60 px-4 py-3 font-display text-sm font-bold text-white"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  openLogin();
+                  setOpen(false);
+                }}
+                className="mt-2 inline-flex items-center justify-center rounded-md border-2 border-white bg-white px-6 py-3 font-display text-base font-bold text-primary"
+              >
+                Iniciar sesión
+              </button>
+            )}
           </nav>
         </div>
       )}

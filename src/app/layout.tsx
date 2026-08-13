@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ChatWidget } from "@/components/ui/chat-widget";
+import { AuthProvider } from "@/components/auth/auth-provider";
+import { LoginModal } from "@/components/auth/login-modal";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -21,10 +23,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <ChatWidget />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <ChatWidget />
+          <LoginModal />
+        </AuthProvider>
       </body>
     </html>
   );

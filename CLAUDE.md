@@ -240,6 +240,35 @@ cliente para cada demo semanal.
         ejemplo (`FAQ_TOPICS` hardcodeado en el mismo archivo) — contenido
         de relleno, pendiente que Inbox entregue las preguntas/respuestas
         reales.
+- [x] **Modal de "Iniciar sesión"** (`src/components/auth/`) — Figma node
+      `136:7385`, componente global (no de Home): `AuthProvider` envuelve
+      todo en `layout.tsx` y expone `useAuth()` (`session`, `openLogin`,
+      `closeLogin`, `login`, `logout`); el botón "Iniciar sesión" del
+      `Navbar` solo llama `openLogin()`, así que el modal puede abrirse
+      desde cualquier página sin volver a montarlo.
+      - **Se quitó el botón "Iniciar sesión con Google"** del diseño: no
+        hay endpoint OAuth en la especificación de la API SIBOX y el sitio
+        actual tampoco lo tiene — decisión explícita del usuario
+        (2026-08-12), no un olvido. Si el cliente lo pide más adelante, es
+        un botón nuevo en `login-modal.tsx` + la integración OAuth
+        correspondiente (NextAuth u otro), no algo que ya esté a medias.
+      - Conectado a `src/lib/auth.ts` (`loginRequest()`), mismo patrón seam
+        que el resto: hoy resuelve contra `src/lib/mock/auth.ts` (usuario
+        `INBOX` / contraseña `Prueba`, el ejemplo exacto del PDF de la API).
+        Al conectar el BFF real, importa recordar que `Login` responde
+        `{success, mensaje, data}` — **no** `{resp:{result,data}}` como casi
+        todos los demás endpoints (ver sección 4) — y que el token real debe
+        quedar en una cookie Secure/HttpOnly puesta por el Route Handler,
+        nunca devuelto al cliente (regla de seguridad 6).
+      - Estados de error ya cubiertos en `login-modal.tsx`: campos vacíos
+        ("Debe indicar el usuario/contraseña", mensaje real de la API),
+        credenciales inválidas ("Usuario o contraseña incorrectos"), y un
+        catch genérico para fallas de red una vez que sea un `fetch` real.
+      - **`session` en `AuthProvider` es 100% de demo**: vive solo en
+        estado de React, se pierde al recargar la página, no hay cookie ni
+        persistencia. No construir nada encima asumiendo que es una sesión
+        real — cuando exista el BFF, esto debe leer la sesión desde el
+        servidor (cookie), no seguir siendo un `useState` local.
 - [ ] **El resto de Home sigue estático/local** — la cotización y el envío
       de guía aún no llaman a la API SIBOX (ni al BFF, que no existe
       todavía). Siguiente paso lógico: crear `src/lib/api/` con el cliente
