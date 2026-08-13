@@ -352,6 +352,32 @@ es un `RastreoCard` independiente (una guía que falla no rompe las demás).
   (comentadas explícitamente en `rastreo-card.tsx`), preguntar a backend de
   dónde deberían salir de verdad.
 
+### `/envio`
+Perfil de envíos protegido visualmente con los Figma nodes `388:39626`
+(principal), `713:27881` (detalle) y `399:19075` (asignar nombre/alias).
+
+- Usa el `AuthProvider` existente. Sin sesión abre automáticamente el popup
+  global de login y no muestra ni carga los datos de envíos; si el usuario lo
+  cierra, queda un estado protegido desde el que puede abrirlo otra vez.
+- **Gate de demo, no autenticación ni seguridad real**: la sesión vive en
+  estado React y se pierde al recargar. La versión real debe validar una cookie
+  `Secure`, `HttpOnly` y `SameSite` en el BFF/servidor, además de comprobar
+  autorización a nivel de objeto en cada guía solicitada.
+- Lista con búsqueda y selección, timeline de 4 pasos mediante la heurística
+  no autoritativa `pasoDesdeEstatus()`, y tabla de `RastreoDetalle` que se carga
+  bajo demanda y queda cacheada en cliente.
+- Modal de alias con máximo 60 caracteres. Persiste solo para la demo en
+  `localStorage`, con clave usuario + guía; el backend futuro debe asociarlo a
+  la cuenta autenticada y volver a autorizar la guía.
+- Seam de datos en `src/lib/envios.ts`, actualmente respaldado por
+  `src/lib/mock/envios.ts`. No hay endpoint documentado de historial asociado
+  a cuenta; fechas y código de rastreo son aproximaciones. La UI lo declara con
+  la etiqueta visible **"Datos demo"** para no confundirlo con información
+  productiva.
+- CTA "Hacer un nuevo envío" y "Cotizar nuevo envío" llevan a `/cotizar`.
+  Se verificó manualmente la vista responsive en desktop/mobile y las
+  interacciones de gate, búsqueda, selección, detalle, alias y CTA.
+
 ### `/somos`
 Figma node `324:26623`. Composición de piezas existentes de Home (pedido
 explícito del usuario). `SomosHero` es variante del banner de `Hero` sin
@@ -375,8 +401,9 @@ propio de esta página.
   sucursal).
 
 ### Todavía no existen
-- `/envio`, `/soporte` — el Navbar/Footer ya enlazan ahí pero dan 404.
-- Pruebas automatizadas (Vitest/Playwright).
+- `/soporte` — el Navbar/Footer ya enlazan ahí pero da 404.
+- Playwright/E2E. Vitest ya está configurado (`npm test`) y actualmente hay
+  14 pruebas automatizadas.
 - La capa BFF real (`src/lib/api/` + Route Handlers) — todo sigue siendo
   mocks resueltos client-side detrás de los seams.
 

@@ -384,6 +384,38 @@ cliente para cada demo semanal.
         pedir datos que quizá nunca se vean).
       - Reutiliza el componente `Faq` de Home tal cual (las preguntas son
         genéricas, no específicas de una página).
+- [x] **Página protegida `/envio`** (`src/app/envio/page.tsx` +
+      `src/components/envios/*`) — Figma nodes `388:39626` (vista principal),
+      `713:27881` (detalle) y `399:19075` (asignar nombre/alias).
+      - Usa el `AuthProvider` global existente como gate: sin `session` abre
+        automáticamente el modal de inicio de sesión y no muestra ni solicita
+        la lista de envíos. Si se cierra el modal, queda un estado protegido
+        con la opción de volver a abrirlo.
+      - **Esto es solamente una demo cliente, no seguridad real**:
+        `AuthProvider.session` vive en React y se pierde al recargar. Al
+        conectar el BFF, la sesión debe validarse del lado servidor mediante
+        cookie `Secure`, `HttpOnly` y `SameSite`, y cada consulta de guía debe
+        aplicar autorización a nivel de objeto para impedir que una cuenta vea
+        envíos ajenos.
+      - Incluye búsqueda, selección de envío, timeline de 4 pasos calculado
+        con la heurística no autoritativa `pasoDesdeEstatus()`, y tabla de
+        detalle cargada bajo demanda desde el mock `RastreoDetalle`. El detalle
+        se conserva en caché cliente después de la primera apertura.
+      - El alias se edita en modal, se limita a 60 caracteres y persiste en
+        `localStorage` con una clave compuesta por usuario + guía. Esa
+        persistencia también es solo de demo; el BFF futuro debe guardar el
+        alias asociado a la cuenta autenticada y autorizar cada guía.
+      - La UI muestra la etiqueta visible **"Datos demo"**. Las fechas y el
+        código de rastreo son aproximaciones porque la API documentada no
+        expone todos los campos del Figma; tampoco existe aún un endpoint
+        documentado para obtener el historial de envíos asociado a una
+        cuenta.
+      - El seam es `src/lib/envios.ts` y hoy resuelve contra
+        `src/lib/mock/envios.ts`, listo para sustituirse por el BFF sin cambiar
+        los componentes. Los CTA "Hacer un nuevo envío" y "Cotizar nuevo
+        envío" navegan a `/cotizar`. La vista fue verificada manualmente en
+        desktop y mobile, incluyendo login gate, búsqueda, selección, detalle,
+        alias y CTA.
 - [x] **Página `/somos`** (`src/app/somos/page.tsx` + `src/components/somos/*`)
       — Figma node `324:26623`. No trae seams nuevos: es una composición de
       piezas que ya existían para Home, tal como pediste ("la sección de tu
@@ -431,10 +463,10 @@ cliente para cada demo semanal.
       - Se quitó el `<Popup>` nativo de Leaflet que tenía cada marcador
         (`cobertura-map.tsx`) — mostraba la misma información dos veces
         (el popup de Leaflet y el panel nuevo) al mismo tiempo.
-- [ ] Sin páginas adicionales (`/envio`, `/soporte`)
-      — el Navbar/Footer ya enlazan a esas rutas pero no existen todavía
-      (404 en Next hasta que se creen).
-- [ ] Sin pruebas automatizadas (Vitest/Playwright) todavía.
+- [ ] Sin página `/soporte` — el Navbar/Footer ya enlazan a esa ruta pero
+      todavía da 404.
+- [x] Vitest configurado (`npm test`), con 14 pruebas automatizadas actuales.
+      Playwright/E2E sigue pendiente.
 
 ## 8. Cómo correr el proyecto
 
