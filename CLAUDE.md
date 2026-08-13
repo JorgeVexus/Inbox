@@ -384,7 +384,29 @@ cliente para cada demo semanal.
         pedir datos que quizá nunca se vean).
       - Reutiliza el componente `Faq` de Home tal cual (las preguntas son
         genéricas, no específicas de una página).
-- [ ] Sin páginas adicionales (`/envio`, `/cobertura`, `/somos`, `/soporte`)
+- [x] **Página `/somos`** (`src/app/somos/page.tsx` + `src/components/somos/*`)
+      — Figma node `324:26623`. No trae seams nuevos: es una composición de
+      piezas que ya existían para Home, tal como pediste ("la sección de tu
+      inbox más cercana, será la misma de home").
+      - `SomosHero` es una variante del banner de `Hero` de Home (mismas 4
+        fotos rotando, mismo overlay oscuro) pero sin el buscador de rastreo;
+        en su lugar tiene la tarjeta blanca de headline "Inbox, una solución
+        confiable que crece contigo" superpuesta al borde inferior del
+        banner, igual patrón de margen negativo que la quote card de Home.
+      - `SomosHistoria` reproduce el contenido de `AboutUs` (mismas 4
+        tarjetas: Nuestra historia / Conectamos destinos / Lo que nos mueve /
+        Comprometidos contigo) pero **no es el mismo componente**: en el
+        Figma de Somos no hay botón "Saber más" (sería un link circular a la
+        propia página) y la imagen es una camioneta distinta
+        (`/images/somos-auto.png`, exportada de Figma) en vez del camión de
+        Home — layouts distintos, así que se separaron en vez de forzar
+        props condicionales sobre `AboutUs`.
+      - `Servicios`, `CoberturaCTA` y `Faq` se importan **tal cual** de
+        `@/components/home/*` sin ningún wrapper — el Figma de Somos usa el
+        mismo copy palabra por palabra. `Cobertura` (el mapa Leaflet) no se
+        incluyó porque el Figma de esta página no lo muestra, solo la tarjeta
+        de estado/ciudad de `CoberturaCTA`.
+- [ ] Sin páginas adicionales (`/envio`, `/cobertura`, `/soporte`)
       — el Navbar/Footer ya enlazan a esas rutas pero no existen todavía
       (404 en Next hasta que se creen).
 - [ ] Sin pruebas automatizadas (Vitest/Playwright) todavía.
