@@ -30,13 +30,19 @@ function NombreEnvioForm({
   const [solicitudEnviada, setSolicitudEnviada] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const submittedRef = useRef(false);
+  const vioGuardandoRef = useRef(false);
+  const onCerrarRef = useRef(onCerrar);
+
+  useEffect(() => {
+    onCerrarRef.current = onCerrar;
+  }, [onCerrar]);
 
   useEffect(() => {
     const elementoAnterior = document.activeElement;
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        onCerrar();
+        onCerrarRef.current();
         return;
       }
 
@@ -52,7 +58,10 @@ function NombreEnvioForm({
 
       const primero = elementos[0];
       const ultimo = elementos[elementos.length - 1];
-      if (event.shiftKey && document.activeElement === primero) {
+      if (!panelRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? ultimo : primero).focus();
+      } else if (event.shiftKey && document.activeElement === primero) {
         event.preventDefault();
         ultimo.focus();
       } else if (!event.shiftKey && document.activeElement === ultimo) {
@@ -66,16 +75,22 @@ function NombreEnvioForm({
       window.removeEventListener("keydown", onKeyDown);
       if (elementoAnterior instanceof HTMLElement) elementoAnterior.focus();
     };
-  }, [onCerrar]);
+  }, []);
 
   useEffect(() => {
-    if (!error) return;
+    if (guardando) {
+      vioGuardandoRef.current = true;
+      return;
+    }
 
+    if (!vioGuardandoRef.current && !error) return;
+
+    vioGuardandoRef.current = false;
     submittedRef.current = false;
     // Defer the visual reset to avoid a synchronous state update in an effect.
     const reset = window.setTimeout(() => setSolicitudEnviada(false), 0);
     return () => window.clearTimeout(reset);
-  }, [error]);
+  }, [guardando, error]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
