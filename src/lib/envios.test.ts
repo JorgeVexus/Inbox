@@ -6,7 +6,7 @@ import type { EnvioPerfil } from "../types/envio";
 const envios: EnvioPerfil[] = [
   {
     guia: "1234567890",
-    nombre: "Regalo para Mamá",
+    nombre: "Paquete ropa",
     rastreo: {
       Guia: "1234567890",
       F_Documentacion: "2026-08-12",
@@ -24,6 +24,27 @@ const envios: EnvioPerfil[] = [
       Recibio: null,
     },
     fechaProgramada: "2026-08-15",
+  },
+  {
+    guia: "9876543210",
+    nombre: "Documentos",
+    rastreo: {
+      Guia: "9876543210",
+      F_Documentacion: "2026-08-11",
+      OficinaEstatus: "Guadalajara",
+      F_Estatus: "2026-08-12",
+      Estatus: "Documentada",
+      Remitente: "Luis",
+      EstadoOrigen: "Jalisco",
+      CdOrigen: "Guadalajara",
+      Origen: "GDL",
+      Destinatario: "Ana",
+      EstadoDestino: "Nuevo León",
+      CdDestino: "Monterrey",
+      Destino: "MTY",
+      Recibio: null,
+    },
+    fechaProgramada: "2026-08-16",
   },
 ];
 
@@ -52,11 +73,11 @@ describe("validarNombreEnvio", () => {
 
 describe("filtrarEnvios", () => {
   it("busca el alias sin distinguir mayúsculas con locale es-MX", () => {
-    expect(filtrarEnvios(envios, "regalo PARA mamá")).toEqual(envios);
+    expect(filtrarEnvios(envios, "PAQUETE ROPA")).toEqual([envios[0]]);
   });
 
   it("busca por número de guía", () => {
-    expect(filtrarEnvios(envios, "456789")).toEqual(envios);
+    expect(filtrarEnvios(envios, "765432")).toEqual([envios[1]]);
   });
 
   it("devuelve la colección original si la consulta está vacía", () => {
