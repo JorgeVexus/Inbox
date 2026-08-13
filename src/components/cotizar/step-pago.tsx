@@ -415,13 +415,7 @@ function TarjetaForm({
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-          <CardPreview
-            numero={value.numero}
-            nombreTitular={value.nombreTitular}
-            vencimiento={value.vencimiento}
-          />
-
+        <div className="flex flex-col items-center gap-6">
           <div className="flex w-full flex-col gap-4 rounded-md bg-white p-6 shadow-card sm:max-w-[400px]">
             <Field label="Número de tarjeta">
               <input
@@ -468,6 +462,12 @@ function TarjetaForm({
               </Field>
             </div>
           </div>
+
+          <CardPreview
+            numero={value.numero}
+            nombreTitular={value.nombreTitular}
+            vencimiento={value.vencimiento}
+          />
         </div>
       </div>
 
