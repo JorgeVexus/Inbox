@@ -352,6 +352,34 @@ function MetodoBoton({
   );
 }
 
+/**
+ * Card number/expiry formatting and network detection are pure client-side
+ * logic (Luhn-style prefix ranges) — they don't depend on SIBOX or any
+ * backend. Identifying the *issuing bank* (e.g. "BBVA") instead of just the
+ * network would require a BIN-lookup service, which is a separate external
+ * API (not part of the SIBOX spec) — intentionally not wired here.
+ */
+function formatNumeroTarjeta(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 16);
+  return (digits.match(/.{1,4}/g) ?? []).join(" ");
+}
+
+function formatVencimiento(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+type MarcaTarjeta = "visa" | "mastercard" | "amex" | null;
+
+function detectarMarca(numero: string): MarcaTarjeta {
+  const digits = numero.replace(/\D/g, "");
+  if (/^4/.test(digits)) return "visa";
+  if (/^5[1-5]/.test(digits) || /^2(2[2-9]|[3-6]\d|7[01]|720)/.test(digits)) return "mastercard";
+  if (/^3[47]/.test(digits)) return "amex";
+  return null;
+}
+
 function TarjetaForm({
   value,
   onChange,
@@ -387,49 +415,58 @@ function TarjetaForm({
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 rounded-md bg-white p-6 shadow-card sm:max-w-[400px]">
-          <Field label="Número de tarjeta">
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={19}
-              value={value.numero}
-              onChange={(e) => set("numero", e.target.value)}
-              placeholder="0000 0000 0000 0000"
-              className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-            />
-          </Field>
-          <Field label="Nombre del titular">
-            <input
-              type="text"
-              value={value.nombreTitular}
-              onChange={(e) => set("nombreTitular", e.target.value)}
-              placeholder="Como aparece en la tarjeta"
-              className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-            />
-          </Field>
-          <div className="flex gap-4">
-            <Field label="Vencimiento" className="flex-1">
-              <input
-                type="text"
-                maxLength={5}
-                value={value.vencimiento}
-                onChange={(e) => set("vencimiento", e.target.value)}
-                placeholder="MM/AA"
-                className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-              />
-            </Field>
-            <Field label="CVV" className="flex-1">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+          <CardPreview
+            numero={value.numero}
+            nombreTitular={value.nombreTitular}
+            vencimiento={value.vencimiento}
+          />
+
+          <div className="flex w-full flex-col gap-4 rounded-md bg-white p-6 shadow-card sm:max-w-[400px]">
+            <Field label="Número de tarjeta">
               <input
                 type="text"
                 inputMode="numeric"
-                maxLength={4}
-                value={value.cvv}
-                onChange={(e) => set("cvv", e.target.value)}
-                placeholder="123"
+                maxLength={19}
+                value={value.numero}
+                onChange={(e) => set("numero", formatNumeroTarjeta(e.target.value))}
+                placeholder="0000 0000 0000 0000"
                 className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </Field>
+            <Field label="Nombre del titular">
+              <input
+                type="text"
+                value={value.nombreTitular}
+                onChange={(e) => set("nombreTitular", e.target.value)}
+                placeholder="Como aparece en la tarjeta"
+                className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+              />
+            </Field>
+            <div className="flex gap-4">
+              <Field label="Vencimiento" className="flex-1">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={5}
+                  value={value.vencimiento}
+                  onChange={(e) => set("vencimiento", formatVencimiento(e.target.value))}
+                  placeholder="MM/AA"
+                  className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+                />
+              </Field>
+              <Field label="CVV" className="flex-1">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={value.cvv}
+                  onChange={(e) => set("cvv", e.target.value.replace(/\D/g, ""))}
+                  placeholder="123"
+                  className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+                />
+              </Field>
+            </div>
           </div>
         </div>
       </div>
@@ -442,6 +479,73 @@ function TarjetaForm({
       </Button>
     </div>
   );
+}
+
+function CardPreview({
+  numero,
+  nombreTitular,
+  vencimiento,
+}: {
+  numero: string;
+  nombreTitular: string;
+  vencimiento: string;
+}) {
+  const digits = numero.replace(/\D/g, "");
+  const marca = detectarMarca(numero);
+  const padded = digits.padEnd(16, "•");
+  const groups = [0, 1, 2, 3].map((i) => {
+    const group = padded.slice(i * 4, i * 4 + 4);
+    return i < 3 ? group.replace(/[0-9]/g, "•") : group;
+  });
+
+  return (
+    <div className="relative h-[201px] w-[331px] shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-blue-700 to-blue-950 p-6 text-white shadow-card">
+      <div className="h-8 w-11 rounded bg-gradient-to-br from-yellow-300 to-yellow-500" />
+
+      <p className="mt-8 font-mono text-lg tracking-widest">
+        {groups.join(" ")}
+      </p>
+
+      <div className="mt-6 flex items-end justify-between">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[9px] uppercase text-white/60">Titular</span>
+          <span className="max-w-[180px] truncate text-xs font-medium uppercase">
+            {nombreTitular || "Nombre del titular"}
+          </span>
+        </div>
+        <div className="flex flex-col items-end gap-0.5">
+          <span className="text-[9px] uppercase text-white/60">Vence</span>
+          <span className="text-xs font-medium">{vencimiento || "MM/AA"}</span>
+        </div>
+      </div>
+
+      <div className="absolute bottom-5 right-6">
+        <MarcaLogo marca={marca} />
+      </div>
+    </div>
+  );
+}
+
+function MarcaLogo({ marca }: { marca: MarcaTarjeta }) {
+  if (marca === "visa") {
+    return <span className="font-display text-xl italic font-bold">VISA</span>;
+  }
+  if (marca === "mastercard") {
+    return (
+      <div className="flex" aria-label="Mastercard">
+        <span className="h-6 w-6 rounded-full bg-red-500/90" />
+        <span className="-ml-2.5 h-6 w-6 rounded-full bg-orange-400/90 mix-blend-screen" />
+      </div>
+    );
+  }
+  if (marca === "amex") {
+    return (
+      <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-blue-800">
+        AMEX
+      </span>
+    );
+  }
+  return null;
 }
 
 function Field({
