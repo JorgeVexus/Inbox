@@ -6,7 +6,7 @@ import type { EnvioPerfil } from "../types/envio";
 const envios: EnvioPerfil[] = [
   {
     guia: "1234567890",
-    nombre: "Paquete ropa",
+    nombre: "Paquete para mamá",
     rastreo: {
       Guia: "1234567890",
       F_Documentacion: "2026-08-12",
@@ -73,7 +73,11 @@ describe("validarNombreEnvio", () => {
 
 describe("filtrarEnvios", () => {
   it("busca el alias sin distinguir mayúsculas con locale es-MX", () => {
-    expect(filtrarEnvios(envios, "PAQUETE ROPA")).toEqual([envios[0]]);
+    expect(filtrarEnvios(envios, "PAQUETE PARA MAMÁ")).toEqual([envios[0]]);
+  });
+
+  it("busca aliases equivalentes con acentos en forma NFD", () => {
+    expect(filtrarEnvios(envios, "MAMA\u0301")).toEqual([envios[0]]);
   });
 
   it("busca por número de guía", () => {

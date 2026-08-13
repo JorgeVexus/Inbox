@@ -21,12 +21,16 @@ export function filtrarEnvios(
   envios: EnvioPerfil[],
   consulta: string,
 ): EnvioPerfil[] {
-  const consultaNormalizada = consulta.trim().toLocaleLowerCase("es-MX");
+  const consultaNormalizada = consulta
+    .trim()
+    .normalize("NFC")
+    .toLocaleLowerCase("es-MX");
 
   if (!consultaNormalizada) return envios;
 
   return envios.filter((envio) =>
     `${envio.nombre} ${envio.guia}`
+      .normalize("NFC")
       .toLocaleLowerCase("es-MX")
       .includes(consultaNormalizada),
   );
