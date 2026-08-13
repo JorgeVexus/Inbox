@@ -10,9 +10,9 @@ import type { EnvioPerfil } from "@/types/envio";
  * approximate demo value until the backend contract confirms the real dates.
  */
 const DEFINICIONES_ENVIO = [
-  { guia: "4003229791", nombre: "Paquete ropa", fechaProgramada: "2007-10-31" },
-  { guia: "4159473741", nombre: "Paquete cositas", fechaProgramada: "2026-08-04" },
-  { guia: "4157067169", nombre: "Pkt mamá", fechaProgramada: "2026-08-03" },
+  { guia: "4003229791", nombre: "Paquete ropa", fechaProgramada: "31/10/2007" },
+  { guia: "4159473741", nombre: "Paquete cositas", fechaProgramada: "04/08/2026" },
+  { guia: "4157067169", nombre: "Pkt mamá", fechaProgramada: "03/08/2026" },
 ] as const;
 
 export const MOCK_ENVIOS: EnvioPerfil[] = DEFINICIONES_ENVIO.map(

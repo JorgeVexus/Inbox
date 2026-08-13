@@ -54,11 +54,15 @@ export function EnvioResumen({
       <div className="py-7">
         <ol aria-label="Progreso del envío" className="grid grid-cols-4 gap-1 sm:gap-3">
           {PASOS.map((paso, indice) => {
-            const alcanzado = indice <= pasoActual;
             const completado = indice < pasoActual;
+            const actual = indice === pasoActual;
 
             return (
-              <li key={paso.label} className="relative flex min-w-0 flex-col items-center text-center">
+              <li
+                key={paso.label}
+                aria-current={actual ? "step" : undefined}
+                className="relative flex min-w-0 flex-col items-center text-center"
+              >
                 {indice > 0 && (
                   <span
                     aria-hidden="true"
@@ -70,8 +74,12 @@ export function EnvioResumen({
                   />
                 )}
                 <span
-                  className={`relative z-10 flex size-14 items-center justify-center rounded-full border-2 bg-white p-2 sm:size-[74px] sm:p-3 ${
-                    alcanzado ? "border-primary" : "border-secondary-dark/50"
+                  className={`relative z-10 flex size-14 items-center justify-center rounded-full border-2 p-2 sm:size-[74px] sm:p-3 ${
+                    completado
+                      ? "border-primary bg-primary"
+                      : actual
+                        ? "border-primary bg-white"
+                        : "border-secondary-dark/50 bg-white"
                   }`}
                 >
                   <Image
@@ -79,12 +87,14 @@ export function EnvioResumen({
                     alt=""
                     width={48}
                     height={48}
-                    className={`size-full object-contain ${alcanzado ? "" : "grayscale opacity-50"}`}
+                    className={`size-full object-contain ${
+                      completado ? "invert" : actual ? "" : "grayscale opacity-50"
+                    }`}
                   />
                 </span>
                 <span
                   className={`mt-2 max-w-[130px] text-[10px] font-medium leading-tight sm:text-sm ${
-                    alcanzado ? "text-black" : "text-black/70"
+                    completado || actual ? "text-black" : "text-black/70"
                   }`}
                 >
                   {paso.label}
