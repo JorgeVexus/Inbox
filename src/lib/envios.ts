@@ -13,7 +13,8 @@ function esperarMock(): Promise<void> {
 }
 
 export function claveAliasEnvio(usuario: string, guia: string): string {
-  return `inbox:envio-alias:${encodeURIComponent(usuario)}:${encodeURIComponent(guia)}`;
+  const usuarioCanonico = usuario.trim().toLocaleUpperCase("es-MX");
+  return `inbox:envio-alias:${encodeURIComponent(usuarioCanonico)}:${encodeURIComponent(guia.trim())}`;
 }
 
 export async function listarEnvios(usuario: string): Promise<EnvioPerfil[]> {

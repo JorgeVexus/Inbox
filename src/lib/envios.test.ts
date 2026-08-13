@@ -106,6 +106,12 @@ describe("seam de envios", () => {
     );
   });
 
+  it("normaliza la identidad del usuario para compartir sus aliases", () => {
+    expect(claveAliasEnvio(" inbox ", "4003229791")).toBe(
+      claveAliasEnvio("INBOX", "4003229791"),
+    );
+  });
+
   it("devuelve aliases iniciales en SSR", async () => {
     const resultado = await listarEnvios("INBOX");
 
