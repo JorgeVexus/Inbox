@@ -1,4 +1,75 @@
-import type { EnvioPerfil, GuardarNombreResult } from "@/types/envio";
+import { MOCK_ENVIOS } from "./mock/envios";
+import { MOCK_RASTREO_DETALLE } from "./mock/rastreo";
+import type {
+  EnvioDetalle,
+  EnvioPerfil,
+  GuardarNombreResult,
+} from "@/types/envio";
+
+const LATENCIA_MOCK_MS = 350;
+
+function esperarMock(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, LATENCIA_MOCK_MS));
+}
+
+export function claveAliasEnvio(usuario: string, guia: string): string {
+  return `inbox:envio-alias:${encodeURIComponent(usuario)}:${encodeURIComponent(guia)}`;
+}
+
+export async function listarEnvios(usuario: string): Promise<EnvioPerfil[]> {
+  await esperarMock();
+
+  return MOCK_ENVIOS.map((envio) => {
+    let nombre = envio.nombre;
+
+    if (typeof window !== "undefined") {
+      try {
+        nombre = window.localStorage.getItem(claveAliasEnvio(usuario, envio.guia)) ?? nombre;
+      } catch {
+        // Storage can be unavailable in privacy mode; defaults remain usable.
+      }
+    }
+
+    return { ...envio, nombre, rastreo: { ...envio.rastreo } };
+  });
+}
+
+export async function obtenerDetalleEnvio(
+  guia: string,
+): Promise<EnvioDetalle | null> {
+  await esperarMock();
+  const guiaLimpia = guia.trim();
+  const eventos = MOCK_RASTREO_DETALLE[guiaLimpia];
+
+  return eventos
+    ? { guia: guiaLimpia, eventos: eventos.map((evento) => ({ ...evento })) }
+    : null;
+}
+
+export async function asignarNombreEnvio(
+  usuario: string,
+  guia: string,
+  valor: string,
+): Promise<GuardarNombreResult> {
+  const validacion = validarNombreEnvio(valor);
+  if (!validacion.ok) return validacion;
+
+  await esperarMock();
+
+  try {
+    if (typeof window === "undefined") throw new Error("Storage no disponible");
+    window.localStorage.setItem(
+      claveAliasEnvio(usuario, guia),
+      validacion.nombre,
+    );
+    return validacion;
+  } catch {
+    return {
+      ok: false,
+      mensaje: "No pudimos guardar el nombre del envío. Intenta de nuevo.",
+    };
+  }
+}
 
 export function validarNombreEnvio(nombre: string): GuardarNombreResult {
   const nombreNormalizado = nombre.trim().replace(/\s+/g, " ");
