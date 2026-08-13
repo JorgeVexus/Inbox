@@ -116,7 +116,7 @@ export function EnviosView() {
           usuario,
           envios: [],
           cargando: false,
-          error: "No pudimos cargar tus envÃ­os. Intenta de nuevo.",
+          error: "No pudimos cargar tus envíos. Intenta de nuevo.",
         });
       });
   }, [reintentoLista, usuario]);
@@ -157,7 +157,7 @@ export function EnviosView() {
             : {
                 detalle: null,
                 cargando: false,
-                error: "No encontramos el historial de este envÃ­o.",
+                error: "No encontramos el historial de este envío.",
               },
         }));
       })
@@ -205,7 +205,7 @@ export function EnviosView() {
         usuarioSolicitud === usuarioActivoRef.current
       ) {
         setGuardandoAlias(false);
-        setErrorAlias("No pudimos guardar el nombre del envÃ­o. Intenta de nuevo.");
+        setErrorAlias("No pudimos guardar el nombre del envío. Intenta de nuevo.");
       }
       return;
     }
@@ -233,16 +233,16 @@ export function EnviosView() {
     return (
       <main className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
         <section className="w-full max-w-xl rounded-md border border-neutral-line bg-white px-6 py-12 text-center shadow-card-sm sm:px-12">
-          <p className="font-display text-sm font-bold text-primary">MIS ENVÃOS</p>
+          <p className="font-display text-sm font-bold text-primary">MIS ENVÍOS</p>
           <h1 className="mt-3 font-display text-3xl font-bold text-black sm:text-4xl">
-            Inicia sesiÃ³n para consultar tus envÃ­os
+            Inicia sesión para consultar tus envíos
           </h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-black/70 sm:text-base">
-            Tu historial, datos de guÃ­a y movimientos estÃ¡n protegidos y solo se muestran dentro de tu cuenta.
+            Tu historial, datos de guía y movimientos están protegidos y solo se muestran dentro de tu cuenta.
           </p>
           {!isLoginOpen && (
             <Button type="button" onClick={openLogin} className="mt-7">
-              Iniciar sesiÃ³n
+              Iniciar sesión
             </Button>
           )}
         </section>
@@ -256,28 +256,28 @@ export function EnviosView() {
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
           <Link href="/" className="transition-colors hover:text-primary">Inicio</Link>
           <span aria-hidden="true" className="mx-2">›</span>
-          <span aria-current="page" className="font-bold text-black">Mis envÃ­os</span>
+          <span aria-current="page" className="font-bold text-black">Mis envíos</span>
         </nav>
 
         <div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-display text-4xl font-bold text-black sm:text-5xl">Mis envÃ­os</h1>
+              <h1 className="font-display text-4xl font-bold text-black sm:text-5xl">Mis envíos</h1>
               <span className="rounded-full bg-secondary/25 px-3 py-1 text-xs font-bold text-primary">Datos demo</span>
             </div>
             <p className="mt-3 max-w-xl text-sm leading-6 text-black/70 sm:text-base">
-              Consulta el estado, los movimientos y el nombre de cada envÃ­o asociado a tu cuenta.
+              Consulta el estado, los movimientos y el nombre de cada envío asociado a tu cuenta.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button href="/cotizar" variant="outline" className="w-full sm:w-auto">Cotizar nuevo envÃ­o</Button>
-            <Button href="/cotizar" className="w-full sm:w-auto">Hacer un nuevo envÃ­o</Button>
+            <Button href="/cotizar" variant="outline" className="w-full sm:w-auto">Cotizar nuevo envío</Button>
+            <Button href="/cotizar" className="w-full sm:w-auto">Hacer un nuevo envío</Button>
           </div>
         </div>
 
         {listaVisible.cargando ? (
           <section aria-live="polite" aria-busy="true" className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
-            <p className="text-sm text-black/70">Cargando tus envÃ­osâ€¦</p>
+            <p className="text-sm text-black/70">Cargando tus envíos…</p>
           </section>
         ) : listaVisible.error ? (
           <section className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
@@ -286,9 +286,9 @@ export function EnviosView() {
           </section>
         ) : listaVisible.envios.length === 0 ? (
           <section className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
-            <h2 className="font-display text-2xl font-bold text-black">AÃºn no tienes envÃ­os</h2>
-            <p className="mt-3 text-sm text-black/70">Cotiza tu primer envÃ­o para comenzar.</p>
-            <Button href="/cotizar" className="mt-5">Cotizar nuevo envÃ­o</Button>
+            <h2 className="font-display text-2xl font-bold text-black">Aún no tienes envíos</h2>
+            <p className="mt-3 text-sm text-black/70">Cotiza tu primer envío para comenzar.</p>
+            <Button href="/cotizar" className="mt-5">Cotizar nuevo envío</Button>
           </section>
         ) : (
           <div className="mt-10 grid items-start gap-6 lg:grid-cols-[310px_minmax(0,1fr)]">
@@ -326,7 +326,7 @@ export function EnviosView() {
                 </>
               ) : (
                 <section className="rounded-md bg-white p-10 text-center shadow-card-sm">
-                  <p className="text-sm text-black/70">No hay envÃ­os que coincidan con tu bÃºsqueda.</p>
+                  <p className="text-sm text-black/70">No hay envíos que coincidan con tu búsqueda.</p>
                 </section>
               )}
             </div>
