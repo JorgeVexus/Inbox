@@ -14,7 +14,15 @@ const SLIDES = [
 ];
 
 export function Hero() {
+  const router = useRouter();
   const [slide, setSlide] = useState(0);
+  const [guia, setGuia] = useState("");
+
+  function handleRastrear(e: React.FormEvent) {
+    e.preventDefault();
+    if (!guia.trim()) return;
+    router.push(`/rastreo?guias=${encodeURIComponent(guia.trim())}`);
+  }
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -48,11 +56,13 @@ export function Hero() {
           <h1 className="text-center font-sans text-2xl font-extrabold text-white sm:text-3xl">
             Rastree su envío
           </h1>
-          <form className="flex w-full max-w-[406px] items-center gap-4">
+          <form onSubmit={handleRastrear} className="flex w-full max-w-[406px] items-center gap-4">
             <input
               type="text"
+              value={guia}
+              onChange={(e) => setGuia(e.target.value)}
               placeholder="Ingrese el número de rastreo"
-              className="h-[53px] flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-secondary-dark shadow-card outline-none"
+              className="h-[53px] flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
             <Button type="submit">Rastrear</Button>
           </form>

@@ -351,16 +351,43 @@ cliente para cada demo semanal.
         endpoint concreto para guardar datos fiscales nuevos** (solo para
         consultar un RFC ya existente) — confirmar con backend cuál es
         antes de conectar esto de verdad.
-- [ ] **El resto de Home sigue estático/local** — el rastreo aún no llama a
-      la API SIBOX (ni al BFF, que no existe todavía). Siguiente paso
-      lógico: crear `src/lib/api/` con el cliente tipado + Route Handlers
-      reales, empezando por `wsRastreo` (ya tiene el seam listo en dos
-      lugares: hero y chatbot) según el plan semana 1.
-- [ ] Sin páginas adicionales (`/rastreo`, `/envio`, `/cobertura`, `/somos`,
-      `/soporte`) — el Navbar/Footer ya enlazan a esas rutas pero no existen
-      todavía (404 en Next hasta que se creen).
+- [x] **Página `/rastreo`** (`src/app/rastreo/page.tsx` + `src/components/rastreo/*`)
+      — Figma node `362:37763`. Soporta varias guías a la vez: la lista vive
+      en el query string (`/rastreo?guias=4159473741,4003229791`, coma-
+      separado), no en `sessionStorage` como `/cotizar` — un link de rastreo
+      es algo que tiene sentido compartir o guardar en favoritos, a
+      diferencia de un borrador de cotización a medio llenar. El buscador
+      "Buscar envío" de la propia página agrega guías a esa lista sin perder
+      las que ya estaban.
+      - El botón "Rastrear" del Hero de Home ahora navega aquí de verdad
+        (`router.push('/rastreo?guias=...')`) en vez de no hacer nada — así
+        es como pediste que funcionara.
+      - Cada guía es un `RastreoCard` independiente con su propio estado de
+        carga/no-encontrada; una guía que falla no rompe las demás.
+      - El timeline de 4 pasos (Paquete recibido/En tránsito/En proceso de
+        entrega/Entregado) **no viene así de la API** — `wsRastreo` regresa
+        `Estatus` como texto libre ("EN RUTA", "DOCUMENTADA", etc.), no un
+        enum de 4 etapas. `pasoDesdeEstatus()` en `src/types/rastreo.ts` es
+        una heurística por palabras clave, marcada explícitamente como no
+        autoritativa — revisar contra valores reales de producción cuando
+        se conecte de verdad.
+      - **"Código de rastreo" y "Fecha programada de entrega"** (columnas
+        del Figma) tampoco están en la respuesta documentada de `wsRastreo`.
+        Hoy el código de rastreo muestra la misma guía y la fecha usa el
+        último `F_Estatus` como aproximación — están así de forma
+        deliberada y comentados en `rastreo-card.tsx`; hay que preguntarle a
+        backend de dónde deberían salir realmente antes de darlos por
+        buenos.
+      - "Ver detalles" trae el historial via el nuevo seam
+        `rastrearGuiaDetalle()` (envuelve `RastreoDetalle`), cargado sólo la
+        primera vez que se expande cada tarjeta (no de entrada, para no
+        pedir datos que quizá nunca se vean).
+      - Reutiliza el componente `Faq` de Home tal cual (las preguntas son
+        genéricas, no específicas de una página).
+- [ ] Sin páginas adicionales (`/envio`, `/cobertura`, `/somos`, `/soporte`)
+      — el Navbar/Footer ya enlazan a esas rutas pero no existen todavía
+      (404 en Next hasta que se creen).
 - [ ] Sin pruebas automatizadas (Vitest/Playwright) todavía.
-- [ ] No se ha hecho el primer commit/push al remoto de GitHub.
 
 ## 8. Cómo correr el proyecto
 
