@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/GUIA_PRUEBAS.md
 
 # isolated feature worktrees
 /.worktrees/
