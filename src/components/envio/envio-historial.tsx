@@ -30,14 +30,17 @@ export type GrupoEventos = {
 /** Separa el formato documentado por SIBOX sin depender del huso horario del navegador. */
 export function parsearFechaEvento(valor: string): FechaEvento {
   const limpio = valor.trim().replace(/\s+/g, " ");
+  if (!limpio) {
+    return { fecha: "Sin fecha", hora: "Sin hora", claveFecha: "sin-fecha" };
+  }
+
   const coincidencia = limpio.match(/^(\d{1,2})-([A-Za-zÁÉÍÓÚÑ]{3})-(\d{4})(?:\s+(\d{1,2}:\d{2}))?$/u);
 
   if (!coincidencia) {
-    const [fecha = limpio || "Sin fecha", hora = "—"] = limpio.split(" ");
-    return { fecha, hora, claveFecha: fecha };
+    return { fecha: limpio, hora: "Sin hora", claveFecha: limpio };
   }
 
-  const [, dia, mesCrudo, anio, hora = "—"] = coincidencia;
+  const [, dia, mesCrudo, anio, hora = "Sin hora"] = coincidencia;
   const mes = MESES[mesCrudo.toUpperCase()] ?? mesCrudo.toLocaleLowerCase("es-MX");
   const diaNormalizado = dia.padStart(2, "0");
   return {
@@ -48,23 +51,26 @@ export function parsearFechaEvento(valor: string): FechaEvento {
 }
 
 export function agruparEventosPorFecha(eventos: RastreoEvento[]): GrupoEventos[] {
-  const grupos = new Map<string, GrupoEventos>();
+  const grupos: GrupoEventos[] = [];
 
   for (const evento of eventos) {
     const fecha = parsearFechaEvento(evento.F_Estatus);
-    const existente = grupos.get(fecha.claveFecha);
-    if (existente) {
-      existente.eventos.push(evento);
+    const ultimo = grupos.at(-1);
+    const claveUltimaFecha = ultimo
+      ? parsearFechaEvento(ultimo.eventos[0].F_Estatus).claveFecha
+      : null;
+    if (ultimo && claveUltimaFecha === fecha.claveFecha) {
+      ultimo.eventos.push(evento);
     } else {
-      grupos.set(fecha.claveFecha, {
-        clave: fecha.claveFecha,
+      grupos.push({
+        clave: `${fecha.claveFecha}:${grupos.length}`,
         fecha: fecha.fecha,
         eventos: [evento],
       });
     }
   }
 
-  return [...grupos.values()];
+  return grupos;
 }
 
 type EnvioHistorialProps = {
@@ -83,7 +89,7 @@ export function EnvioHistorial({
   if (cargando) {
     return (
       <section aria-live="polite" aria-busy="true" className="rounded-md border border-neutral-line bg-white p-7 shadow-card-sm">
-        <p className="text-center text-sm text-secondary-dark">Cargando historial…</p>
+        <p className="text-center text-sm text-black/70">Cargando historial…</p>
       </section>
     );
   }
@@ -106,7 +112,7 @@ export function EnvioHistorial({
   if (eventos.length === 0) {
     return (
       <section className="rounded-md border border-neutral-line bg-white p-7 shadow-card-sm">
-        <p className="text-center text-sm text-secondary-dark">
+        <p className="text-center text-sm text-black/70">
           Aún no hay movimientos disponibles para este envío.
         </p>
       </section>
@@ -142,13 +148,13 @@ export function EnvioHistorial({
                   <CeldaMovil label="Hora" valor={hora} />
                   <CeldaMovil label="Ubicación" valor={evento.OficinaEstatus || "Sin ubicación"} />
                   <div className="col-span-2 sm:col-span-1">
-                    <span className="mb-1 block text-[10px] font-bold uppercase text-secondary-dark sm:hidden">Estado</span>
+                    <span className="mb-1 block text-[10px] font-bold uppercase text-black/70 sm:hidden">Estado</span>
                     <p className="font-bold text-black">{evento.Estatus || "Sin estado"}</p>
                     {evento.Observaciones && (
-                      <p className="mt-1 text-xs text-secondary-dark">{evento.Observaciones}</p>
+                      <p className="mt-1 text-xs text-black/70">{evento.Observaciones}</p>
                     )}
                     {evento.Recibio && (
-                      <p className="mt-1 text-xs text-secondary-dark">Recibió: {evento.Recibio}</p>
+                      <p className="mt-1 text-xs text-black/70">Recibió: {evento.Recibio}</p>
                     )}
                   </div>
                 </article>
@@ -164,8 +170,8 @@ export function EnvioHistorial({
 function CeldaMovil({ label, valor }: { label: string; valor: string }) {
   return (
     <div>
-      <span className="mb-1 block text-[10px] font-bold uppercase text-secondary-dark sm:hidden">{label}</span>
-      <span className={valor ? "text-black" : "text-secondary-dark"}>{valor || "Misma fecha"}</span>
+      <span className="mb-1 block text-[10px] font-bold uppercase text-black/70 sm:hidden">{label}</span>
+      <span className={valor ? "text-black" : "text-black/70"}>{valor || "Misma fecha"}</span>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function EnvioResumen({
     <section className="rounded-md border border-neutral-line bg-white p-5 shadow-card-sm sm:p-7">
       <div className="flex flex-col gap-5 border-b border-neutral-line pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-xs text-secondary-dark">Nombre del envío</p>
+          <p className="text-xs text-black/70">Nombre del envío</p>
           <div className="mt-1 flex items-center gap-3">
             <h2 className="truncate font-display text-xl font-bold text-black sm:text-2xl">
               {envio.nombre || "Envío sin nombre"}
@@ -84,7 +84,7 @@ export function EnvioResumen({
                 </span>
                 <span
                   className={`mt-2 max-w-[130px] text-[10px] font-medium leading-tight sm:text-sm ${
-                    alcanzado ? "text-black" : "text-secondary-dark"
+                    alcanzado ? "text-black" : "text-black/70"
                   }`}
                 >
                   {paso.label}
@@ -119,7 +119,7 @@ export function EnvioResumen({
 function Dato({ label, valor }: { label: string; valor: string }) {
   return (
     <div>
-      <dt className="text-xs text-secondary-dark">{label}</dt>
+      <dt className="text-xs text-black/70">{label}</dt>
       <dd className="mt-1 break-words font-bold text-primary">{valor}</dd>
     </div>
   );

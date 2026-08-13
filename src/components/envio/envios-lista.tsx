@@ -45,7 +45,7 @@ export function EnviosLista({
       </div>
 
       {envios.length === 0 ? (
-        <p className="px-5 py-8 text-center text-sm text-secondary-dark">
+        <p className="px-5 py-8 text-center text-sm text-black/70">
           No encontramos envíos que coincidan con tu búsqueda.
         </p>
       ) : (
@@ -79,7 +79,7 @@ export function EnviosLista({
                     <span className="block truncate font-display text-sm font-bold text-black">
                       {envio.nombre || "Envío sin nombre"}
                     </span>
-                    <span className="mt-1 block text-xs text-secondary-dark">
+                    <span className="mt-1 block text-xs text-black/70">
                       Guía {envio.guia}
                     </span>
                   </span>
