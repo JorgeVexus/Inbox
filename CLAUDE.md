@@ -320,6 +320,37 @@ cliente para cada demo semanal.
         `procesarPago` en `src/lib/cotizacion.ts`) siguen el mismo patrón
         que `sucursales.ts`/`rastreo.ts`/`auth.ts`: mock hoy, un `fetch` al
         BFF mañana, sin tocar los componentes.
+      - El campo "Vencimiento" de la tarjeta y el número se auto-formatean
+        (`06/28`, agrupado en 4) y hay un `CardPreview` en vivo que detecta
+        la marca (Visa/Mastercard/Amex) por los dígitos iniciales — lógica
+        100% cliente, sin API. Identificar el banco emisor (p.ej. "BBVA")
+        sí requeriría un servicio externo de BIN-lookup, que **no** es parte
+        de la especificación SIBOX — deliberadamente no se agregó.
+- [x] **Modal "Datos de facturación"** (`src/components/facturacion/facturacion-modal.tsx`)
+      — Figma node `317:14223`, se abre desde el botón "Facturar" de la
+      pantalla de éxito en `/cotizar` (`step-pago.tsx`); no es un modal
+      global como el de login porque hoy solo tiene un punto de entrada,
+      pero está desacoplado (recibe `onClose`/`onSuccess`) para poder
+      montarse desde cualquier otro lado sin refactor.
+      - **Sube tu constancia fiscal → autocompleta el formulario**: el
+        parseo real de PDF/XML no existe (no hay librería ni endpoint
+        conectado) — `extraerDatosConstanciaFiscal()` en `src/lib/facturacion.ts`
+        solo valida la extensión del archivo y regresa datos fijos después
+        de una espera, documentado explícitamente como mock para no
+        confundirlo con parsing real.
+      - **CP → Estado/Ciudad/Colonia** sí está resuelto de verdad (dentro de
+        lo mock): `src/lib/codigo-postal.ts` (`buscarCodigoPostal()`) es el
+        seam de `BusquedaCP`, pensado para compartirse con cualquier otro
+        campo de CP del sitio (los de Home/Cotizar siguen siendo texto
+        libre y deberían migrar a este mismo seam en vez de duplicar la
+        búsqueda). El campo "Especificar colonia" del Figma es el fallback
+        para cuando la colonia deseada no viene en la lista que regresa el
+        CP.
+      - `guardarDatosFacturacion()` en `src/lib/facturacion.ts`: el plan de
+        desarrollo describe el flujo de facturación pero **no nombra un
+        endpoint concreto para guardar datos fiscales nuevos** (solo para
+        consultar un RFC ya existente) — confirmar con backend cuál es
+        antes de conectar esto de verdad.
 - [ ] **El resto de Home sigue estático/local** — el rastreo aún no llama a
       la API SIBOX (ni al BFF, que no existe todavía). Siguiente paso
       lógico: crear `src/lib/api/` con el cliente tipado + Route Handlers

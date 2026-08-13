@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
+import { FacturacionModal } from "@/components/facturacion/facturacion-modal";
 import { generarGuia, procesarPago } from "@/lib/cotizacion";
 import { pesoTotalPaquetes } from "@/lib/mock/cotizacion";
 import type {
@@ -572,6 +573,9 @@ function PagoExitoso({
   guia: GuiaGenerada;
   cotizacion: CotizacionInput;
 }) {
+  const [facturarAbierto, setFacturarAbierto] = useState(false);
+  const [facturado, setFacturado] = useState(false);
+
   return (
     <div className="flex w-full flex-col items-center gap-10 rounded-xl bg-neutral-bg px-6 py-10 sm:px-16">
       <div className="flex flex-col items-start gap-1">
@@ -637,14 +641,37 @@ function PagoExitoso({
       </div>
 
       <div className="flex flex-col items-center gap-4">
-        <Button href="/facturar" variant="outline">
-          Facturar
-        </Button>
+        {facturado ? (
+          <p className="flex items-center gap-2 font-display text-sm font-bold text-green-700">
+            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden>
+              <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+            Datos de facturación guardados
+          </p>
+        ) : (
+          <Button
+            type="button"
+            onClick={() => setFacturarAbierto(true)}
+            variant="outline"
+          >
+            Facturar
+          </Button>
+        )}
         <p className="max-w-md text-center text-sm text-black/60">
           Puedes facturar después desde el enlace que recibirás en tu correo.{" "}
           <span className="text-black">Tienes 10 días naturales para hacerlo.</span>
         </p>
       </div>
+
+      {facturarAbierto && (
+        <FacturacionModal
+          onClose={() => setFacturarAbierto(false)}
+          onSuccess={() => {
+            setFacturarAbierto(false);
+            setFacturado(true);
+          }}
+        />
+      )}
 
       <div className="flex items-center gap-8 font-display text-sm text-primary">
         <Link href="/" className="underline">
