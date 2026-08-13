@@ -43,6 +43,7 @@ export function EnviosView() {
   const detalleRequestRef = useRef<Record<string, number>>({});
   const guardadoRequestRef = useRef(0);
   const usuarioActivoRef = useRef<string | null>(null);
+  const identidadVistaRef = useRef<string | null>(null);
   const [lista, setLista] = useState<ListaState>(LISTA_INICIAL);
   const [reintentoLista, setReintentoLista] = useState(0);
   const [busqueda, setBusqueda] = useState("");
@@ -75,10 +76,18 @@ export function EnviosView() {
   }, [isLoginOpen, openLogin, usuario]);
 
   useEffect(() => {
+    const cambioIdentidad = identidadVistaRef.current !== usuario;
+    identidadVistaRef.current = usuario;
+
     if (!usuario) {
       listaRequestRef.current += 1;
       detalleRequestRef.current = {};
       guardadoRequestRef.current += 1;
+      // Session-owned controls must not survive a logout/account change.
+      if (cambioIdentidad) {
+        setBusqueda("");
+        setSeleccionado(null);
+      }
       return;
     }
 
@@ -87,6 +96,8 @@ export function EnviosView() {
     // user's list here prevents it from being reused by a new session.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLista({ usuario, envios: [], cargando: true, error: null });
+    if (cambioIdentidad) setBusqueda("");
+    setSeleccionado(null);
     setDetalles({});
     setDetalleAbierto(null);
     setAliasAbierto(false);
@@ -97,11 +108,7 @@ export function EnviosView() {
       .then((envios) => {
         if (listaRequestRef.current !== requestId) return;
         setLista({ usuario, envios, cargando: false, error: null });
-        setSeleccionado((actual) =>
-          actual && envios.some((envio) => envio.guia === actual)
-            ? actual
-            : (envios[0]?.guia ?? null),
-        );
+        setSeleccionado(envios[0]?.guia ?? null);
       })
       .catch(() => {
         if (listaRequestRef.current !== requestId) return;
