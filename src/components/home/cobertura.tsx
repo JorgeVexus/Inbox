@@ -19,7 +19,14 @@ const CoberturaMap = dynamic(
   },
 );
 
-export function Cobertura() {
+export function Cobertura({
+  headlineImage,
+}: {
+  /** Optional image shown to the left of the "Tu inbox más cercana" headline
+   * (used by the standalone /cobertura page, Figma node 401:19835). Home's
+   * section doesn't pass this. */
+  headlineImage?: string;
+}) {
   const sucursales = useMemo(() => getSucursales(), []);
   const estados = useMemo(() => getEstados(sucursales), [sucursales]);
 
@@ -54,22 +61,31 @@ export function Cobertura() {
 
   return (
     <section className="mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-8 lg:px-16">
-      <div className="flex items-center gap-4">
-        <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">
-          Tu Inbox más cercana
-        </h2>
-        <Image
-          src="/icons/globe-location-pin.svg"
-          alt=""
-          width={48}
-          height={48}
-          className="hidden sm:block"
-        />
+      <div className="flex flex-col items-center gap-8 lg:flex-row">
+        {headlineImage && (
+          <div className="relative h-[220px] w-full shrink-0 sm:h-[280px] lg:h-[320px] lg:w-[480px]">
+            <Image src={headlineImage} alt="" fill className="object-contain" />
+          </div>
+        )}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">
+              Tu Inbox más cercana
+            </h2>
+            <Image
+              src="/icons/globe-location-pin.svg"
+              alt=""
+              width={48}
+              height={48}
+              className="hidden sm:block"
+            />
+          </div>
+          <p className="max-w-2xl text-base text-black">
+            Explora nuestras ubicaciones y elige la que mejor se adapte a tus
+            necesidades de envío o recolección.
+          </p>
+        </div>
       </div>
-      <p className="max-w-2xl text-base text-black">
-        Explora nuestras ubicaciones y elige la que mejor se adapte a tus
-        necesidades de envío o recolección.
-      </p>
 
       <div className="relative flex h-[480px] w-full flex-col overflow-hidden rounded-xl sm:h-[629px]">
         <div className="absolute inset-0">
@@ -160,23 +176,115 @@ export function Cobertura() {
             </button>
           </div>
         </div>
-      </div>
 
-      {seleccionada && (
-        <div className="flex flex-col gap-1 rounded-md border border-secondary-dark/30 bg-white p-4 shadow-card-sm">
+        {seleccionada && (
+          <SucursalPanel
+            sucursal={seleccionada}
+            onClose={() => setSeleccionada(null)}
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+/** Detail panel shown when a map pin is clicked (Figma node 713:28003).
+ * Overlays the right side of the map card; the "Buscar"/tabs are decorative
+ * (they mirror the Google-Maps-style reference in the Figma but aren't wired
+ * to anything — there's nothing to search within a single sucursal's info). */
+function SucursalPanel({
+  sucursal,
+  onClose,
+}: {
+  sucursal: Sucursal;
+  onClose: () => void;
+}) {
+  const abierto = estaAbiertoAhora(sucursal.Observaciones);
+
+  return (
+    <div className="absolute inset-0 z-[600] flex justify-end sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[380px]">
+      <div className="flex h-full w-full flex-col gap-8 overflow-y-auto bg-[rgba(238,238,238,0.9)] px-6 py-8 backdrop-blur-md sm:rounded-r-xl">
+        <div className="flex items-center gap-5">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar información de sucursal"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
+              <path d="M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.29 1.41 1.41 6.3-6.29 6.3 6.29 1.41-1.41-6.3-6.29 6.3-6.3z" />
+            </svg>
+          </button>
+          <div className="flex h-[53px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card">
+            <span className="text-sm text-secondary-dark">Buscar</span>
+            <Image src="/icons/search2.svg" alt="" width={18} height={18} />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Image src="/icons/warehouse.svg" alt="" width={56} height={56} />
+          <div className="flex flex-col">
+            <p className="font-display text-2xl font-bold text-black">Inbox</p>
+            <p className="font-display text-lg text-black">Paquetería y envíos</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between px-1 font-display text-sm font-bold whitespace-nowrap">
+          <span className="border-b-2 border-primary pb-1 text-primary">
+            Descripción general
+          </span>
+          <span className="text-black">Opiniones</span>
+          <span className="text-black">Acerca de</span>
+        </div>
+
+        <div className="flex flex-col gap-6 rounded-md bg-white px-6 py-5 shadow-card-sm">
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${
+                abierto ? "bg-green-500" : "bg-secondary-dark"
+              }`}
+            />
+            <span className="text-xs font-semibold text-black">
+              {abierto ? "Abierto" : "Cerrado"}
+            </span>
+          </div>
+
           <p className="font-display text-lg font-bold text-black">
-            {seleccionada.D_Oficina}
+            {sucursal.D_Oficina}
           </p>
-          <p className="text-sm text-black/70">
-            {seleccionada.Calle}, {seleccionada.D_Ciudad}, {seleccionada.D_Estado}{" "}
-            — CP {seleccionada.Codigo_Postal}
-          </p>
-          {seleccionada.Telefono && (
-            <p className="text-sm text-black/70">Tel. {seleccionada.Telefono}</p>
+
+          {sucursal.Observaciones && (
+            <div className="flex items-center gap-4">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 fill-primary" aria-hidden>
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm.75 5v5.3l4.2 2.5-.75 1.2-5-3V7h1.55z" />
+              </svg>
+              <p className="whitespace-pre-line text-xs text-black">
+                {sucursal.Observaciones}
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-4">
+            <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 fill-primary" aria-hidden>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
+            </svg>
+            <p className="text-xs text-black">
+              {sucursal.Calle}, {sucursal.D_Ciudad}, {sucursal.D_Estado} — CP{" "}
+              {sucursal.Codigo_Postal}
+            </p>
+          </div>
+
+          {sucursal.Telefono && (
+            <div className="flex items-center gap-4">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 fill-primary" aria-hidden>
+                <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.02z" />
+              </svg>
+              <p className="text-xs text-black">{sucursal.Telefono}</p>
+            </div>
           )}
         </div>
-      )}
-    </section>
+      </div>
+    </div>
   );
 }
 

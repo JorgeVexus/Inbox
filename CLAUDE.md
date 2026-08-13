@@ -406,7 +406,32 @@ cliente para cada demo semanal.
         mismo copy palabra por palabra. `Cobertura` (el mapa Leaflet) no se
         incluyó porque el Figma de esta página no lo muestra, solo la tarjeta
         de estado/ciudad de `CoberturaCTA`.
-- [ ] Sin páginas adicionales (`/envio`, `/cobertura`, `/soporte`)
+- [x] **Página `/cobertura`** (`src/app/cobertura/page.tsx` +
+      `src/components/cobertura/estamos-donde.tsx`) — Figma node `362:38174`.
+      Reutiliza el componente `Cobertura` de Home (el mapa Leaflet) tal cual,
+      con un nuevo prop opcional `headlineImage` para el camión que el Figma
+      de esta página pone junto al encabezado "Tu Inbox más cercana" (Home no
+      lo pasa, así que ahí no cambia nada visualmente). Debajo va
+      `EstamosDonde`, sección nueva y estática (2 tarjetas de stats + un mapa
+      de México decorativo exportado de Figma como imagen — son ~900 paths
+      SVG en el diseño original, no vale la pena recrearlos a mano). Arriba
+      lleva un breadcrumb "Inicio > Cobertura" específico de esta página.
+      - **Pin de sucursal → panel de información** (pedido explícitamente,
+        Figma node `713:28003`): al hacer clic en un pin del mapa se abre un
+        panel lateral (`SucursalPanel`, dentro de `cobertura.tsx`) con
+        nombre, estatus abierto/cerrado (mismo heurístico de
+        `estaAbiertoAhora()` que ya usaba `CoberturaCTA`), horario
+        (`Observaciones`), dirección y teléfono. Es una mejora al
+        componente `Cobertura` compartido, no algo exclusivo de esta
+        página — el mismo clic-en-pin ahora funciona igual en el mapa de
+        Home. Las pestañas "Descripción general / Opiniones / Acerca de" y
+        el buscador dentro del panel son decorativos, tal como aparecen en
+        el Figma (no hay nada que buscar dentro de la ficha de una sola
+        sucursal).
+      - Se quitó el `<Popup>` nativo de Leaflet que tenía cada marcador
+        (`cobertura-map.tsx`) — mostraba la misma información dos veces
+        (el popup de Leaflet y el panel nuevo) al mismo tiempo.
+- [ ] Sin páginas adicionales (`/envio`, `/soporte`)
       — el Navbar/Footer ya enlazan a esas rutas pero no existen todavía
       (404 en Next hasta que se creen).
 - [ ] Sin pruebas automatizadas (Vitest/Playwright) todavía.

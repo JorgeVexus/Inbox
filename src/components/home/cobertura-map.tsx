@@ -2,7 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useEffect, useMemo } from "react";
 import type { Sucursal } from "@/types/sucursal";
 
@@ -93,21 +93,7 @@ export function CoberturaMap({
             opacity={
               selectedOficina && selectedOficina !== s.K_Oficina ? 0.55 : 1
             }
-          >
-            <Popup>
-              <div className="flex min-w-[180px] flex-col gap-1 text-sm">
-                <p className="font-display font-bold text-black">{s.D_Oficina}</p>
-                <p className="text-black/70">{s.Calle}</p>
-                <p className="text-black/70">
-                  {s.D_Ciudad}, {s.D_Estado} — CP {s.Codigo_Postal}
-                </p>
-                {s.Telefono && <p className="text-black/70">Tel. {s.Telefono}</p>}
-                {s.Observaciones && (
-                  <p className="text-xs text-black/60">{s.Observaciones}</p>
-                )}
-              </div>
-            </Popup>
-          </Marker>
+          />
         ))}
     </MapContainer>
   );
