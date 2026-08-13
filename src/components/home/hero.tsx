@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { saveCotizacionDraft } from "@/lib/cotizacion-draft";
 
 const SLIDES = [
   "/images/hero-1.png",
@@ -87,6 +89,7 @@ const ENTREGA_LABEL: Record<EntregaTipo, string> = {
 };
 
 function QuoteCard() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("form");
   const [form, setForm] = useState<FormState>({
     origenCP: "",
@@ -104,6 +107,26 @@ function QuoteCard() {
     cantidad: 1,
     pais: "MX" as "US" | "MX",
   });
+
+  function handleConfirmar() {
+    saveCotizacionDraft({
+      entrega: form.entrega,
+      envio: envio === "sobre" ? "sobre" : "paquete",
+      origen: { cp: form.origenCP, ciudad: form.origenCiudad, colonia: "" },
+      destino: { cp: form.destinoCP, ciudad: form.destinoCiudad, colonia: "" },
+      paquetes: [
+        {
+          id: crypto.randomUUID(),
+          cantidad: paquete.cantidad,
+          peso: paquete.peso,
+          alto: paquete.alto,
+          largo: paquete.largo,
+          ancho: paquete.ancho,
+        },
+      ],
+    });
+    router.push("/cotizar");
+  }
 
   const canContinue =
     form.origenCP.trim() !== "" &&
@@ -280,7 +303,11 @@ function QuoteCard() {
           </div>
         )}
 
-        <Button href="/cotizar" className="w-full max-w-[300px] sm:w-auto">
+        <Button
+          type="button"
+          onClick={handleConfirmar}
+          className="w-full max-w-[300px] sm:w-auto"
+        >
           Confirmar
         </Button>
       </div>

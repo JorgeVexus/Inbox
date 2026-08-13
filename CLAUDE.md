@@ -269,15 +269,65 @@ cliente para cada demo semanal.
         persistencia. No construir nada encima asumiendo que es una sesión
         real — cuando exista el BFF, esto debe leer la sesión desde el
         servidor (cookie), no seguir siendo un `useState` local.
-- [ ] **El resto de Home sigue estático/local** — la cotización y el envío
-      de guía aún no llaman a la API SIBOX (ni al BFF, que no existe
-      todavía). Siguiente paso lógico: crear `src/lib/api/` con el cliente
-      tipado + Route Handlers reales, empezando por `wsRastreo` (ya tiene el
-      seam listo en dos lugares: hero y chatbot) según el plan semana 1.
-- [ ] Sin páginas adicionales (`/rastreo`, `/cotizar`, `/envio`, `/cobertura`,
-      `/somos`, `/soporte`, `/cuenta/iniciar-sesion`) — el Navbar/Footer ya
-      enlazan a esas rutas pero no existen todavía (404 en Next hasta que se
-      creen).
+- [x] **Página `/cotizar`** (`src/app/cotizar/page.tsx` + `src/components/cotizar/*`)
+      — Figma node `184:13498` ("cotizador"). El Figma muestra 7 frames
+      apilados como estados independientes (cotizar, costo, confirmar, pago,
+      pago2, pago2-completed, pago_exitoso); la implementación real es **un
+      wizard de una sola página** con 4 pasos (`WizardStepper`:
+      Cotizar/Costo/Confirmar/Pago) que avanza in-place y marca el paso
+      anterior como completado (check verde, borde naranja, click para
+      regresar) — así es como se leyó la intención del diseño, no como 7
+      páginas separadas.
+      - **Paso 1 Cotizar** (`step-cotizar.tsx`): origen/destino con CP,
+        ciudad y colonia; tipo de entrega; tipo de envío; soporta *varios*
+        paquetes (botón "+", cada uno con peso/medidas/cantidad) — el Figma
+        solo mostraba uno, pero el array ya existe en
+        `CotizacionInput.paquetes` para no rehacerlo cuando pidan
+        multi-bulto.
+      - **Paso 2 Costo** (`step-costo.tsx`): dos opciones calculadas por
+        `obtenerCotizacion()` (mock en `src/lib/mock/cotizacion.ts` — no es
+        la tarifa real de SIBOX, solo sensible a peso/volumen para que se
+        sienta real en demo), cada una expandible ("Ver detalles") con
+        desglose Flete/Servicios/IVA.
+      - **Paso 3 Confirmar** (`step-confirmar.tsx`): formularios completos
+        de remitente/destinatario (mismos campos que
+        `wsGeneracionGuiaCliente`), seguro opcional (+$200), y el link
+        "Inicia sesión" del Figma **sí está conectado** — abre el modal de
+        `useAuth()` y, si ya hay sesión, ofrece autocompletar con el nombre
+        de la cuenta.
+      - **Paso 4 Pago** (`step-pago.tsx`, sub-estados internos: datos →
+        método → tarjeta → éxito): genera un folio real vía `generarGuia()`
+        al entrar, deja elegir tarjeta/PayPal/efectivo/cobrar al
+        destinatario, y termina en la pantalla de éxito con fechas
+        estimadas y botón Facturar.
+        **`procesarPago()` en `src/lib/cotizacion.ts` NUNCA debe conectarse
+        a un gateway real sin que alguien lo decida explícitamente** — todos
+        los endpoints de pago están marcados "pendiente" en la
+        especificación de la API (ver sección 4) y en el plan (semana 7,
+        bloqueado por backend). Hoy solo simula una espera y regresa éxito;
+        no envía datos de tarjeta a ningún lado.
+      - **Puente Home → Cotizar**: el botón "Confirmar" de la tarjeta de
+        cotización del Hero guarda lo ya escrito en `sessionStorage`
+        (`src/lib/cotizacion-draft.ts`) y navega a `/cotizar`, que lo lee y
+        limpia en el primer render. *Gotcha ya resuelto*: `StepCotizar`
+        siembra su estado local desde la prop `initial` una sola vez (según
+        el patrón de esta app, ver `login-modal.tsx`), así que
+        `CotizarPage` NO debe montar `StepCotizar` hasta después de leer el
+        draft (`ready` gate en `page.tsx`) — montarlo antes congela el
+        formulario en los valores por defecto aunque el estado del padre se
+        actualice después.
+      - Todos los seams nuevos (`obtenerCotizacion`, `generarGuia`,
+        `procesarPago` en `src/lib/cotizacion.ts`) siguen el mismo patrón
+        que `sucursales.ts`/`rastreo.ts`/`auth.ts`: mock hoy, un `fetch` al
+        BFF mañana, sin tocar los componentes.
+- [ ] **El resto de Home sigue estático/local** — el rastreo aún no llama a
+      la API SIBOX (ni al BFF, que no existe todavía). Siguiente paso
+      lógico: crear `src/lib/api/` con el cliente tipado + Route Handlers
+      reales, empezando por `wsRastreo` (ya tiene el seam listo en dos
+      lugares: hero y chatbot) según el plan semana 1.
+- [ ] Sin páginas adicionales (`/rastreo`, `/envio`, `/cobertura`, `/somos`,
+      `/soporte`) — el Navbar/Footer ya enlazan a esas rutas pero no existen
+      todavía (404 en Next hasta que se creen).
 - [ ] Sin pruebas automatizadas (Vitest/Playwright) todavía.
 - [ ] No se ha hecho el primer commit/push al remoto de GitHub.
 
