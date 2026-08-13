@@ -385,7 +385,7 @@ cliente para cada demo semanal.
       - Reutiliza el componente `Faq` de Home tal cual (las preguntas son
         genéricas, no específicas de una página).
 - [x] **Página protegida `/envio`** (`src/app/envio/page.tsx` +
-      `src/components/envios/*`) — Figma nodes `388:39626` (vista principal),
+      `src/components/envio/*`) — Figma nodes `388:39626` (vista principal),
       `713:27881` (detalle) y `399:19075` (asignar nombre/alias).
       - Usa el `AuthProvider` global existente como gate: sin `session` abre
         automáticamente el modal de inicio de sesión y no muestra ni solicita
@@ -465,8 +465,8 @@ cliente para cada demo semanal.
         (el popup de Leaflet y el panel nuevo) al mismo tiempo.
 - [ ] Sin página `/soporte` — el Navbar/Footer ya enlazan a esa ruta pero
       todavía da 404.
-- [x] Vitest configurado (`npm test`), con 14 pruebas automatizadas actuales.
-      Playwright/E2E sigue pendiente.
+- [x] Vitest configurado (`npm test`); la suite cubre lógica pura y flujos
+      protegidos del perfil de envíos. Playwright/E2E sigue pendiente.
 
 ## 8. Cómo correr el proyecto
 

@@ -402,8 +402,8 @@ propio de esta página.
 
 ### Todavía no existen
 - `/soporte` — el Navbar/Footer ya enlazan ahí pero da 404.
-- Playwright/E2E. Vitest ya está configurado (`npm test`) y actualmente hay
-  14 pruebas automatizadas.
+- Playwright/E2E. Vitest ya está configurado (`npm test`) y la suite incluye
+  lógica pura y flujos protegidos del perfil de envíos.
 - La capa BFF real (`src/lib/api/` + Route Handlers) — todo sigue siendo
   mocks resueltos client-side detrás de los seams.
 
