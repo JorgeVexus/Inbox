@@ -34,23 +34,25 @@ export function InfoEnvioCard({
         <p>Origen: {origenLabel}</p>
         <p>Destino: {destinoLabel}</p>
       </div>
-      <div className="relative flex flex-col gap-2.5 pl-1.5">
-        <p className="text-base font-semibold text-black">
-          {numPaquetes} Paquete{numPaquetes === 1 ? "" : "s"}
-        </p>
+      <div className="flex flex-col gap-2.5 pl-1.5">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-base font-semibold text-black">
+            {numPaquetes} Paquete{numPaquetes === 1 ? "" : "s"}
+          </p>
+          {onEditar && (
+            <button
+              type="button"
+              onClick={onEditar}
+              className="shrink-0 rounded-md border border-primary px-2 py-1 text-xs font-medium text-primary"
+            >
+              Editar
+            </button>
+          )}
+        </div>
         <div className="flex flex-col gap-2.5 text-sm text-black">
           <p>Medidas: {medidasLabel}</p>
           <p>Peso estimado: {pesoLabel}</p>
         </div>
-        {onEditar && (
-          <button
-            type="button"
-            onClick={onEditar}
-            className="absolute right-0 top-9 rounded-md border border-primary px-2 py-1 text-xs font-medium text-primary"
-          >
-            Editar
-          </button>
-        )}
       </div>
 
       {onToggleSeguro && (

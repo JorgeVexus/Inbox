@@ -89,7 +89,12 @@ export default function CotizarPage() {
         )}
 
         {step === "pago" && opcion && confirmar && (
-          <StepPago cotizacion={cotizacion} opcion={opcion} confirmar={confirmar} />
+          <StepPago
+            cotizacion={cotizacion}
+            opcion={opcion}
+            confirmar={confirmar}
+            onEditarEnvio={() => goTo("cotizar")}
+          />
         )}
       </div>
     </div>

@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
 import { generarGuia, procesarPago } from "@/lib/cotizacion";
+import { pesoTotalPaquetes } from "@/lib/mock/cotizacion";
 import type {
   ConfirmarInput,
   CostoOpcion,
@@ -20,16 +22,21 @@ export function StepPago({
   cotizacion,
   opcion,
   confirmar,
+  onEditarEnvio,
 }: {
   cotizacion: CotizacionInput;
   opcion: CostoOpcion;
   confirmar: ConfirmarInput;
+  onEditarEnvio: () => void;
 }) {
   const [sub, setSub] = useState<PagoSubStep>("datos");
   const [guia, setGuia] = useState<GuiaGenerada | null>(null);
 
   const [email, setEmail] = useState(confirmar.remitente.email);
   const [telefono, setTelefono] = useState(confirmar.remitente.telefono);
+  const [rellenado, setRellenado] = useState(false);
+  const [referencia, setReferencia] = useState("");
+  const [editandoReferencia, setEditandoReferencia] = useState(false);
 
   const [metodoSeleccionado, setMetodoSeleccionado] = useState<MetodoPago | null>(
     null,
@@ -66,6 +73,11 @@ export function StepPago({
     return <PagoExitoso guia={guia} cotizacion={cotizacion} />;
   }
 
+  const paquete = cotizacion.paquetes[0];
+  const medidasLabel = paquete
+    ? `${paquete.alto} cm x ${paquete.largo} cm x ${paquete.ancho}cm`
+    : "—";
+
   return (
     <div className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 lg:flex-row lg:items-start">
       <div className="flex w-full max-w-[729px] flex-col items-end gap-6">
@@ -76,9 +88,18 @@ export function StepPago({
             telefono={telefono}
             onEmailChange={setEmail}
             onTelefonoChange={setTelefono}
+            referencia={referencia}
+            onReferenciaChange={setReferencia}
+            editandoReferencia={editandoReferencia}
+            onToggleEditarReferencia={() => setEditandoReferencia((v) => !v)}
+            rellenado={rellenado}
             onRellenar={() => {
-              setEmail(confirmar.remitente.email);
-              setTelefono(confirmar.remitente.telefono);
+              const activar = !rellenado;
+              setRellenado(activar);
+              if (activar) {
+                setEmail(confirmar.remitente.email);
+                setTelefono(confirmar.remitente.telefono);
+              }
             }}
             onContinuar={() => setSub("metodo")}
           />
@@ -87,6 +108,7 @@ export function StepPago({
         {sub === "metodo" && (
           <MetodoPagoForm
             seleccionado={metodoSeleccionado}
+            permiteCobrarDestinatario={opcion.id === "domicilio"}
             onSeleccionar={setMetodoSeleccionado}
             onVolver={() => setSub("datos")}
             onContinuar={() => {
@@ -111,21 +133,15 @@ export function StepPago({
         )}
       </div>
 
-      <div className="flex w-full max-w-[279px] flex-col gap-6 rounded-md bg-white p-6 shadow-card">
-        <p className="text-right font-display text-sm text-primary">
-          Información de envío
-        </p>
-        <div className="flex flex-col gap-2.5 pl-1.5 text-sm text-black">
-          <p>Origen: {cotizacion.origen.ciudad || "—"}</p>
-          <p>Destino: {cotizacion.destino.ciudad || "—"}</p>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <p className="font-display text-sm font-bold text-black">Total</p>
-          <p className="font-sans text-2xl font-bold text-black">
-            ${total.toFixed(2)} <span className="text-sm font-medium">MXN</span>
-          </p>
-        </div>
-      </div>
+      <InfoEnvioCard
+        origenLabel={`${cotizacion.origen.ciudad || "—"}, ${cotizacion.origen.cp}`}
+        destinoLabel={`${cotizacion.destino.ciudad || "—"}, ${cotizacion.destino.cp}`}
+        numPaquetes={cotizacion.paquetes.length}
+        medidasLabel={medidasLabel}
+        pesoLabel={`${pesoTotalPaquetes(cotizacion.paquetes)} kg`}
+        onEditar={onEditarEnvio}
+        total={total}
+      />
     </div>
   );
 }
@@ -136,6 +152,11 @@ function DatosPrincipales({
   telefono,
   onEmailChange,
   onTelefonoChange,
+  referencia,
+  onReferenciaChange,
+  editandoReferencia,
+  onToggleEditarReferencia,
+  rellenado,
   onRellenar,
   onContinuar,
 }: {
@@ -144,6 +165,11 @@ function DatosPrincipales({
   telefono: string;
   onEmailChange: (v: string) => void;
   onTelefonoChange: (v: string) => void;
+  referencia: string;
+  onReferenciaChange: (v: string) => void;
+  editandoReferencia: boolean;
+  onToggleEditarReferencia: () => void;
+  rellenado: boolean;
   onRellenar: () => void;
   onContinuar: () => void;
 }) {
@@ -156,10 +182,32 @@ function DatosPrincipales({
         </p>
         <p className="text-base text-black">
           Folio:{" "}
-          <span className="font-medium">
-            {folio ?? "Generando…"}
-          </span>
+          <span className="font-medium">{folio ?? "Generando…"}</span>
         </p>
+        <div className="flex flex-wrap items-center gap-3 text-base text-black">
+          <span>Referencia</span>
+          {editandoReferencia ? (
+            <input
+              type="text"
+              autoFocus
+              value={referencia}
+              onChange={(e) => onReferenciaChange(e.target.value)}
+              onBlur={onToggleEditarReferencia}
+              placeholder="XAXX0101001000"
+              className="h-[36px] w-[180px] rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
+            />
+          ) : (
+            <span className="font-medium">{referencia || "Sin asignar"}</span>
+          )}
+          <span className="h-[23px] w-px bg-neutral-line" />
+          <button
+            type="button"
+            onClick={onToggleEditarReferencia}
+            className="font-display text-xs text-primary"
+          >
+            {referencia ? "Editar referencia" : "Asignar referencia"}
+          </button>
+        </div>
       </div>
 
       <div className="flex w-full flex-col items-start gap-6 rounded-md bg-white p-6 shadow-card">
@@ -195,7 +243,17 @@ function DatosPrincipales({
         onClick={onRellenar}
         className="flex items-center gap-2 self-start text-xs text-black"
       >
-        <span className="flex h-[25px] w-[25px] items-center justify-center rounded-[3px] border-2 border-secondary bg-white" />
+        <span
+          className={`flex h-[25px] w-[25px] items-center justify-center rounded-[3px] border-2 bg-white ${
+            rellenado ? "border-primary" : "border-secondary"
+          }`}
+        >
+          {rellenado && (
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-primary" aria-hidden>
+              <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+          )}
+        </span>
         Rellenar con la info del remitente
       </button>
 
@@ -218,11 +276,13 @@ const METODOS: { id: MetodoPago; icon: string; label: string; width: string }[] 
 
 function MetodoPagoForm({
   seleccionado,
+  permiteCobrarDestinatario,
   onSeleccionar,
   onVolver,
   onContinuar,
 }: {
   seleccionado: MetodoPago | null;
+  permiteCobrarDestinatario: boolean;
   onSeleccionar: (m: MetodoPago) => void;
   onVolver: () => void;
   onContinuar: () => void;
@@ -250,7 +310,9 @@ function MetodoPagoForm({
             <MetodoBoton metodo={METODOS[1]} seleccionado={seleccionado} onSeleccionar={onSeleccionar} />
             <MetodoBoton metodo={METODOS[2]} seleccionado={seleccionado} onSeleccionar={onSeleccionar} />
           </div>
-          <MetodoBoton metodo={METODOS[3]} seleccionado={seleccionado} onSeleccionar={onSeleccionar} />
+          {permiteCobrarDestinatario && (
+            <MetodoBoton metodo={METODOS[3]} seleccionado={seleccionado} onSeleccionar={onSeleccionar} />
+          )}
         </div>
       </div>
 

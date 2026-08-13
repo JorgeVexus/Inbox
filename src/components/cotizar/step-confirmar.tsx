@@ -99,14 +99,17 @@ export function StepConfirmar({
           )}
         </button>
 
-        <div className="flex flex-col gap-8 rounded-md bg-white p-6 shadow-card lg:flex-row lg:items-start lg:justify-center lg:divide-x lg:divide-neutral-line">
-          <ContactoForm
-            titulo="Origen"
-            value={remitente}
-            onChange={setRemitente}
-            nombreLabel="Nombre del remitente"
-          />
-          <div className="lg:pl-8">
+        <div className="flex flex-col gap-8 rounded-md bg-white p-6 shadow-card lg:flex-row lg:items-stretch">
+          <div className="flex w-full lg:flex-1 lg:justify-end lg:pr-8">
+            <ContactoForm
+              titulo="Origen"
+              value={remitente}
+              onChange={setRemitente}
+              nombreLabel="Nombre del remitente"
+            />
+          </div>
+          <div className="hidden w-px shrink-0 self-stretch bg-neutral-line lg:block" />
+          <div className="flex w-full lg:flex-1 lg:justify-start lg:pl-8">
             <ContactoForm
               titulo="Destino"
               value={destinatario}
