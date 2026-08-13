@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 type NombreEnvioModalProps = {
@@ -15,7 +15,8 @@ type NombreEnvioModalProps = {
 export function NombreEnvioModal(props: NombreEnvioModalProps) {
   if (!props.abierto) return null;
 
-  return <NombreEnvioForm {...props} />;
+  // A selected shipment can change while the modal remains mounted.
+  return <NombreEnvioForm key={props.nombreInicial} {...props} />;
 }
 
 function NombreEnvioForm({
@@ -26,18 +27,62 @@ function NombreEnvioForm({
   onGuardar,
 }: Omit<NombreEnvioModalProps, "abierto">) {
   const [nombre, setNombre] = useState(nombreInicial);
+  const [solicitudEnviada, setSolicitudEnviada] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const submittedRef = useRef(false);
 
   useEffect(() => {
+    const elementoAnterior = document.activeElement;
+
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onCerrar();
+      if (event.key === "Escape") {
+        onCerrar();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const elementos = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+      );
+      if (!elementos?.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const primero = elementos[0];
+      const ultimo = elementos[elementos.length - 1];
+      if (event.shiftKey && document.activeElement === primero) {
+        event.preventDefault();
+        ultimo.focus();
+      } else if (!event.shiftKey && document.activeElement === ultimo) {
+        event.preventDefault();
+        primero.focus();
+      }
     }
 
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      if (elementoAnterior instanceof HTMLElement) elementoAnterior.focus();
+    };
   }, [onCerrar]);
+
+  useEffect(() => {
+    if (!error) return;
+
+    submittedRef.current = false;
+    // Defer the visual reset to avoid a synchronous state update in an effect.
+    const reset = window.setTimeout(() => setSolicitudEnviada(false), 0);
+    return () => window.clearTimeout(reset);
+  }, [error]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittedRef.current || guardando) return;
+
+    submittedRef.current = true;
+    setSolicitudEnviada(true);
     onGuardar(nombre);
   }
 
@@ -47,6 +92,7 @@ function NombreEnvioForm({
       onClick={onCerrar}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="nombre-envio-titulo"
@@ -77,7 +123,7 @@ function NombreEnvioForm({
             autoFocus
             aria-describedby={error ? "nombre-envio-error nombre-envio-contador" : "nombre-envio-contador"}
             aria-invalid={Boolean(error)}
-            className="mt-2 h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-5 text-sm font-medium text-black shadow-card outline-none placeholder:text-secondary-dark focus:border-primary"
+            className="mt-2 h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-5 text-sm font-medium text-black shadow-card outline-none placeholder:text-black/60 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           />
 
           <div className="mt-1 flex min-h-5 items-start justify-between gap-4">
@@ -90,7 +136,7 @@ function NombreEnvioForm({
             )}
             <span
               id="nombre-envio-contador"
-              className="shrink-0 text-xs text-secondary-dark"
+              className="shrink-0 text-xs text-black/70"
             >
               {nombre.length}/60
             </span>
@@ -98,9 +144,9 @@ function NombreEnvioForm({
 
           <Button
             type="submit"
-            variant="white"
-            disabled={guardando}
-            className="mx-auto mt-5 h-[43px] min-w-[116px] disabled:cursor-not-allowed disabled:opacity-60"
+            variant="primary"
+            disabled={guardando || solicitudEnviada}
+            className="mx-auto mt-5 h-[43px] min-w-[116px] text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {guardando ? "Guardando…" : "Aceptar"}
           </Button>
