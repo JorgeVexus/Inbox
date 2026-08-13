@@ -4,6 +4,10 @@ import type { EnvioPerfil } from "@/types/envio";
 /**
  * MOCK DATA for the profile shipments seam. Remove this table when the BFF
  * provides the authenticated user's shipments and saved aliases.
+ *
+ * The account-history API is not available yet, and wsRastreo does not return
+ * the promised delivery date. Therefore, each fechaProgramada below is an
+ * approximate demo value until the backend contract confirms the real dates.
  */
 const DEFINICIONES_ENVIO = [
   { guia: "4003229791", nombre: "Paquete ropa", fechaProgramada: "2007-10-31" },
