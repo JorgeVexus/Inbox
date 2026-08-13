@@ -112,6 +112,12 @@ describe("seam de envios", () => {
     );
   });
 
+  it("unifica formas unicode equivalentes de la identidad del usuario", () => {
+    expect(claveAliasEnvio("JOSÉ", "4003229791")).toBe(
+      claveAliasEnvio("JOSE\u0301", "4003229791"),
+    );
+  });
+
   it("devuelve aliases iniciales en SSR", async () => {
     const resultado = await listarEnvios("INBOX");
 

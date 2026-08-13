@@ -13,7 +13,10 @@ function esperarMock(): Promise<void> {
 }
 
 export function claveAliasEnvio(usuario: string, guia: string): string {
-  const usuarioCanonico = usuario.trim().toLocaleUpperCase("es-MX");
+  const usuarioCanonico = usuario
+    .trim()
+    .normalize("NFC")
+    .toLocaleUpperCase("es-MX");
   return `inbox:envio-alias:${encodeURIComponent(usuarioCanonico)}:${encodeURIComponent(guia.trim())}`;
 }
 
