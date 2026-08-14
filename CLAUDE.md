@@ -543,12 +543,51 @@ cliente para cada demo semanal.
       - Tests: `src/lib/domicilios.test.ts` cubre `validarDomicilio`, el
         sembrado desde el mock, y que un fallo de `localStorage` no finja
         éxito (mismo patrón que `envios.test.ts`).
+- [x] **Página protegida `/recoleccion`** (`src/app/recoleccion/page.tsx` +
+      `src/components/recoleccion/recoleccion-view.tsx`) — **sin diseño en
+      Figma**, pedida explícitamente para clientes que ya generaron sus
+      guías y solo necesitan agendar que pasen por el paquete. Nuevo link
+      "Recolección" en el Navbar (desktop y menú móvil), junto a "Envío".
+      Mismo patrón de login-gate que `/envio`/`/perfil`.
+      - Seams nuevos en `src/lib/recoleccion.ts` +
+        `src/types/recoleccion.ts` + `src/lib/mock/recoleccion.ts`, para
+        `ObtenerHorariosPorCP` y `wsGeneracionRecoleccion` (endpoints reales
+        y documentados — ver sección 4). El flujo: elegir una dirección
+        guardada (reutiliza `listarDomicilios()` de `/perfil`, sin
+        duplicar nada) → se consulta el horario de esa CP → se eligen
+        fecha (solo días marcados `B_Lunes`...`B_Domingo` en la respuesta)
+        y ventana de 1h dentro de `Hora_Minima`/`Hora_Maxima` → contacto y
+        cantidad de paquetes → folio de confirmación (`K_Recoleccion`).
+      - **Discrepancia importante encontrada al construir esto**:
+        `wsGeneracionRecoleccion` requiere `K_Cliente` (int) para
+        identificar la cuenta, pero `Login` (ver `src/types/auth.ts`)
+        **solo regresa un `token`**, ningún ID de cliente ni dato de
+        perfil. No hay forma documentada de obtener `K_Cliente` desde la
+        sesión — el mock usa el valor de ejemplo del PDF (62801) como
+        placeholder. Hay que preguntarle a backend de dónde sale ese ID
+        antes de conectar esto de verdad.
+      - **El endpoint no tiene campo para referenciar guías existentes** —
+        la recolección se agenda por domicilio + cantidad de bultos, no por
+        número de guía. Como el caso de uso es justo clientes que ya tienen
+        guías, se agregó un campo "Guías a recolectar" que es **solo local**:
+        se antepone al texto de `Observaciones` (único campo libre que sí
+        acepta la API) para que el mensajero sepa qué buscar —
+        `observacionesConGuias()` en `recoleccion.ts`.
+      - Solo soporta domicilios de la libreta (`K_Domicilio`), no la ruta
+        manual de la API (mandar Estado/Ciudad/Colonia/Calle sueltos) —
+        nuestro mock de `BusquedaCP` no regresa IDs numéricos de
+        estado/ciudad/colonia, solo nombres, así que esa segunda ruta no se
+        podía armar de forma realista todavía.
+      - Tests: `src/lib/recoleccion.test.ts` cubre `diasDisponibles`,
+        `ventanasDisponibles`, `validarSolicitudRecoleccion` y
+        `observacionesConGuias`.
 - [x] Vitest configurado (`npm test`); la suite cubre lógica pura y flujos
-      protegidos del perfil de envíos y de direcciones guardadas.
+      protegidos del perfil de envíos, direcciones guardadas y recolección.
       Playwright/E2E sigue pendiente.
 - [x] Ya existen todas las páginas que el Navbar/Footer enlazan: `/`,
       `/cotizar`, `/rastreo`, `/somos`, `/cobertura`, `/envio` (protegida),
-      `/soporte`, `/perfil` (protegida, sin diseño en Figma).
+      `/soporte`, `/perfil` (protegida, sin diseño en Figma), `/recoleccion`
+      (protegida, sin diseño en Figma).
 
 ## 8. Cómo correr el proyecto
 

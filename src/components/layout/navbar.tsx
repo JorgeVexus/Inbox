@@ -7,6 +7,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 
 const NAV_LINKS = [
   { label: "Envío", href: "/envio", hasChevron: true },
+  { label: "Recolección", href: "/recoleccion" },
   { label: "Rastreo", href: "/rastreo" },
   { label: "Somos", href: "/somos" },
   { label: "Soporte", href: "/soporte" },

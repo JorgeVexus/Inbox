@@ -452,14 +452,51 @@ Cubierto por `src/lib/domicilios.test.ts` (validación, sembrado desde mock,
 fallo de `localStorage` no finge éxito — mismo patrón que
 `envios.test.ts`).
 
+### `/recoleccion` — sin diseño en Figma, para clientes que ya tienen guías
+Pedido explícito: un cliente que ya generó su(s) guía(s) (por teléfono, en
+sucursal, o vía `/cotizar`) solo quiere agendar que un mensajero pase por el
+paquete. Nuevo link "Recolección" en el Navbar junto a "Envío". Mismo
+login-gate que `/envio`/`/perfil`.
+
+Flujo: elegir una dirección guardada (reutiliza `listarDomicilios()` de
+`/perfil` tal cual) → se consulta `ObtenerHorariosPorCP` con el CP de esa
+dirección → se eligen fecha (solo días marcados como activos en la
+respuesta: `B_Lunes`...`B_Domingo`) y una ventana de 1h dentro de
+`Hora_Minima`/`Hora_Maxima` → nombre de contacto y cantidad de paquetes →
+se llama a `wsGeneracionRecoleccion` → folio de confirmación
+(`K_Recoleccion`).
+
+Dos hallazgos importantes al construir esto, ambos documentados con más
+detalle en CLAUDE.md:
+- **`wsGeneracionRecoleccion` pide `K_Cliente` (int) pero `Login` solo
+  regresa un `token`** — no hay forma documentada de obtener el ID de
+  cliente desde la sesión. El mock usa el 62801 de ejemplo del PDF como
+  placeholder; hay que preguntarle a backend de dónde sale ese dato.
+- **El endpoint no tiene campo para número de guía** — se agenda por
+  domicilio + cantidad de bultos, no por guía. Como el caso de uso es
+  justo "ya tengo guías", se agregó un campo "Guías a recolectar" que es
+  solo local y se antepone al texto de `Observaciones` (única cadena
+  libre que la API sí acepta) — `observacionesConGuias()` en
+  `src/lib/recoleccion.ts`.
+
+Solo soporta la ruta de domicilio guardado (`K_Domicilio`) de la API, no la
+ruta manual (Estado/Ciudad/Colonia/Calle sueltos) — nuestro mock de
+`BusquedaCP` no regresa IDs numéricos de estado/ciudad/colonia, así que esa
+segunda ruta no se podía armar de forma realista sin inventar IDs.
+
+Cubierto por `src/lib/recoleccion.test.ts` (`diasDisponibles`,
+`ventanasDisponibles`, `validarSolicitudRecoleccion`,
+`observacionesConGuias`).
+
 ### Ya existen todas las páginas enlazadas desde Navbar/Footer
 `/`, `/cotizar`, `/rastreo`, `/somos`, `/cobertura`, `/envio` (protegida por
-login), `/soporte` y `/perfil` (protegida por login, sin diseño en Figma).
+login), `/soporte`, `/perfil` y `/recoleccion` (protegidas por login, sin
+diseño en Figma).
 
 ### Todavía pendiente
 - Playwright/E2E. Vitest ya está configurado (`npm test`) y la suite incluye
-  lógica pura y flujos protegidos del perfil de envíos y de direcciones
-  guardadas.
+  lógica pura y flujos protegidos del perfil de envíos, direcciones
+  guardadas y recolección.
 - La capa BFF real (`src/lib/api/` + Route Handlers) — todo sigue siendo
   mocks resueltos client-side detrás de los seams.
 - Confirmar con backend si `DomiciliosRecoleccionesCliente` (o algún otro
@@ -467,6 +504,8 @@ login), `/soporte` y `/perfil` (protegida por login, sin diseño en Figma).
   por `wsGeneracionRecoleccion` en el momento de agendar — de eso depende
   si `guardarDomicilio()`/`eliminarDomicilio()` en `src/lib/domicilios.ts`
   se conectan tal cual están o se rediseñan.
+- Confirmar de dónde sale `K_Cliente` para `wsGeneracionRecoleccion` — no
+  viene en la respuesta de `Login` (ver arriba, sección `/recoleccion`).
 
 ---
 
