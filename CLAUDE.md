@@ -469,9 +469,9 @@ cliente para cada demo semanal.
         3 tarjetas (Llámanos, Envíanos un mensaje, ¡Síguenos en redes!). Las
         redes sociales reutilizan los mismos SVG que ya usaba `Footer`
         (`facebook.svg`/`instagram.svg`/`linkedin.svg`), solo más grandes.
-        La flecha decorativa que en el Figma apunta al widget de chat se
-        agregó como imagen (`icons/soporte-arrow.svg`), rotada con CSS para
-        aproximar el ángulo del Figma — es puramente decorativa.
+        El Figma tiene una flecha decorativa apuntando al widget de chat;
+        se quitó a pedido del usuario (2026-08-14) — se veía mal recortada
+        junto al texto en varios anchos de pantalla.
       - `ContactoForm`: el formulario "¿Necesitas que te contactemos?"
         (nombre/correo/mensaje) es un seam nuevo,
         `enviarContactoSoporte()` en `src/lib/soporte.ts`, hermano de

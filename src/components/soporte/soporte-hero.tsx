@@ -53,14 +53,6 @@ export function SoporteHero() {
         </p>
       </div>
 
-      <Image
-        src="/icons/soporte-arrow.svg"
-        alt=""
-        width={90}
-        height={75}
-        className="pointer-events-none absolute right-10 top-6 hidden rotate-[100deg] opacity-80 sm:block"
-      />
-
       <div className="flex flex-wrap gap-6">
         {TARJETAS.map((t) => (
           <div
