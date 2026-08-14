@@ -204,6 +204,23 @@ Endpoints disponibles hoy (detalle de payloads en el PDF):
 | `wsGeneracionGuiaCliente` | Documentar guía |
 | `Genera_Etiqueta` | Etiqueta PDF en Base64 |
 
+### Prueba de conectividad real contra `apitest.inbox.com.mx` (2026-08-14)
+
+Se probó `Login` de verdad vía `curl` (fuera de la app, nada de esto se
+conectó al mock). Tres hallazgos para la próxima charla con backend/cliente
+— detalle completo en CLAUDE.md:
+
+1. El ambiente de pruebas está detrás de Cloudflare (managed challenge) —
+   sin headers de navegador responde un 403 con página de challenge, no la
+   API. Preguntar si producción tiene la misma protección y qué necesita un
+   server-to-server (BFF) para pasarla.
+2. La respuesta real de `Login` vino como `{"resp":{"result":1,"data":"...",
+   "token":null}}`, **no** como `{"success","mensaje","data"}` que dice el
+   PDF — o el PDF quedó desactualizado, o el ambiente cambió. Confirmar
+   antes de programar el cliente API para dos formatos distintos.
+3. Las credenciales de ejemplo del PDF (`INBOX`/`Prueba`) no autentican en
+   el ambiente actual — pedir credenciales de prueba vigentes.
+
 **Pendientes de backend** (NO construir la integración real todavía, usar
 mocks claramente identificados como tal en la UI): pagos (referencias/
 actualización de pago, PayPal/Santander/MIT), registro/login de usuario y

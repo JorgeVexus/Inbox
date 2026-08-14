@@ -137,6 +137,40 @@ SIBOX, historial de envíos/recolecciones, facturación. Ver sección 10 del
 plan de desarrollo para las prioridades exactas a pedir al backend por
 semana.
 
+### Prueba de conectividad real (2026-08-14)
+
+Se probó `POST https://apitest.inbox.com.mx/Login` de verdad (vía `curl`,
+fuera de la app) con las credenciales de ejemplo del PDF (`INBOX`/`Prueba`).
+Dos hallazgos que cambian supuestos de este documento:
+
+1. **El ambiente de pruebas está detrás de Cloudflare** (managed challenge).
+   Una petición sin headers de navegador (`User-Agent`, `Origin`, `Referer`)
+   recibe un **403 con una página de challenge JS**, no la respuesta de la
+   API. Con esos headers agregados, sí responde JSON normalmente. Esto
+   importa para la futura capa BFF: el Route Handler server-side deberá
+   mandar headers creíbles (o el cliente deberá whitelistear la IP/origen
+   del servidor de producción) o se topará con el mismo bloqueo — **hay que
+   preguntarle al cliente/backend si el ambiente de producción tiene la
+   misma protección y qué hace falta para que un server-to-server la
+   pase**.
+2. **El formato real de la respuesta de `Login` no coincide con el PDF.**
+   La prueba devolvió `{"resp":{"result":1,"data":"USUARIO/CONTRASEÑA
+   INVALIDOS.","token":null}}` — el formato estándar `{resp:{result,data}}`
+   que el PDF dice que **Login NO usa** (documentado ahí como
+   `{success,mensaje,data}`). O el PDF está desactualizado, o el ambiente de
+   pruebas cambió desde que se escribió — **hay que confirmar con backend
+   cuál es el formato real antes de programar el cliente API para manejar
+   los dos casos como dice la sección de arriba**; podría ser que ya no
+   haga falta la rama especial para `Login`.
+3. **Las credenciales de ejemplo del PDF no autentican** en el ambiente de
+   pruebas actual (mismo error de "usuario/contraseña inválidos" con
+   credenciales vacías y con las del PDF) — hay que pedirle al cliente
+   credenciales de prueba reales y vigentes.
+
+Ninguno de estos hallazgos se conectó a la app (el mock sigue siendo la
+fuente de datos); es solo información para la siguiente conversación con
+backend/cliente.
+
 ## 5. Reglas de seguridad (no negociables)
 
 Tomadas del plan de desarrollo — aplican a cualquier feature que toque la
