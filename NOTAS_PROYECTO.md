@@ -14,7 +14,7 @@
 > principal edita después de cada feature); conviene revisar ambos y avisar
 > si hay contradicciones.
 >
-> Última actualización: 2026-08-14.
+> Última actualización: 2026-08-14 (agregada `/perfil`).
 
 ---
 
@@ -411,15 +411,62 @@ porque son dos flujos distintos en el Figma que podrían terminar en destinos
 distintos). Reutiliza `CoberturaCTA` y `Faq` de Home tal cual, mismo patrón
 que `/somos`.
 
+### `/perfil` — sin diseño en Figma, decisión de producto tomada en código
+Pedido explícito: "decide qué poner ahí... considerando la info de las APIs
+que tenemos". Mismo patrón visual y de login-gate que `/envio` (breadcrumb,
+títulos `font-display text-4xl/5xl`, badge "Datos demo", fondo
+`neutral-bg`) para que ambas páginas de cuenta se sientan de la misma
+familia. El Navbar ahora enlaza aquí: "Hola, {nombre}" pasó de texto plano a
+`<Link href="/perfil">`.
+
+Criterio de alcance: de todo lo que se podría poner en un perfil, solo se
+construyó lo que tiene una base real en la API SIBOX documentada — no se
+inventaron features sin respaldo:
+
+- **Datos de mi cuenta**: solo lectura (`session.nombre`/`session.usuario`).
+  No hay endpoint de perfil documentado más allá de `Login`, así que no hay
+  edición de correo/teléfono — la UI lo explica en una nota, no lo omite en
+  silencio.
+- **Datos de facturación**: reutiliza `FacturacionModal` **tal cual** (antes
+  solo vivía en `step-pago.tsx`), con dos props nuevas opcionales
+  (`usuario`, `datosIniciales`) para poder reabrirlo aquí precargado.
+  `obtenerDatosFacturacionGuardados()`/`guardarDatosFacturacionLocal()`
+  (nuevas en `src/lib/facturacion.ts`) cachean el resultado en
+  `localStorage` por usuario — es una caché de demo, no un GET real: no
+  hay endpoint documentado para "traer mis datos fiscales guardados", solo
+  para consultar un RFC ya existente.
+- **Direcciones guardadas**: la pieza con más base real —
+  `DomiciliosRecoleccionesCliente` sí es un endpoint documentado
+  ("domicilios pre-registrados del cliente"). Seam nuevo completo:
+  `src/types/domicilio.ts` + `src/lib/mock/domicilios.ts` +
+  `src/lib/domicilios.ts`. **Solo la lectura tiene respaldo documentado** —
+  no hay endpoint confirmado para crear/editar/eliminar un domicilio, así
+  que esas operaciones están implementadas contra `localStorage` (mismo
+  patrón que el alias de `/envio`) y quedan marcadas en el código como
+  pendientes de confirmar con backend. El modal de agregar/editar reutiliza
+  el seam de `BusquedaCP` (`buscarCodigoPostal`) para autocompletar
+  estado/ciudad, igual que `FacturacionModal`.
+- **Mis envíos**: no se duplicó nada, es una tarjeta con link a `/envio`.
+
+Cubierto por `src/lib/domicilios.test.ts` (validación, sembrado desde mock,
+fallo de `localStorage` no finge éxito — mismo patrón que
+`envios.test.ts`).
+
 ### Ya existen todas las páginas enlazadas desde Navbar/Footer
 `/`, `/cotizar`, `/rastreo`, `/somos`, `/cobertura`, `/envio` (protegida por
-login) y `/soporte`.
+login), `/soporte` y `/perfil` (protegida por login, sin diseño en Figma).
 
 ### Todavía pendiente
 - Playwright/E2E. Vitest ya está configurado (`npm test`) y la suite incluye
-  lógica pura y flujos protegidos del perfil de envíos.
+  lógica pura y flujos protegidos del perfil de envíos y de direcciones
+  guardadas.
 - La capa BFF real (`src/lib/api/` + Route Handlers) — todo sigue siendo
   mocks resueltos client-side detrás de los seams.
+- Confirmar con backend si `DomiciliosRecoleccionesCliente` (o algún otro
+  endpoint) soporta crear/editar/eliminar domicilios, o si eso siempre pasa
+  por `wsGeneracionRecoleccion` en el momento de agendar — de eso depende
+  si `guardarDomicilio()`/`eliminarDomicilio()` en `src/lib/domicilios.ts`
+  se conectan tal cual están o se rediseñan.
 
 ---
 

@@ -63,9 +63,12 @@ export function Navbar() {
           </button>
           {session ? (
             <div className="flex items-center gap-3">
-              <span className="font-display text-base font-bold text-white">
+              <Link
+                href="/perfil"
+                className="font-display text-base font-bold text-white underline-offset-4 hover:underline"
+              >
                 Hola, {session.nombre}
-              </span>
+              </Link>
               <button
                 type="button"
                 onClick={logout}
@@ -112,9 +115,13 @@ export function Navbar() {
             ))}
             {session ? (
               <div className="mt-2 flex flex-col items-start gap-3">
-                <span className="font-display text-base font-bold text-white">
+                <Link
+                  href="/perfil"
+                  onClick={() => setOpen(false)}
+                  className="font-display text-base font-bold text-white underline-offset-4 hover:underline"
+                >
                   Hola, {session.nombre}
-                </span>
+                </Link>
                 <button
                   type="button"
                   onClick={() => {

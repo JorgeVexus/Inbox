@@ -484,11 +484,56 @@ cliente para cada demo semanal.
         campos; al enviar limpia el formulario y muestra confirmación.
       - Reutiliza `CoberturaCTA` y `Faq` de Home **tal cual**, sin wrapper —
         mismo patrón que `/somos`.
+- [x] **Página protegida `/perfil`** (`src/app/perfil/page.tsx` +
+      `src/components/perfil/*`) — **sin diseño en Figma**, pedida
+      explícitamente ("decide qué poner ahí... considerando la info de las
+      APIs que tenemos"). Mismo patrón visual y de gate que `/envio`
+      (breadcrumb, `font-display text-4xl/5xl`, badge "Datos demo",
+      `neutral-bg`) para que las dos páginas de cuenta se vean como una
+      familia. El Navbar ahora enlaza aquí: "Hola, {nombre}" es un link a
+      `/perfil` en vez de solo texto (desktop y menú móvil).
+      - **Decisión de alcance**: de todo lo que pedía el mensaje (perfil,
+        direcciones, facturación, etc.), se armó solo lo que tiene una base
+        real en la API SIBOX documentada, para no inventar features sin
+        respaldo:
+        - **Datos de mi cuenta**: solo lectura (`session.nombre` /
+          `session.usuario`). No hay endpoint de perfil documentado más
+          allá de `Login`, así que no se agregó edición de correo/teléfono
+          — se dejó una nota explícita en la UI de por qué.
+        - **Datos de facturación**: reutiliza `FacturacionModal` **tal
+          cual** (antes solo se abría desde `step-pago.tsx`); se le
+          agregaron props opcionales `usuario` y `datosIniciales` para
+          poder reabrirlo aquí precargado y cachear el resultado. Esa
+          caché es nueva: `obtenerDatosFacturacionGuardados()` /
+          `guardarDatosFacturacionLocal()` en `src/lib/facturacion.ts`,
+          en `localStorage` por usuario — **es solo para que la demo
+          tenga algo que mostrar**, no simula un GET real (no hay
+          endpoint documentado para "traer mis datos fiscales guardados",
+          solo para consultar un RFC ya existente).
+        - **Direcciones guardadas**: la pieza con más base real —
+          `DomiciliosRecoleccionesCliente` sí es un endpoint documentado
+          ("domicilios pre-registrados del cliente"). Seam nuevo en
+          `src/lib/domicilios.ts` + `src/types/domicilio.ts` +
+          `src/lib/mock/domicilios.ts`. **Solo la lectura tiene respaldo
+          documentado** — no hay endpoint confirmado para crear/editar/
+          eliminar un domicilio, así que agregar/editar/eliminar están
+          implementados contra `localStorage` (mismo patrón que el alias
+          de `/envio`) y quedan explícitamente marcados en el código como
+          pendientes de confirmar con backend antes de conectarlos de
+          verdad. El modal reutiliza el seam de `BusquedaCP`
+          (`buscarCodigoPostal`) para autocompletar estado/ciudad, igual
+          que `FacturacionModal`.
+        - **Mis envíos**: no se duplicó nada — es solo una tarjeta con
+          link a `/envio`, que ya existe.
+      - Tests: `src/lib/domicilios.test.ts` cubre `validarDomicilio`, el
+        sembrado desde el mock, y que un fallo de `localStorage` no finja
+        éxito (mismo patrón que `envios.test.ts`).
 - [x] Vitest configurado (`npm test`); la suite cubre lógica pura y flujos
-      protegidos del perfil de envíos. Playwright/E2E sigue pendiente.
+      protegidos del perfil de envíos y de direcciones guardadas.
+      Playwright/E2E sigue pendiente.
 - [x] Ya existen todas las páginas que el Navbar/Footer enlazan: `/`,
       `/cotizar`, `/rastreo`, `/somos`, `/cobertura`, `/envio` (protegida),
-      `/soporte`.
+      `/soporte`, `/perfil` (protegida, sin diseño en Figma).
 
 ## 8. Cómo correr el proyecto
 

@@ -12,11 +12,21 @@ import type { DatosFacturacion } from "@/types/facturacion";
 export function FacturacionModal({
   onClose,
   onSuccess,
+  usuario,
+  datosIniciales,
 }: {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (datos: DatosFacturacion) => void;
+  /** When passed, a successful save is also cached locally for this user
+   * (see obtenerDatosFacturacionGuardados in lib/facturacion.ts) so /perfil
+   * can display it later. Omitted by the checkout flow (step-pago.tsx),
+   * which has no saved-data display to keep in sync. */
+  usuario?: string;
+  datosIniciales?: DatosFacturacion;
 }) {
-  const [datos, setDatos] = useState<DatosFacturacion>(datosFacturacionVacios());
+  const [datos, setDatos] = useState<DatosFacturacion>(
+    datosIniciales ?? datosFacturacionVacios(),
+  );
   const [colonias, setColonias] = useState<string[]>([]);
   const [buscandoCP, setBuscandoCP] = useState(false);
 
@@ -77,13 +87,13 @@ export function FacturacionModal({
   async function handleAceptar() {
     setErrorGuardar(null);
     setGuardando(true);
-    const res = await guardarDatosFacturacion(datos);
+    const res = await guardarDatosFacturacion(datos, usuario);
     setGuardando(false);
     if (!res.ok) {
       setErrorGuardar(res.mensaje ?? "No se pudieron guardar los datos.");
       return;
     }
-    onSuccess();
+    onSuccess(datos);
   }
 
   return (
