@@ -236,6 +236,21 @@ cliente para cada demo semanal.
         resuelve `{ ok: true }` — falta decidir con backend/producto si esto
         termina siendo un lead a CRM, un webhook, o un widget de terceros
         (Zendesk/Intercom) antes de conectarlo de verdad.
+        **Re-confirmado el 2026-08-14**: se buscó "chat"/"ticket"/"asesor"
+        en las 3 fuentes de `../Documentacion/` (el PDF de la API completo
+        vía `pdftotext`, y los dos `.docx` de pantallas/plan) — cero
+        resultados. Si el sitio actual de Inbox ya tiene un chat en vivo,
+        ese chat no es parte de la API SIBOX documentada; es casi
+        seguro un widget de terceros (Zendesk/Intercom/WhatsApp Business
+        o similar) integrado aparte, y conectarlo aquí requiere que el
+        cliente diga cuál usa y sus credenciales — no hay endpoint propio
+        que "activar".
+      - **Widget siempre por encima del contenido**: el panel del chat
+        (y el propio botón flotante) usan `z-[1150]` para quedar sobre el
+        mapa de Leaflet de Cobertura (sus controles y paneles internos
+        llegan a `z-index:1000`) y sobre el Navbar (`z-[1100]`), pero por
+        debajo de los modales (`z-[1200]`) — ver sección "Reglas de
+        z-index" más abajo si agregas un nuevo overlay.
       - **Ayuda**: buscador + acordeón de categorías con preguntas de
         ejemplo (`FAQ_TOPICS` hardcodeado en el mismo archivo) — contenido
         de relleno, pendiente que Inbox entregue las preguntas/respuestas
@@ -562,3 +577,21 @@ preview del agente (`npm --prefix repo run dev`, puerto 3000).
 - Imágenes locales siempre vía `next/image` (ya configurado, no se necesitan
   dominios remotos en `next.config.ts` mientras los assets vivan en
   `public/`).
+
+### Reglas de z-index
+
+Escala fija (de menor a mayor) para que un overlay nuevo no tape ni quede
+tapado por accidente — Leaflet (usado en el mapa de Cobertura) reserva
+z-index hasta 1000 para sus propios controles/paneles, lo cual ya rompió el
+Navbar una vez (2026-08-14) cuando este estaba en `z-50`:
+
+| z-index | Qué lo usa |
+|---|---|
+| `z-40` y menores | Overlays internos de una sección (dropdowns del mapa `z-500`/`z-600`, el panel `SucursalPanel` de `cobertura.tsx`, etc.) — cualquier cosa que solo necesita ganarle a su propio contenido hermano. |
+| hasta `z-index:1000` (no-Tailwind) | Reservado por Leaflet internamente (`.leaflet-top`/`.leaflet-bottom`, controles de zoom). No lo pises con nada por debajo de `z-[1100]` si esperas que quede encima del mapa. |
+| `z-[1100]` | `Navbar` (sticky). |
+| `z-[1150]` | `ChatWidget` flotante (botón + panel) — encima del Navbar y de Leaflet, pero por debajo de los modales. |
+| `z-[1200]` | Modales de página completa (`LoginModal`, `FacturacionModal`, `DomicilioModal`, `NombreEnvioModal`) — siempre el nivel más alto, deben tapar cualquier otra cosa incluyendo el Navbar y el chat. |
+
+Si agregas un overlay nuevo que compite visualmente con el Navbar, el chat o
+un modal, usa esta tabla en vez de adivinar un número.

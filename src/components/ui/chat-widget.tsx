@@ -87,7 +87,7 @@ export function ChatWidget() {
   const [tab, setTab] = useState<Tab>("home");
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-[1150] flex flex-col items-end gap-3">
       {open && (
         <div className="flex h-[550px] w-[calc(100vw-2rem)] max-w-[369px] flex-col overflow-hidden rounded-md bg-neutral-bg shadow-card">
           <button
