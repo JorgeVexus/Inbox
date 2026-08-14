@@ -8,8 +8,12 @@ export default function SoportePage() {
     <>
       <SoporteHero />
       <ContactoForm />
-      <CoberturaCTA />
-      <Faq />
+      <div className="mt-16">
+        <CoberturaCTA />
+      </div>
+      <div className="my-16">
+        <Faq />
+      </div>
     </>
   );
 }
