@@ -17,9 +17,9 @@ export function Navbar() {
   const { session, openLogin, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 bg-primary shadow-nav">
+    <header className="sticky top-0 z-[1100] bg-primary shadow-nav">
       <div className="mx-auto flex h-[91px] max-w-[1440px] items-center justify-between gap-6 px-6 lg:px-10">
-        <Link href="/" className="relative h-[45px] w-[220px] shrink-0">
+        <Link href="/" className="relative h-[64px] w-[220px] shrink-0">
           <Image
             src="/images/logo-blanco-horizontal.png"
             alt="Inbox"
