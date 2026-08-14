@@ -463,10 +463,32 @@ cliente para cada demo semanal.
       - Se quitó el `<Popup>` nativo de Leaflet que tenía cada marcador
         (`cobertura-map.tsx`) — mostraba la misma información dos veces
         (el popup de Leaflet y el panel nuevo) al mismo tiempo.
-- [ ] Sin página `/soporte` — el Navbar/Footer ya enlazan a esa ruta pero
-      todavía da 404.
+- [x] **Página `/soporte`** (`src/app/soporte/page.tsx` +
+      `src/components/soporte/*`) — Figma node `341:27315`.
+      - `SoporteHero`: encabezado "¿Tienes dudas? Pregunta a nuestro chat" +
+        3 tarjetas (Llámanos, Envíanos un mensaje, ¡Síguenos en redes!). Las
+        redes sociales reutilizan los mismos SVG que ya usaba `Footer`
+        (`facebook.svg`/`instagram.svg`/`linkedin.svg`), solo más grandes.
+        La flecha decorativa que en el Figma apunta al widget de chat se
+        agregó como imagen (`icons/soporte-arrow.svg`), rotada con CSS para
+        aproximar el ángulo del Figma — es puramente decorativa.
+      - `ContactoForm`: el formulario "¿Necesitas que te contactemos?"
+        (nombre/correo/mensaje) es un seam nuevo,
+        `enviarContactoSoporte()` en `src/lib/soporte.ts`, hermano de
+        `enviarContactoChat()` que ya usaba el widget de chat — mismo
+        problema (no hay endpoint de chat/ticket en SIBOX), pero se dejó
+        como función separada en vez de generalizar la existente porque son
+        dos flujos distintos en el Figma (uno dentro del widget global, uno
+        en esta página) que podrían terminar en destinos distintos cuando
+        backend decida. Botón "Enviar" deshabilitado hasta llenar los 3
+        campos; al enviar limpia el formulario y muestra confirmación.
+      - Reutiliza `CoberturaCTA` y `Faq` de Home **tal cual**, sin wrapper —
+        mismo patrón que `/somos`.
 - [x] Vitest configurado (`npm test`); la suite cubre lógica pura y flujos
       protegidos del perfil de envíos. Playwright/E2E sigue pendiente.
+- [x] Ya existen todas las páginas que el Navbar/Footer enlazan: `/`,
+      `/cotizar`, `/rastreo`, `/somos`, `/cobertura`, `/envio` (protegida),
+      `/soporte`.
 
 ## 8. Cómo correr el proyecto
 

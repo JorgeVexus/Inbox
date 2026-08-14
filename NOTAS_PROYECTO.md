@@ -14,7 +14,7 @@
 > principal edita después de cada feature); conviene revisar ambos y avisar
 > si hay contradicciones.
 >
-> Última actualización: 2026-08-13.
+> Última actualización: 2026-08-14.
 
 ---
 
@@ -400,8 +400,22 @@ propio de esta página.
   panel son decorativos (no hay nada que buscar en la ficha de una sola
   sucursal).
 
-### Todavía no existen
-- `/soporte` — el Navbar/Footer ya enlazan ahí pero da 404.
+### `/soporte`
+Figma node `341:27315`. `SoporteHero` (encabezado + 3 tarjetas: Llámanos /
+Envíanos un mensaje / ¡Síguenos en redes!, reutilizando los íconos sociales
+que ya usaba `Footer`) + `ContactoForm` (formulario nombre/correo/mensaje,
+seam nuevo `enviarContactoSoporte()` en `src/lib/soporte.ts`, hermano de
+`enviarContactoChat()` del widget de chat — mismo problema de fondo, sin
+endpoint de chat/ticket en SIBOX, pero se mantienen como funciones separadas
+porque son dos flujos distintos en el Figma que podrían terminar en destinos
+distintos). Reutiliza `CoberturaCTA` y `Faq` de Home tal cual, mismo patrón
+que `/somos`.
+
+### Ya existen todas las páginas enlazadas desde Navbar/Footer
+`/`, `/cotizar`, `/rastreo`, `/somos`, `/cobertura`, `/envio` (protegida por
+login) y `/soporte`.
+
+### Todavía pendiente
 - Playwright/E2E. Vitest ya está configurado (`npm test`) y la suite incluye
   lógica pura y flujos protegidos del perfil de envíos.
 - La capa BFF real (`src/lib/api/` + Route Handlers) — todo sigue siendo

@@ -16,3 +16,22 @@ export async function enviarContactoChat(email: string): Promise<{ ok: boolean }
   await new Promise((resolve) => setTimeout(resolve, 400));
   return { ok: true };
 }
+
+/**
+ * Same situation as `enviarContactoChat()` above, but for the full
+ * "¿Necesitas que te contactemos?" form on `/soporte` (Figma node
+ * `349:27815`): nombre + correo + mensaje instead of just an email. Kept as
+ * a separate function rather than generalizing `enviarContactoChat()`
+ * because the two forms are unrelated in the Figma (different flows, one
+ * inside the chat widget, one a standalone page section) and may end up
+ * hitting different destinations once backend decides where leads go.
+ */
+export async function enviarContactoSoporte(datos: {
+  nombre: string;
+  correo: string;
+  mensaje: string;
+}): Promise<{ ok: boolean }> {
+  void datos; // not sent anywhere yet — see doc comment above
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  return { ok: true };
+}
