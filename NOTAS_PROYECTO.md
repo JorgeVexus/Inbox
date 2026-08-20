@@ -184,10 +184,12 @@ Jun26.pdf` (fuera del repo). Resumen para no releerlo cada vez:
   demás llamadas van con `Authorization: Bearer {token}`.
 - **Formato de respuesta estándar**: `{"resp": {"result": 0|1, "data": ...}}`
   (`result: 0` = éxito, `1` = error, mensaje en `data`).
-- ⚠️ **Excepción importante**: `Login` (y `Cobertura` en su rama de error)
-  usan en cambio `{"success": bool, "mensaje": "...", "data": ...}`. El
-  cliente API del BFF debe manejar ambos formatos, no asumir uno solo — es un
-  error fácil de cometer al conectar el login de verdad.
+- ⚠️ El PDF documenta que `Login` (y `Cobertura` en su rama de error) usan en
+  cambio `{"success": bool, "mensaje": "...", "data": ...}` — **pero la
+  prueba real del 2026-08-14 (ver abajo) muestra que `Login` responde
+  `{resp:{result,data}}` igual que todo lo demás**. El cliente API debe
+  poder manejar ambos formatos por seguridad, pero probablemente la
+  excepción documentada ya no aplica — confirmar con backend.
 
 Endpoints disponibles hoy (detalle de payloads en el PDF):
 
@@ -206,20 +208,33 @@ Endpoints disponibles hoy (detalle de payloads en el PDF):
 
 ### Prueba de conectividad real contra `apitest.inbox.com.mx` (2026-08-14)
 
-Se probó `Login` de verdad vía `curl` (fuera de la app, nada de esto se
-conectó al mock). Tres hallazgos para la próxima charla con backend/cliente
-— detalle completo en CLAUDE.md:
+Se probaron `Login` y `wsRastreo` de verdad vía `curl` (fuera de la app,
+nada de esto se conectó al mock). Hallazgos — detalle completo en CLAUDE.md:
 
 1. El ambiente de pruebas está detrás de Cloudflare (managed challenge) —
    sin headers de navegador responde un 403 con página de challenge, no la
    API. Preguntar si producción tiene la misma protección y qué necesita un
    server-to-server (BFF) para pasarla.
-2. La respuesta real de `Login` vino como `{"resp":{"result":1,"data":"...",
-   "token":null}}`, **no** como `{"success","mensaje","data"}` que dice el
-   PDF — o el PDF quedó desactualizado, o el ambiente cambió. Confirmar
-   antes de programar el cliente API para dos formatos distintos.
+2. `Login` responde `{"resp":{"result":1,"data":"..."}}`, **no**
+   `{"success","mensaje","data"}` como dice el PDF — y `wsRastreo` responde
+   con el mismo sobre (probado sin `Authorization` y con un Bearer
+   inválido, ambos 401 con `{resp:{result,data}}`). Todo apunta a que la
+   excepción de `Login` en el PDF ya no aplica; confirmar con backend antes
+   de programar el cliente API para dos formatos distintos.
 3. Las credenciales de ejemplo del PDF (`INBOX`/`Prueba`) no autentican en
-   el ambiente actual — pedir credenciales de prueba vigentes.
+   el ambiente actual — pedir credenciales de prueba vigentes. Sin esto no
+   se puede obtener un token válido para probar `wsRastreo` con datos
+   reales.
+4. **`apitest.inbox.com.mx` no soporta CORS** — un preflight `OPTIONS` a
+   `/Login` da `405` sin ningún header `Access-Control-*`, y la respuesta
+   normal tampoco trae `Access-Control-Allow-Origin`. Esto responde la
+   pregunta "¿el BFF es realmente necesario?": **sí, y no es negociable** —
+   sin CORS, un `fetch()` desde el navegador del sitio (otro origen) es
+   bloqueado por el propio navegador antes de que la respuesta llegue a la
+   UI, sin importar qué tan relajadas estuvieran las demás reglas de
+   seguridad. Necesitas un proxy same-origin (el BFF) solo para que el
+   navegador pueda hablar con SIBOX, aparte de las razones de seguridad ya
+   documentadas (ocultar credenciales, recalcular precios, rate limiting).
 
 **Pendientes de backend** (NO construir la integración real todavía, usar
 mocks claramente identificados como tal en la UI): pagos (referencias/

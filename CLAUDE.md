@@ -110,10 +110,14 @@ Jun26.pdf`. Resumen que necesitas para no releerlo cada vez:
 - Auth: `POST /Login` con `{Usuario, Password}` → devuelve `token`. Todas las
   demás llamadas van con `Authorization: Bearer {token}`.
 - Formato de respuesta estándar: `{"resp": {"result": 0|1, "data": ...}}`
-  (`result: 0` = éxito, `1` = error, mensaje en `data`). Dos endpoints viejos
-  (`Login`, `Cobertura` en su rama de error) usan en cambio
-  `{"success": bool, "mensaje": "...", "data": ...}` — maneja ambos formatos
-  en el cliente API, no asumas uno solo.
+  (`result: 0` = éxito, `1` = error, mensaje en `data`). El PDF dice que
+  `Login` (y `Cobertura` en su rama de error) usan en cambio
+  `{"success": bool, "mensaje": "...", "data": ...}` — **pero la prueba real
+  contra el ambiente de pruebas (2026-08-14, ver más abajo) muestra que
+  `Login` en la práctica también responde `{resp:{result,data}}`**. El
+  cliente API debe poder manejar ambos formatos por seguridad, pero todo
+  indica que la excepción documentada para `Login` ya no aplica — confirmar
+  con backend antes de asumir cuál es el real.
 
 Endpoints disponibles hoy (ver detalle de payloads en el PDF):
 
@@ -137,39 +141,48 @@ SIBOX, historial de envíos/recolecciones, facturación. Ver sección 10 del
 plan de desarrollo para las prioridades exactas a pedir al backend por
 semana.
 
-### Prueba de conectividad real (2026-08-14)
+### Prueba de conectividad real (2026-08-14, `Login` + `wsRastreo`)
 
-Se probó `POST https://apitest.inbox.com.mx/Login` de verdad (vía `curl`,
-fuera de la app) con las credenciales de ejemplo del PDF (`INBOX`/`Prueba`).
-Dos hallazgos que cambian supuestos de este documento:
+Se probaron `POST https://apitest.inbox.com.mx/Login` y `.../wsRastreo` de
+verdad (vía `curl`, fuera de la app — nada de esto tocó el mock ni la UI).
+Hallazgos:
 
 1. **El ambiente de pruebas está detrás de Cloudflare** (managed challenge).
    Una petición sin headers de navegador (`User-Agent`, `Origin`, `Referer`)
    recibe un **403 con una página de challenge JS**, no la respuesta de la
-   API. Con esos headers agregados, sí responde JSON normalmente. Esto
-   importa para la futura capa BFF: el Route Handler server-side deberá
-   mandar headers creíbles (o el cliente deberá whitelistear la IP/origen
-   del servidor de producción) o se topará con el mismo bloqueo — **hay que
-   preguntarle al cliente/backend si el ambiente de producción tiene la
-   misma protección y qué hace falta para que un server-to-server la
-   pase**.
-2. **El formato real de la respuesta de `Login` no coincide con el PDF.**
-   La prueba devolvió `{"resp":{"result":1,"data":"USUARIO/CONTRASEÑA
-   INVALIDOS.","token":null}}` — el formato estándar `{resp:{result,data}}`
-   que el PDF dice que **Login NO usa** (documentado ahí como
-   `{success,mensaje,data}`). O el PDF está desactualizado, o el ambiente de
-   pruebas cambió desde que se escribió — **hay que confirmar con backend
-   cuál es el formato real antes de programar el cliente API para manejar
-   los dos casos como dice la sección de arriba**; podría ser que ya no
-   haga falta la rama especial para `Login`.
-3. **Las credenciales de ejemplo del PDF no autentican** en el ambiente de
-   pruebas actual (mismo error de "usuario/contraseña inválidos" con
-   credenciales vacías y con las del PDF) — hay que pedirle al cliente
-   credenciales de prueba reales y vigentes.
+   API. Con esos headers agregados, sí responde JSON normalmente. Hay que
+   preguntarle al cliente/backend si producción tiene la misma protección.
 
-Ninguno de estos hallazgos se conectó a la app (el mock sigue siendo la
-fuente de datos); es solo información para la siguiente conversación con
-backend/cliente.
+2. **`Login` en la práctica responde `{resp:{result,data}}`, igual que todo
+   lo demás** — probado también contra `wsRastreo` (sin `Authorization` →
+   `{"resp":{"result":1,"data":"No se detectó el header de autorización."}}`;
+   con un Bearer inválido → `{"resp":{"result":1,"data":"El formato del
+   token es incorrecto."}}`, ambos con HTTP 401). Los tres responden con el
+   mismo sobre. Todo indica que la excepción de `Login` que describe el PDF
+   (`{success,mensaje,data}`) **ya no aplica en este ambiente** — confirmar
+   con backend, pero probablemente ya no haga falta la rama especial en el
+   cliente API.
+
+3. **Las credenciales de ejemplo del PDF no autentican** en el ambiente de
+   pruebas actual (mismo error con credenciales vacías y con las del PDF) —
+   pedirle al cliente credenciales de prueba reales y vigentes. Sin esto no
+   se puede obtener un `token` válido para probar `wsRastreo` con datos
+   reales todavía.
+
+4. **`apitest.inbox.com.mx` no soporta CORS** — un preflight `OPTIONS` a
+   `/Login` responde `405 Method Not Allowed` sin ningún header
+   `Access-Control-*`, y la respuesta normal tampoco trae
+   `Access-Control-Allow-Origin`. Esto **no es opcional de resolver**: un
+   `fetch()` hecho directamente desde el navegador del sitio (otro origen)
+   será bloqueado por el navegador antes de que la respuesta llegue a la
+   UI, sin importar si el resto de las reglas de seguridad se relajaran. Es
+   la prueba más concreta de que la capa BFF (o al menos un proxy same-origin)
+   no es una preferencia de arquitectura — es un requisito técnico duro
+   para que el sitio pueda hablar con SIBOX desde el navegador.
+
+Ver también la pregunta "¿es necesario el BFF?" resuelta con este hallazgo
+en la conversación del proyecto — la respuesta corta es sí, y el CORS
+ausente es la razón que no admite vuelta.
 
 ## 5. Reglas de seguridad (no negociables)
 
