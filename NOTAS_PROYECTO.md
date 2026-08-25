@@ -268,6 +268,29 @@ asociación a cliente SIBOX, historial de envíos/recolecciones, facturación
 (el flujo está descrito pero no hay endpoint confirmado para *guardar* datos
 fiscales nuevos, solo para consultar un RFC existente).
 
+### `Login` es una cuenta técnica única para todo el sitio (confirmado por el cliente)
+
+Duda que traía el usuario al leer el PDF: si `wsRastreo` (y el resto) exigen
+`Authorization: Bearer Token`, ¿cada visitante necesita iniciar sesión solo
+para rastrear un paquete? No — **confirmado directamente por el cliente
+(WhatsApp, 2026-08-25): las credenciales de `Login` son una única cuenta de
+servicio para todo el sitio web, no una cuenta por cliente/usuario final.**
+
+Esto confirma la arquitectura ya asumida para el BFF: el servidor hace
+`Login` una sola vez con esa credencial de servicio (guardada como secreto
+de servidor, nunca expuesta al navegador), guarda el token, y lo reutiliza
+en el header `Authorization` para todas las llamadas "públicas" (rastreo,
+cotización, cobertura, búsqueda por CP) sin que el visitante nunca vea ni
+escriba usuario/contraseña. El login de `AuthProvider` (modal "Iniciar
+sesión" del sitio) es un concepto **aparte**: identifica a una persona para
+funciones de cuenta (Mis envíos, domicilios guardados), no tiene relación
+con el token de servicio del BFF.
+
+**Sigue pendiente**: las credenciales de ejemplo del PDF (`INBOX`/`Prueba`)
+no autentican en el ambiente de pruebas (confirmado varias veces con curl
+real, ver arriba) — falta que el cliente entregue la credencial de servicio
+vigente para poder probar cualquier endpoint con datos reales.
+
 **Sobre producción**: el equipo solo tiene la URL de pruebas
 (`apitest.inbox.com.mx`); no hay evidencia en `../Documentacion/` ni en este
 repo de que ya exista acceso o credenciales para `api.inbox.com.mx`

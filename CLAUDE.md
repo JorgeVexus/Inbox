@@ -206,6 +206,18 @@ autentican aquí — solo se ha confirmado el comportamiento de *rechazo* (401
 + sobre de error), nunca una respuesta exitosa con datos reales. Sigue
 pendiente pedir credenciales de prueba vigentes.
 
+### `Login` es cuenta de servicio única para todo el sitio (confirmado por cliente 2026-08-25)
+
+El `Usuario`/`Password` de `Login` **no es por cliente final** — es una
+cuenta técnica única del sitio web, confirmada directamente por el cliente
+por WhatsApp. El BFF hace `Login` una sola vez con esa credencial de
+servicio y reutiliza el token en el header `Authorization` para todas las
+llamadas públicas (rastreo, cotización, cobertura) sin que el visitante
+inicie sesión. El login de `AuthProvider` (modal del sitio) es un concepto
+aparte — identifica personas para funciones de cuenta, no tiene relación
+con este token de servicio. Sigue pendiente que el cliente entregue la
+credencial de servicio vigente (`INBOX`/`Prueba` del PDF ya no autentica).
+
 ### Producción vs Pruebas — solo tenemos acceso a Pruebas
 
 No hay evidencia de que el equipo tenga URL/credenciales de
