@@ -235,6 +235,31 @@ nada de esto se conectó al mock). Hallazgos — detalle completo en CLAUDE.md:
    seguridad. Necesitas un proxy same-origin (el BFF) solo para que el
    navegador pueda hablar con SIBOX, aparte de las razones de seguridad ya
    documentadas (ocultar credenciales, recalcular precios, rate limiting).
+   **Confirmado el 2026-08-25 que no es exclusivo de `/Login`**: el mismo
+   preflight contra `/ObtenerHorariosPorCP` (con headers de navegador
+   creíbles) también da `405` sin headers `Access-Control-*` — es una
+   política a nivel de gateway/Cloudflare, no algo que varíe por endpoint.
+5. **El PDF también documenta mal el formato de error de
+   `ObtenerHorariosPorCP`**: dice que un JWT inválido/vacío responde texto
+   plano `"El token JWT es inválido o está vacío."` con `401`, pero la
+   prueba real (2026-08-25, sin `Authorization` y con Bearer inválido)
+   devuelve el mismo sobre `{"resp":{"result":1,"data":"..."}}` que
+   `Login`/`wsRastreo` — mismo patrón que el hallazgo del punto 2, ahora
+   confirmado en un tercer endpoint. Conclusión práctica: el cliente API del
+   BFF puede asumir con bastante confianza el sobre `{resp:{result,data}}`
+   como el único formato real en este ambiente — las excepciones que
+   describe el PDF (`Login`, textos planos de error) parecen ser
+   documentación desactualizada, no comportamiento vigente. Aun así, dejar
+   el parser tolerante a ambos formatos por seguridad hasta que backend lo
+   confirme por escrito.
+6. **No se pudo probar ningún endpoint más allá del rechazo por
+   autenticación** — todos (`TipoEnvio`, `ObtenerHorariosPorCP`, etc.)
+   exigen Bearer Token válido y las credenciales de ejemplo del PDF no
+   autentican en este ambiente, así que no hay forma de ver una respuesta
+   exitosa real (con datos) todavía. Todo lo confirmado hasta ahora es el
+   comportamiento de rechazo (401) y el sobre de la respuesta — sigue
+   pendiente validar los `data` reales de cualquier endpoint una vez haya
+   credenciales vigentes.
 
 **Pendientes de backend** (NO construir la integración real todavía, usar
 mocks claramente identificados como tal en la UI): pagos (referencias/
@@ -242,6 +267,39 @@ actualización de pago, PayPal/Santander/MIT), registro/login de usuario y
 asociación a cliente SIBOX, historial de envíos/recolecciones, facturación
 (el flujo está descrito pero no hay endpoint confirmado para *guardar* datos
 fiscales nuevos, solo para consultar un RFC existente).
+
+**Sobre producción**: el equipo solo tiene la URL de pruebas
+(`apitest.inbox.com.mx`); no hay evidencia en `../Documentacion/` ni en este
+repo de que ya exista acceso o credenciales para `api.inbox.com.mx`
+(producción). Es una pregunta abierta para el cliente, no un hecho asumido.
+
+### Cómo funcionará el cambio de Pruebas → Producción
+
+El diseño de la capa BFF (Route Handlers server-side, nunca el navegador
+hablando directo con SIBOX) ya deja esto como un cambio de configuración, no
+de código:
+
+- La URL base (`apitest.inbox.com.mx` vs `api.inbox.com.mx`) y las
+  credenciales (`Usuario`/`Password` del `Login`) viven en variables de
+  entorno del servidor (`.env` en Vercel/hosting, nunca en el bundle del
+  cliente ni en `NEXT_PUBLIC_*`). Pasar de pruebas a producción es cambiar
+  esas variables en el entorno, no tocar `src/lib/api/*`.
+- Por eso conviene que el cliente HTTP interno del BFF reciba la URL base
+  como parámetro/config en vez de tenerla hardcodeada — ya es la práctica
+  planeada, solo dejarlo explícito aquí para no perderlo de vista al
+  construir `src/lib/api/`.
+- **Lo que sí puede cambiar entre ambientes y hay que volver a probar antes
+  de dar por buena la migración**: si producción tiene la misma protección
+  de Cloudflare (pendiente confirmar), si el formato de respuesta es
+  realmente uniforme ahí también (los hallazgos de arriba son solo del
+  ambiente de pruebas), y si las políticas de CORS/rate limiting de
+  producción difieren. No asumir que "funciona en test" implica "funciona
+  en prod" sin repetir al menos una prueba de conectividad real contra
+  `api.inbox.com.mx` antes del lanzamiento.
+- El plan de entregas ya contempla usar mocks identificados como demo
+  mientras no haya credenciales de prueba vigentes — eso no bloquea
+  construir el BFF en sí (los Route Handlers, el manejo de errores, la
+  validación Zod), solo bloquea probarlo end-to-end con datos reales.
 
 ---
 

@@ -184,6 +184,39 @@ Ver también la pregunta "¿es necesario el BFF?" resuelta con este hallazgo
 en la conversación del proyecto — la respuesta corta es sí, y el CORS
 ausente es la razón que no admite vuelta.
 
+### Prueba adicional (2026-08-25, `TipoEnvio` + `ObtenerHorariosPorCP`)
+
+Confirmó dos cosas del punto anterior en un tercer/cuarto endpoint (no solo
+`Login`/`wsRastreo`):
+
+1. **Ausencia de CORS es política de gateway, no por endpoint** — el
+   preflight `OPTIONS` a `/ObtenerHorariosPorCP` también da `405` sin
+   headers `Access-Control-*`.
+2. **El PDF documenta mal el formato de error de `ObtenerHorariosPorCP`**
+   (dice texto plano `401`, la prueba real da el mismo sobre
+   `{resp:{result,data}}` que todo lo demás) — mismo patrón que `Login`.
+   Conclusión: el sobre `{resp:{result,data}}` parece ser universal en este
+   ambiente; el parser del BFF debe seguir tolerando el formato alterno por
+   seguridad, pero no hay que asumir que hace falta para ningún endpoint en
+   particular.
+
+**Límite de lo que se puede probar sin credenciales**: todos los endpoints
+exigen Bearer Token válido y las credenciales de ejemplo del PDF no
+autentican aquí — solo se ha confirmado el comportamiento de *rechazo* (401
++ sobre de error), nunca una respuesta exitosa con datos reales. Sigue
+pendiente pedir credenciales de prueba vigentes.
+
+### Producción vs Pruebas — solo tenemos acceso a Pruebas
+
+No hay evidencia de que el equipo tenga URL/credenciales de
+`api.inbox.com.mx` (producción) — es una pregunta abierta para el cliente.
+El cambio de ambiente está diseñado para ser solo configuración: URL base y
+credenciales del `Login` en variables de entorno del servidor (nunca
+`NEXT_PUBLIC_*`), sin tocar `src/lib/api/*`. Lo que **no** se puede asumir
+igual entre ambientes sin volver a probar: protección Cloudflare, formato de
+respuesta uniforme, políticas de CORS/rate limiting — repetir al menos una
+prueba de conectividad real contra producción antes de lanzar.
+
 ## 5. Reglas de seguridad (no negociables)
 
 Tomadas del plan de desarrollo — aplican a cualquier feature que toque la
