@@ -291,6 +291,17 @@ no autentican en el ambiente de pruebas (confirmado varias veces con curl
 real, ver arriba) — falta que el cliente entregue la credencial de servicio
 vigente para poder probar cualquier endpoint con datos reales.
 
+**Estado 2026-08-25 (WhatsApp con el cliente)**: confirmó que es "contra la
+API de Sibox, y con ese [token] se utiliza en todas las llamadas" — coincide
+exactamente con la arquitectura de BFF ya asumida. Dijo que iba a revisar el
+usuario que tienen definido y pasar la actualización de la contraseña —
+**quedamos en espera de esa credencial**. En cuanto llegue: (1) probar
+`Login` real con curl para confirmar que autentica y ver el formato real del
+token, (2) repetir la prueba de `wsRastreo` con una guía de ejemplo del PDF
+usando ese token para ver una respuesta exitosa real por primera vez, (3)
+recién ahí tiene sentido empezar a construir el cliente API del BFF contra
+datos reales en vez de solo contra el mock.
+
 **Sobre producción**: el equipo solo tiene la URL de pruebas
 (`apitest.inbox.com.mx`); no hay evidencia en `../Documentacion/` ni en este
 repo de que ya exista acceso o credenciales para `api.inbox.com.mx`
