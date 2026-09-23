@@ -231,16 +231,22 @@ prueba de conectividad real contra producción antes de lanzar.
 
 ### Sistemas de Inbox pidió el "origen" para whitelist (2026-09-23)
 
-Confirma la duda que ya estaba anotada en `sibox-client.ts`. "Origen para
-lista blanca" en un contexto server-to-server casi seguro significa **IP de
-salida del servidor**, no el header `Origin` (CORS no aplica aquí, ya
-confirmamos que SIBOX no lo soporta). Problema: Vercel Functions no tienen
-IP de salida fija por defecto, y todavía no hay nada desplegado en
-producción — no existe un origen real que darles hoy. Detalle de las 3
-opciones para conseguir una IP fija (addon de Vercel, proxy dedicado, o
-auto-hospedar en Docker) en NOTAS_PROYECTO.md, sección "El cliente pide el
-'origen' para whitelistear". Hay que decidir una antes de responderle a
-sistemas con un valor concreto.
+Confirma la duda que ya estaba anotada en `sibox-client.ts`. Cliente
+confirmó (2026-09-23) que el whitelist **es por IP**. Vercel Functions no
+tienen IP de salida fija por defecto y todavía no hay nada desplegado en
+producción — no existe un origen real que darles hoy.
+
+Verificado contra la documentación oficial de Vercel (2026-09-23): la ruta
+recomendada es **Vercel Static IPs, $100 USD/mes por proyecto, disponible
+en plan Pro** (no hace falta Enterprise) — da un par de IPs fijas de salida
+para el proyecto, se activa en Settings → Networking una vez desplegado.
+`Secure Compute` (la opción "completa" con VPC dedicada) es Enterprise-only
+con precio a cotizar, descartada por ahora. Alternativas más baratas pero
+con más mantenimiento: un proxy de salida propio (~$5-6/mes) o
+auto-hospedar el BFF en Docker/VPS. Detalle completo con las 4 opciones en
+NOTAS_PROYECTO.md, sección "El cliente pide el 'origen' para whitelistear".
+Falta que el cliente confirme si el costo mensual de Static IPs es
+aceptable antes de comprometerse.
 
 ## 5. Reglas de seguridad (no negociables)
 

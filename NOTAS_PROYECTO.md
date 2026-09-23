@@ -359,24 +359,45 @@ con IPs dinámicas/rotativas, así que no hay "un origen" estable que darles
 todavía. Tampoco hay nada desplegado en producción aún (seguimos en
 desarrollo local), así que hoy no existe un origen real que entregar.
 
-**Opciones para conseguir una IP de salida fija** (hay que decidir una antes
-de responderle a sistemas con un valor concreto):
-1. **Vercel Secure Compute / IPs estáticas** — addon nativo de Vercel
-   pensado exactamente para este caso (whitelistear con APIs de terceros).
-   Confirmar disponibilidad/costo en el plan actual antes de asumirlo.
-2. **Proxy de salida con IP fija** — las Route Handlers llaman a un
-   servidor intermedio pequeño y siempre encendido (VM/contenedor barato, o
-   un servicio de proxy con IP estática tipo QuotaGuard/Fixie) que sí tiene
-   una IP fija conocida.
-3. **Auto-hospedar el BFF en infraestructura con IP fija** (Docker en un
+**Opciones para conseguir una IP de salida fija** (verificado contra la
+documentación oficial de Vercel el 2026-09-23, no son estimaciones):
+
+1. **Vercel Static IPs** (recomendada) — **$100 USD/mes por proyecto** +
+   Private Data Transfer a tarifa regional. Disponible en plan **Pro**, no
+   hace falta Enterprise. Da un par de IPs fijas de *salida* (egress) para
+   todas las Vercel Functions del proyecto — exactamente el caso de uso
+   ("IP allowlisting, database access" es el ejemplo textual de Vercel). Se
+   activa en Project → Settings → Networking una vez que el proyecto esté
+   creado en Vercel. **No sirve para IP de entrada/ingress**, solo para que
+   las llamadas salientes del BFF hacia SIBOX salgan siempre por la misma
+   IP — es justo lo que necesitamos.
+2. **Vercel Secure Compute** — la opción "completa" (VPC dedicada, peering,
+   aislamiento total), pero es **exclusiva de plan Enterprise con precio a
+   cotizar directo con Vercel** — de entrada más cara y más infraestructura
+   de la que necesitamos solo para un allowlist. Descartada a menos que el
+   proyecto migre a Enterprise por otra razón.
+3. **Proxy de salida con IP fija** — las Route Handlers llaman a un
+   servidor intermedio pequeño y siempre encendido (VM/contenedor barato,
+   ~$5-6 USD/mes en DigitalOcean/Linode, o un servicio ya armado para este
+   problema tipo QuotaGuard/Fixie) que sí tiene una IP fija conocida. Más
+   barato que Static IPs pero es una pieza nueva de infraestructura que
+   mantener y que puede fallar — punto único de falla adicional.
+4. **Auto-hospedar el BFF en infraestructura con IP fija** (Docker en un
    VPS) — ya lo dejamos como salida válida en la sección 2 ("mantener una
    salida a Docker viable"); resuelve esto de forma trivial a cambio de
-   perder el autoscaling/edge de Vercel para esa pieza.
+   perder el autoscaling/edge de Vercel para esa pieza. Solo tiene sentido
+   si ya se estuviera considerando salir de Vercel por otra razón.
 
-**Siguiente paso concreto**: decidir una de las tres opciones (recomendado:
-empezar por confirmar el addon de Vercel, es el que menos infraestructura
-nueva agrega) y responderle a sistemas de Inbox aclarando si piden IP o
-algo más, aprovechando para pedir también las credenciales de servicio
+**Recomendación**: empezar por **Static IPs de Vercel** ($100/mes) — es la
+ruta oficial, con menos partes móviles, y no obliga a saltar a Enterprise.
+Es una decisión de costo/presupuesto del cliente, no técnica — falta que
+Jorge confirme si ese monto mensual es aceptable antes de comprometerse.
+
+**Siguiente paso concreto**: confirmar con el cliente/presupuesto si los
+$100/mes de Static IPs son aceptables; si no, evaluar la opción 3 (proxy
+más barato). Mientras tanto, responderle a sistemas de Inbox aclarando si
+piden IP o algo más, aprovechando para pedir también las credenciales de
+servicio
 vigentes y confirmar si el whitelist aplica solo a producción o también al
 ambiente de pruebas (`apitest.inbox.com.mx`) que seguimos usando hoy.
 
