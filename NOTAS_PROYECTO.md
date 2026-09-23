@@ -14,7 +14,8 @@
 > principal edita después de cada feature); conviene revisar ambos y avisar
 > si hay contradicciones.
 >
-> Última actualización: 2026-08-14 (agregada `/perfil`).
+> Última actualización: 2026-09-23 (cliente pidió el origen/IP para
+> whitelistear el acceso a la API).
 
 ---
 
@@ -334,6 +335,50 @@ de código:
   mientras no haya credenciales de prueba vigentes — eso no bloquea
   construir el BFF en sí (los Route Handlers, el manejo de errores, la
   validación Zod), solo bloquea probarlo end-to-end con datos reales.
+
+### El cliente pide el "origen" para whitelistear (2026-09-23)
+
+Sistemas de Inbox preguntó, para habilitar/permitir la conexión a la API,
+que les demos **el origen desde donde nos conectaríamos, para ponerlo en
+lista blanca**. Esto confirma la duda que ya dejamos anotada en
+`sibox-client.ts` (línea 17) y arriba en este documento — es exactamente lo
+que esperábamos que preguntaran tarde o temprano.
+
+**Lectura de la pregunta**: en un contexto de API server-to-server (no
+navegador), "origen para lista blanca" casi siempre significa la **IP (o
+rango de IPs) de salida** del servidor que hace las llamadas — un allowlist
+de firewall/WAF, no el header `Origin` de CORS (ese es un concepto de
+navegador y ya confirmamos que SIBOX ni siquiera soporta CORS, así que no
+aplica aquí). Vale la pena confirmarlo explícitamente con ellos en vez de
+asumir, pero es la interpretación más probable.
+
+**El problema**: el hosting decidido es Vercel (sección 2), y las Vercel
+Functions (Node.js serverless) **no tienen una IP de salida fija por
+defecto** — las peticiones salen por infraestructura compartida de Vercel
+con IPs dinámicas/rotativas, así que no hay "un origen" estable que darles
+todavía. Tampoco hay nada desplegado en producción aún (seguimos en
+desarrollo local), así que hoy no existe un origen real que entregar.
+
+**Opciones para conseguir una IP de salida fija** (hay que decidir una antes
+de responderle a sistemas con un valor concreto):
+1. **Vercel Secure Compute / IPs estáticas** — addon nativo de Vercel
+   pensado exactamente para este caso (whitelistear con APIs de terceros).
+   Confirmar disponibilidad/costo en el plan actual antes de asumirlo.
+2. **Proxy de salida con IP fija** — las Route Handlers llaman a un
+   servidor intermedio pequeño y siempre encendido (VM/contenedor barato, o
+   un servicio de proxy con IP estática tipo QuotaGuard/Fixie) que sí tiene
+   una IP fija conocida.
+3. **Auto-hospedar el BFF en infraestructura con IP fija** (Docker en un
+   VPS) — ya lo dejamos como salida válida en la sección 2 ("mantener una
+   salida a Docker viable"); resuelve esto de forma trivial a cambio de
+   perder el autoscaling/edge de Vercel para esa pieza.
+
+**Siguiente paso concreto**: decidir una de las tres opciones (recomendado:
+empezar por confirmar el addon de Vercel, es el que menos infraestructura
+nueva agrega) y responderle a sistemas de Inbox aclarando si piden IP o
+algo más, aprovechando para pedir también las credenciales de servicio
+vigentes y confirmar si el whitelist aplica solo a producción o también al
+ambiente de pruebas (`apitest.inbox.com.mx`) que seguimos usando hoy.
 
 ---
 

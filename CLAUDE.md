@@ -229,6 +229,19 @@ igual entre ambientes sin volver a probar: protección Cloudflare, formato de
 respuesta uniforme, políticas de CORS/rate limiting — repetir al menos una
 prueba de conectividad real contra producción antes de lanzar.
 
+### Sistemas de Inbox pidió el "origen" para whitelist (2026-09-23)
+
+Confirma la duda que ya estaba anotada en `sibox-client.ts`. "Origen para
+lista blanca" en un contexto server-to-server casi seguro significa **IP de
+salida del servidor**, no el header `Origin` (CORS no aplica aquí, ya
+confirmamos que SIBOX no lo soporta). Problema: Vercel Functions no tienen
+IP de salida fija por defecto, y todavía no hay nada desplegado en
+producción — no existe un origen real que darles hoy. Detalle de las 3
+opciones para conseguir una IP fija (addon de Vercel, proxy dedicado, o
+auto-hospedar en Docker) en NOTAS_PROYECTO.md, sección "El cliente pide el
+'origen' para whitelistear". Hay que decidir una antes de responderle a
+sistemas con un valor concreto.
+
 ## 5. Reglas de seguridad (no negociables)
 
 Tomadas del plan de desarrollo — aplican a cualquier feature que toque la
