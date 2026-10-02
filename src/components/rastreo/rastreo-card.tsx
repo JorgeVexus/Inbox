@@ -17,21 +17,30 @@ const PASOS = [
 export function RastreoCard({
   guia,
   resultado,
+  error,
   onQuitar,
 }: {
   guia: string;
   resultado: Rastreo | null;
+  /** La consulta fallo (red/servidor) -- distinto de "guia no encontrada". */
+  error?: string;
   onQuitar: () => void;
 }) {
   const [detalleAbierto, setDetalleAbierto] = useState(false);
   const [detalle, setDetalle] = useState<RastreoEvento[] | null>(null);
   const [cargandoDetalle, setCargandoDetalle] = useState(false);
+  const [errorDetalle, setErrorDetalle] = useState<string | null>(null);
 
   async function toggleDetalle() {
     if (!detalleAbierto && detalle === null) {
       setCargandoDetalle(true);
-      const eventos = await rastrearGuiaDetalle(guia);
-      setDetalle(eventos ?? []);
+      setErrorDetalle(null);
+      try {
+        const eventos = await rastrearGuiaDetalle(guia);
+        setDetalle(eventos ?? []);
+      } catch (err) {
+        setErrorDetalle(err instanceof Error ? err.message : "No pudimos cargar el historial.");
+      }
       setCargandoDetalle(false);
     }
     setDetalleAbierto((v) => !v);
@@ -42,8 +51,16 @@ export function RastreoCard({
       <div className="flex w-full flex-col gap-2 rounded-md border border-secondary-dark/30 bg-white p-6 shadow-card-sm">
         <div className="flex items-center justify-between gap-4">
           <p className="text-sm text-black">
-            No encontramos información para la guía{" "}
-            <span className="font-bold">{guia}</span>.
+            {error ? (
+              <>
+                {error} (guía <span className="font-bold">{guia}</span>)
+              </>
+            ) : (
+              <>
+                No encontramos información para la guía{" "}
+                <span className="font-bold">{guia}</span>.
+              </>
+            )}
           </p>
           <button
             type="button"
@@ -59,14 +76,14 @@ export function RastreoCard({
 
   const paso = pasoDesdeEstatus(resultado.Estatus);
   // "Código de rastreo" and "Fecha programada de entrega" appear in the
-  // Figma but aren't part of wsRastreo's documented response — there's no
-  // separate tracking code in the API, and the promised delivery date only
-  // shows up in ObtieneDetalleCostos (F_promesa_entrega), not here. Using
-  // the guía itself as the tracking code and the latest status date as the
-  // stand-in "programada" date until backend clarifies where these should
-  // really come from.
+  // "Fecha programada" = F_Promesa_Entrega, que wsRastreo SI regresa (el PDF
+  // no la lista; confirmado contra la API real 2026-10-02) y viene null en
+  // guias ya entregadas. "Codigo de rastreo" sigue sin existir en la API: se
+  // muestra la guia misma hasta que backend aclare si hay otro dato.
   const codigoRastreo = resultado.Guia;
-  const fechaProgramada = formatFechaCorta(resultado.F_Estatus);
+  const fechaProgramada = resultado.F_Promesa_Entrega
+    ? formatFechaCorta(resultado.F_Promesa_Entrega)
+    : "Por confirmar";
 
   return (
     <div className="flex w-full flex-col items-center gap-4 rounded-md border border-secondary-dark/20 bg-white p-6 shadow-card-sm sm:p-8">
@@ -150,7 +167,10 @@ export function RastreoCard({
           {cargandoDetalle && (
             <p className="text-sm text-black/60">Cargando historial…</p>
           )}
-          {!cargandoDetalle && detalle?.length === 0 && (
+          {errorDetalle && (
+            <p role="alert" className="text-sm text-red-600">{errorDetalle}</p>
+          )}
+          {!cargandoDetalle && !errorDetalle && detalle?.length === 0 && (
             <p className="text-sm text-black/60">
               Sin historial detallado disponible para esta guía.
             </p>

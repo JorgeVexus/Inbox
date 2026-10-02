@@ -260,6 +260,31 @@ probó por primera vez contra la API real **con respuestas exitosas**:
    Route Handler (hoy la UI sigue leyendo el mock) y el rate limiting (TODO
    en la ruta).
 
+9. **BLOQUEO DE CLOUDFLARE DESDE NODE (hallazgo clave, 2026-10-02).** El mismo
+   request, con los mismos headers y desde la misma IP ya whitelisteada
+   (`187.189.155.14`), **pasa con `curl` pero Cloudflare lo reta desde Node**
+   (`fetch` y `https.request`: HTTP 403, `cf-mitigated: challenge`, 6/6
+   intentos). Cloudflare distingue por la **huella TLS del cliente**, no por
+   headers, así que no se arregla agregando headers. El whitelist de IP que
+   hicieron sistemas **no se aplicó en Cloudflare** (probablemente solo en el
+   firewall del origen). Consecuencia: el BFF en Vercel (Node) recibirá el
+   mismo reto en producción, y el proxy/VPS con Caddy (Go) probablemente
+   también. **Arreglo real, a pedir al cliente**: que en Cloudflare creen una
+   regla que permita la IP de salida (WAF custom rule con acción *Skip* de
+   Managed Challenge/Bot Fight, o IP Access Rule → *Allow*) para
+   `apitest.inbox.com.mx` y luego `api.inbox.com.mx`. Alternativa: que
+   permitan peticiones con un header secreto propio (regla WAF por header).
+   El BFF ya detecta el caso: `SiboxBlockedError` (`sibox-client.ts`) → 503
+   genérico al visitante y el detalle solo en logs.
+10. **Rastreo conectado de punta a punta en el frontend.** `src/lib/rastreo.ts`
+   ya no lee el mock: llama a `/api/rastreo` y `/api/rastreo/detalle` (nuevo,
+   `RastreoDetalle`). `/rastreo`, "Ver detalles" y el widget del chat distinguen
+   "guía no encontrada" (`null`) de "no pudimos consultar" (error visible).
+   "Fecha programada" usa el `F_Promesa_Entrega` real ("Por confirmar" si
+   es null). El mock de rastreo sigue vivo solo para `/envio` (no hay
+   endpoint de historial por cuenta). **Mientras Cloudflare siga bloqueando a
+   Node, `/rastreo` mostrará el error 503 en desarrollo.**
+
 ### Producción vs Pruebas — solo tenemos acceso a Pruebas
 
 No hay evidencia de que el equipo tenga URL/credenciales de

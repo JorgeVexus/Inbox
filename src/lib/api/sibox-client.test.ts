@@ -150,3 +150,29 @@ describe("siboxPost", () => {
     await expect(failure).rejects.toThrow("USUARIO/CONTRASEÑA INVALIDOS.");
   });
 });
+
+describe("reto anti-bot de Cloudflare", () => {
+  beforeEach(() => {
+    process.env.SIBOX_API_BASE_URL = BASE_URL;
+    process.env.SIBOX_SERVICE_USER = "servicio";
+    process.env.SIBOX_SERVICE_PASSWORD = "clave";
+    vi.resetModules();
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    delete process.env.SIBOX_API_BASE_URL;
+    delete process.env.SIBOX_SERVICE_USER;
+    delete process.env.SIBOX_SERVICE_PASSWORD;
+  });
+
+  it("lanza SiboxBlockedError (no un JSON.parse críptico) si llega el HTML del reto", async () => {
+    const reto = new Response("<!DOCTYPE html><title>Just a moment...</title>", {
+      status: 403,
+      headers: { "Content-Type": "text/html; charset=UTF-8", "cf-mitigated": "challenge" },
+    });
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(reto));
+
+    const { siboxPost, SiboxBlockedError } = await importFreshClient();
+    await expect(siboxPost("/wsRastreo", { Guia: "1" })).rejects.toBeInstanceOf(SiboxBlockedError);
+  });
+});

@@ -5,19 +5,22 @@
  */
 export type Rastreo = {
   Guia: string;
-  F_Documentacion: string;
-  OficinaEstatus: string;
-  F_Estatus: string;
+  F_Documentacion: string | null;
+  OficinaEstatus: string | null;
+  F_Estatus: string | null;
   Estatus: string;
-  Remitente: string;
-  EstadoOrigen: string;
-  CdOrigen: string;
-  Origen: string;
-  Destinatario: string;
-  EstadoDestino: string;
-  CdDestino: string;
-  Destino: string;
+  Remitente: string | null;
+  EstadoOrigen: string | null;
+  CdOrigen: string | null;
+  Origen: string | null;
+  Destinatario: string | null;
+  EstadoDestino: string | null;
+  CdDestino: string | null;
+  Destino: string | null;
   Recibio: string | null;
+  /** Fecha prometida de entrega (la "fecha programada" del Figma). La API
+   * la regresa aunque el PDF no la liste; null en guias ya entregadas. */
+  F_Promesa_Entrega?: string | null;
 };
 
 /**
@@ -25,7 +28,7 @@ export type Rastreo = {
  * `RastreoDetalle`) — the chronological history behind "Ver detalles".
  */
 export type RastreoEvento = {
-  OficinaEstatus: string;
+  OficinaEstatus: string | null;
   F_Estatus: string;
   Estatus: string;
   Recibio: string | null;

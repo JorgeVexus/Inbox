@@ -201,14 +201,18 @@ function BottomNav({
 function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   const [guia, setGuia] = useState("");
   const [buscando, setBuscando] = useState(false);
-  const [resultado, setResultado] = useState<Rastreo | null | "not-found">(null);
+  const [resultado, setResultado] = useState<Rastreo | null | "not-found" | "error">(null);
 
   async function handleRastrear() {
     if (!guia.trim()) return;
     setBuscando(true);
     setResultado(null);
-    const data = await rastrearGuia(guia);
-    setResultado(data ?? "not-found");
+    try {
+      const data = await rastrearGuia(guia);
+      setResultado(data ?? "not-found");
+    } catch {
+      setResultado("error");
+    }
     setBuscando(false);
   }
 
@@ -247,12 +251,17 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
           {buscando ? "Buscando…" : "Rastrear"}
         </button>
 
+        {resultado === "error" && (
+          <p role="alert" className="text-xs text-red-600">
+            No pudimos consultar tu envío ahora. Intenta de nuevo en unos momentos.
+          </p>
+        )}
         {resultado === "not-found" && (
           <p className="text-xs text-black/60">
             No encontramos esa guía. Verifica el número e intenta de nuevo.
           </p>
         )}
-        {resultado && resultado !== "not-found" && (
+        {resultado && resultado !== "not-found" && resultado !== "error" && (
           <div className="flex flex-col gap-1 rounded-md bg-neutral-bg px-3 py-2 text-xs text-black">
             <p className="font-bold">{resultado.Estatus}</p>
             <p>{resultado.OficinaEstatus} — {resultado.F_Estatus}</p>

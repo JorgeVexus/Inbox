@@ -32,6 +32,33 @@ export class SiboxApiError extends Error {
   }
 }
 
+/**
+ * Cloudflare (delante de SIBOX) respondio con su reto anti-bot en vez de la
+ * API. Probado 2026-10-02: el MISMO request con los mismos headers pasa con
+ * curl pero es retado desde Node (fetch/https) -- Cloudflare distingue por la
+ * huella TLS del cliente, no solo por headers, asi que no se arregla
+ * agregando headers. El arreglo real es una regla de Cloudflare que permita
+ * la IP de salida del BFF (ver NOTAS_PROYECTO.md).
+ */
+export class SiboxBlockedError extends SiboxApiError {
+  constructor(endpoint: string) {
+    super(
+      `Cloudflare bloqueo la peticion a ${endpoint} (reto anti-bot). La IP/cliente del servidor no esta permitido en Cloudflare.`,
+      endpoint,
+    );
+    this.name = "SiboxBlockedError";
+  }
+}
+
+/** Lee el JSON de la respuesta, o lanza SiboxBlockedError si llego el reto HTML de Cloudflare. */
+async function readJson(res: Response, endpoint: string): Promise<unknown> {
+  const contentType = res.headers.get("content-type") ?? "";
+  if (res.headers.get("cf-mitigated") === "challenge" || !contentType.includes("json")) {
+    throw new SiboxBlockedError(endpoint);
+  }
+  return res.json();
+}
+
 class SiboxConfigError extends Error {
   constructor(missingVar: string) {
     super(
@@ -117,7 +144,7 @@ async function login(): Promise<{ token: string; cliente: SiboxCliente }> {
     body: JSON.stringify({ Usuario: usuario, Password: password }),
   });
 
-  const json = (await res.json()) as {
+  const json = (await readJson(res, "/Login")) as {
     resp?: { result?: number; data?: unknown; token?: string | null };
   };
   const [cuenta] = parseEnvelope<
@@ -172,6 +199,6 @@ export async function siboxPost<T>(endpoint: string, body: unknown): Promise<T> 
     res = await attempt(freshToken);
   }
 
-  const json = await res.json();
+  const json = await readJson(res, endpoint);
   return parseEnvelope<T>(json, endpoint);
 }
