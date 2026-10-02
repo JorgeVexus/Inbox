@@ -14,7 +14,7 @@
 > principal edita después de cada feature); conviene revisar ambos y avisar
 > si hay contradicciones.
 >
-> Última actualización: 2026-09-23 (cliente pidió el origen/IP para
+> Última actualización: 2026-10-02 (primera prueba real exitosa contra la API de SIBOX).
 > whitelistear el acceso a la API).
 
 ---
@@ -287,7 +287,7 @@ sesión" del sitio) es un concepto **aparte**: identifica a una persona para
 funciones de cuenta (Mis envíos, domicilios guardados), no tiene relación
 con el token de servicio del BFF.
 
-**Sigue pendiente**: las credenciales de ejemplo del PDF (`INBOX`/`Prueba`)
+**[RESUELTO 2026-10-02: credencial entregada y probada]** Antes pendiente: las credenciales de ejemplo del PDF (`INBOX`/`Prueba`)
 no autentican en el ambiente de pruebas (confirmado varias veces con curl
 real, ver arriba) — falta que el cliente entregue la credencial de servicio
 vigente para poder probar cualquier endpoint con datos reales.
@@ -307,6 +307,49 @@ datos reales en vez de solo contra el mock.
 (`apitest.inbox.com.mx`); no hay evidencia en `../Documentacion/` ni en este
 repo de que ya exista acceso o credenciales para `api.inbox.com.mx`
 (producción). Es una pregunta abierta para el cliente, no un hecho asumido.
+
+### Prueba real con credenciales vigentes (2026-10-02) — todo lo anterior queda matizado por esto
+
+El cliente entregó la credencial de servicio de pruebas (usuario `TESTWB2025`;
+la contraseña vive solo en `.env.local`, ignorado por git — **nunca** en el
+repo ni en estos documentos) y ya whitelisteó la IP desde la que se prueba
+(`187.189.155.14`, temporal; la definitiva será la del VPS/proxy). Con eso se
+probó por primera vez contra la API real **con respuestas exitosas**:
+
+1. **`Login` funciona, pero su forma real no es la del PDF ni la que asumió el
+   primer esqueleto del BFF.** Respuesta real:
+   `{"resp":{"result":0,"data":[{"K_Cliente":63105,"D_Cliente":"PAGINA WEB","K_Usuario":2782,"RFC":"XAXX01010100","B_Contrato":false}],"token":"eyJ…"}}`
+   — el **token viene en `resp.token`** (hermano de `data`, no dentro) y
+   `data` es un arreglo con los datos de la cuenta de servicio. Corregido en
+   `src/lib/api/sibox-client.ts` (antes buscaba `data.token` y habría fallado).
+2. **Se resuelve la discrepancia de `K_Cliente`**: `wsGeneracionRecoleccion`
+   pide `K_Cliente`, y `Login` **sí lo regresa** (`63105`, "PAGINA WEB").
+   `getSiboxCliente()` en `sibox-client.ts` lo expone para cuando se conecte
+   `/recoleccion`. (Esa entrada de "hay que preguntarle a backend" ya no aplica.)
+3. **Se resuelve la discrepancia de "Fecha programada de entrega"**: `wsRastreo`
+   sí regresa `F_Promesa_Entrega` (el PDF no lo lista). Vino `null` en la guía
+   de prueba (ya entregada) — falta verlo poblado en una guía en tránsito.
+4. **`wsRastreo` real coincide con el PDF** para la guía `4003229791`
+   (ENTREGADA, REYNOSA HIDALGO). Una guía inexistente responde HTTP 200 con
+   `{"resp":{"result":1,"data":""}}` (mensaje **vacío**) → el Route Handler
+   lo traduce a 404 "No encontramos esa guía". Una guía vacía da
+   `"Debe indicar el No de guía que desea rastrear"`. Ojo: `0000000000` NO es
+   "no encontrada" — es una guía interna (CANCELADA, "GUIA PARA PROCESO DE
+   FACTURAS") con varios campos `null`; por eso el esquema Zod ahora acepta
+   nulos en estado/ciudad/oficina/remitente/destinatario.
+5. **Las guías del mock del proyecto (`4159473741`, `4157067169`) no existen en
+   pruebas** — solo `4003229791` (la del PDF) se confirmó. Para probar guías en
+   tránsito hay que pedirle al cliente números reales de pruebas.
+6. `RastreoDetalle`, `ObtenerHorariosPorCP` (CP `64060`: oficina 721, 14:00–19:00)
+   y `TipoEnvio` (1 SOBRE, 2 PAQUETE, 3 SOBREPAQ) también responden bien y
+   coinciden con el PDF.
+7. **Sigue haciendo falta Cloudflare-friendly headers** (`User-Agent`/`Origin`/
+   `Referer`): el whitelist de IP no eliminó el challenge — son capas separadas.
+8. **Flujo end-to-end verificado** por el BFF propio: `POST /api/rastreo` →
+   Login con cuenta de servicio → `wsRastreo` → validación Zod → 200 / 404 /
+   400. Pendiente: conectar el seam `src/lib/rastreo.ts` del frontend a este
+   Route Handler (hoy la UI sigue leyendo el mock) y el rate limiting (TODO
+   en la ruta).
 
 ### Cómo funcionará el cambio de Pruebas → Producción
 
@@ -537,7 +580,7 @@ es un `RastreoCard` independiente (una guía que falla no rompe las demás).
 - El timeline de 4 pasos **no viene así de la API** — `wsRastreo` regresa
   `Estatus` como texto libre. `pasoDesdeEstatus()` es heurística por palabras
   clave, no autoritativa, revisar contra valores reales de producción.
-- "Código de rastreo" y "Fecha programada de entrega" del Figma **no están**
+- **[Fecha programada RESUELTA 2026-10-02: `wsRastreo` sí trae `F_Promesa_Entrega`]** "Código de rastreo" y "Fecha programada de entrega" del Figma **no están**
   en la respuesta documentada de `wsRastreo` — hoy son aproximaciones
   (comentadas explícitamente en `rastreo-card.tsx`), preguntar a backend de
   dónde deberían salir de verdad.
@@ -658,7 +701,7 @@ se llama a `wsGeneracionRecoleccion` → folio de confirmación
 
 Dos hallazgos importantes al construir esto, ambos documentados con más
 detalle en CLAUDE.md:
-- **`wsGeneracionRecoleccion` pide `K_Cliente` (int) pero `Login` solo
+- **[RESUELTO 2026-10-02: `Login` sí regresa `K_Cliente` (63105), ver sección 5]** **`wsGeneracionRecoleccion` pide `K_Cliente` (int) pero `Login` solo
   regresa un `token`** — no hay forma documentada de obtener el ID de
   cliente desde la sesión. El mock usa el 62801 de ejemplo del PDF como
   placeholder; hay que preguntarle a backend de dónde sale ese dato.

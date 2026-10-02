@@ -12,6 +12,17 @@ function jsonResponse(body: unknown, status = 200) {
 // El cliente cachea el token en una variable de modulo -- cada test necesita
 // su propia instancia del modulo (via resetModules + import dinamico) para
 // no arrastrar el token de un test al siguiente.
+// Forma real de Login (probada contra apitest): token en resp.token, data = arreglo de cuenta.
+function loginOk(token: string) {
+  return jsonResponse({
+    resp: {
+      result: 0,
+      data: [{ K_Cliente: 63105, D_Cliente: "PAGINA WEB", K_Usuario: 2782 }],
+      token,
+    },
+  });
+}
+
 async function importFreshClient() {
   return import("@/lib/api/sibox-client");
 }
@@ -35,7 +46,7 @@ describe("siboxPost", () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
       .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: { token: "abc123" } } }),
+        loginOk("abc123"),
       )
       .mockResolvedValueOnce(
         jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } }),
@@ -56,7 +67,7 @@ describe("siboxPost", () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
       .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: { token: "viejo" } } }),
+        loginOk("viejo"),
       )
       .mockResolvedValueOnce(
         jsonResponse(
@@ -65,7 +76,7 @@ describe("siboxPost", () => {
         ),
       )
       .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: { token: "nuevo" } } }),
+        loginOk("nuevo"),
       )
       .mockResolvedValueOnce(
         jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } }),
@@ -85,7 +96,7 @@ describe("siboxPost", () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
       .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: { token: "abc123" } } }),
+        loginOk("abc123"),
       )
       .mockResolvedValueOnce(
         jsonResponse({ resp: { result: 1, data: "No se encontro la guia." } }),
@@ -102,7 +113,7 @@ describe("siboxPost", () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
       .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: { token: "abc123" } } }),
+        loginOk("abc123"),
       )
       .mockResolvedValueOnce(
         jsonResponse({ success: true, mensaje: "ok", data: [{ Guia: "1" }] }),
@@ -112,5 +123,30 @@ describe("siboxPost", () => {
     const { siboxPost } = await importFreshClient();
     const result = await siboxPost("/wsRastreo", { Guia: "1" });
     expect(result).toEqual([{ Guia: "1" }]);
+  });
+  it("expone K_Cliente de la cuenta de servicio que regresa Login", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValueOnce(loginOk("abc123"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { getSiboxCliente } = await importFreshClient();
+    await expect(getSiboxCliente()).resolves.toEqual({
+      kCliente: 63105,
+      nombre: "PAGINA WEB",
+      kUsuario: 2782,
+    });
+  });
+
+  it("falla con SiboxApiError si Login rechaza las credenciales", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ resp: { result: 1, data: "USUARIO/CONTRASEÑA INVALIDOS.", token: null } }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { siboxPost, SiboxApiError } = await importFreshClient();
+    const failure = siboxPost("/wsRastreo", { Guia: "1" });
+    await expect(failure).rejects.toBeInstanceOf(SiboxApiError);
+    await expect(failure).rejects.toThrow("USUARIO/CONTRASEÑA INVALIDOS.");
   });
 });

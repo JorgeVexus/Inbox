@@ -87,13 +87,27 @@ function parseEnvelope<T>(json: unknown, endpoint: string): T {
   );
 }
 
+/** Datos de la cuenta de servicio que regresa Login (confirmado con la API real). */
+export type SiboxCliente = {
+  kCliente: number;
+  nombre: string;
+  kUsuario: number;
+};
+
 // Cache de token en memoria del proceso. Vale para el ciclo de vida de una
 // instancia del servidor -- en un entorno serverless (Vercel) cada
 // invocacion fria vuelve a hacer Login, lo cual esta bien: es una sola
 // cuenta de servicio, no hay limite de sesiones conocido documentado.
-let cachedToken: string | null = null;
+let cachedSession: { token: string; cliente: SiboxCliente } | null = null;
 
-async function login(): Promise<string> {
+/**
+ * Forma REAL de la respuesta de Login (probada contra apitest 2026-10-02,
+ * el PDF documenta otra): el token viene en `resp.token` (hermano de `data`,
+ * no dentro), y `data` es un arreglo con los datos de la cuenta:
+ *   {"resp":{"result":0,"data":[{"K_Cliente":63105,"D_Cliente":"PAGINA WEB",
+ *     "K_Usuario":2782,"RFC":"...","B_Contrato":false}],"token":"eyJ..."}}
+ */
+async function login(): Promise<{ token: string; cliente: SiboxCliente }> {
   const baseUrl = getBaseUrl();
   const { usuario, password } = getServiceCredentials();
 
@@ -103,18 +117,35 @@ async function login(): Promise<string> {
     body: JSON.stringify({ Usuario: usuario, Password: password }),
   });
 
-  const json = await res.json();
-  const data = parseEnvelope<{ token: string }>(json, "/Login");
-  if (!data.token) {
-    throw new SiboxApiError("Login no regreso token en la respuesta.", "/Login");
+  const json = (await res.json()) as {
+    resp?: { result?: number; data?: unknown; token?: string | null };
+  };
+  const [cuenta] = parseEnvelope<
+    { K_Cliente: number; D_Cliente: string; K_Usuario: number }[]
+  >(json, "/Login");
+  const token = json.resp?.token;
+  if (!token || !cuenta) {
+    throw new SiboxApiError("Login no regreso token o datos de cuenta.", "/Login");
   }
-  return data.token;
+  return {
+    token,
+    cliente: { kCliente: cuenta.K_Cliente, nombre: cuenta.D_Cliente, kUsuario: cuenta.K_Usuario },
+  };
+}
+
+async function getSession(forceRefresh = false) {
+  if (cachedSession && !forceRefresh) return cachedSession;
+  cachedSession = await login();
+  return cachedSession;
 }
 
 async function getToken(forceRefresh = false): Promise<string> {
-  if (cachedToken && !forceRefresh) return cachedToken;
-  cachedToken = await login();
-  return cachedToken;
+  return (await getSession(forceRefresh)).token;
+}
+
+/** K_Cliente de la cuenta de servicio -- lo pide wsGeneracionRecoleccion. */
+export async function getSiboxCliente(): Promise<SiboxCliente> {
+  return (await getSession()).cliente;
 }
 
 /**

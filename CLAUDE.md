@@ -215,8 +215,50 @@ servicio y reutiliza el token en el header `Authorization` para todas las
 llamadas públicas (rastreo, cotización, cobertura) sin que el visitante
 inicie sesión. El login de `AuthProvider` (modal del sitio) es un concepto
 aparte — identifica personas para funciones de cuenta, no tiene relación
-con este token de servicio. Sigue pendiente que el cliente entregue la
-credencial de servicio vigente (`INBOX`/`Prueba` del PDF ya no autentica).
+con este token de servicio. Credencial de servicio **ya entregada y probada** (2026-10-02, ver más abajo).
+
+### Prueba real con credenciales vigentes (2026-10-02) — todo lo anterior queda matizado por esto
+
+El cliente entregó la credencial de servicio de pruebas (usuario `TESTWB2025`;
+la contraseña vive solo en `.env.local`, ignorado por git — **nunca** en el
+repo ni en estos documentos) y ya whitelisteó la IP desde la que se prueba
+(`187.189.155.14`, temporal; la definitiva será la del VPS/proxy). Con eso se
+probó por primera vez contra la API real **con respuestas exitosas**:
+
+1. **`Login` funciona, pero su forma real no es la del PDF ni la que asumió el
+   primer esqueleto del BFF.** Respuesta real:
+   `{"resp":{"result":0,"data":[{"K_Cliente":63105,"D_Cliente":"PAGINA WEB","K_Usuario":2782,"RFC":"XAXX01010100","B_Contrato":false}],"token":"eyJ…"}}`
+   — el **token viene en `resp.token`** (hermano de `data`, no dentro) y
+   `data` es un arreglo con los datos de la cuenta de servicio. Corregido en
+   `src/lib/api/sibox-client.ts` (antes buscaba `data.token` y habría fallado).
+2. **Se resuelve la discrepancia de `K_Cliente`**: `wsGeneracionRecoleccion`
+   pide `K_Cliente`, y `Login` **sí lo regresa** (`63105`, "PAGINA WEB").
+   `getSiboxCliente()` en `sibox-client.ts` lo expone para cuando se conecte
+   `/recoleccion`. (Esa entrada de "hay que preguntarle a backend" ya no aplica.)
+3. **Se resuelve la discrepancia de "Fecha programada de entrega"**: `wsRastreo`
+   sí regresa `F_Promesa_Entrega` (el PDF no lo lista). Vino `null` en la guía
+   de prueba (ya entregada) — falta verlo poblado en una guía en tránsito.
+4. **`wsRastreo` real coincide con el PDF** para la guía `4003229791`
+   (ENTREGADA, REYNOSA HIDALGO). Una guía inexistente responde HTTP 200 con
+   `{"resp":{"result":1,"data":""}}` (mensaje **vacío**) → el Route Handler
+   lo traduce a 404 "No encontramos esa guía". Una guía vacía da
+   `"Debe indicar el No de guía que desea rastrear"`. Ojo: `0000000000` NO es
+   "no encontrada" — es una guía interna (CANCELADA, "GUIA PARA PROCESO DE
+   FACTURAS") con varios campos `null`; por eso el esquema Zod ahora acepta
+   nulos en estado/ciudad/oficina/remitente/destinatario.
+5. **Las guías del mock del proyecto (`4159473741`, `4157067169`) no existen en
+   pruebas** — solo `4003229791` (la del PDF) se confirmó. Para probar guías en
+   tránsito hay que pedirle al cliente números reales de pruebas.
+6. `RastreoDetalle`, `ObtenerHorariosPorCP` (CP `64060`: oficina 721, 14:00–19:00)
+   y `TipoEnvio` (1 SOBRE, 2 PAQUETE, 3 SOBREPAQ) también responden bien y
+   coinciden con el PDF.
+7. **Sigue haciendo falta Cloudflare-friendly headers** (`User-Agent`/`Origin`/
+   `Referer`): el whitelist de IP no eliminó el challenge — son capas separadas.
+8. **Flujo end-to-end verificado** por el BFF propio: `POST /api/rastreo` →
+   Login con cuenta de servicio → `wsRastreo` → validación Zod → 200 / 404 /
+   400. Pendiente: conectar el seam `src/lib/rastreo.ts` del frontend a este
+   Route Handler (hoy la UI sigue leyendo el mock) y el rate limiting (TODO
+   en la ruta).
 
 ### Producción vs Pruebas — solo tenemos acceso a Pruebas
 
@@ -497,7 +539,7 @@ cliente para cada demo semanal.
         una heurística por palabras clave, marcada explícitamente como no
         autoritativa — revisar contra valores reales de producción cuando
         se conecte de verdad.
-      - **"Código de rastreo" y "Fecha programada de entrega"** (columnas
+      - **[Fecha programada RESUELTA 2026-10-02: `wsRastreo` sí regresa `F_Promesa_Entrega`]** **"Código de rastreo" y "Fecha programada de entrega"** (columnas
         del Figma) tampoco están en la respuesta documentada de `wsRastreo`.
         Hoy el código de rastreo muestra la misma guía y la fecha usa el
         último `F_Estatus` como aproximación — están así de forma
@@ -670,7 +712,7 @@ cliente para cada demo semanal.
         y ventana de 1h dentro de `Hora_Minima`/`Hora_Maxima` → contacto y
         cantidad de paquetes → folio de confirmación (`K_Recoleccion`).
       - **Discrepancia importante encontrada al construir esto**:
-        `wsGeneracionRecoleccion` requiere `K_Cliente` (int) para
+        **[RESUELTO 2026-10-02: `Login` sí regresa `K_Cliente`, ver sección 4]** `wsGeneracionRecoleccion` requiere `K_Cliente` (int) para
         identificar la cuenta, pero `Login` (ver `src/types/auth.ts`)
         **solo regresa un `token`**, ningún ID de cliente ni dato de
         perfil. No hay forma documentada de obtener `K_Cliente` desde la

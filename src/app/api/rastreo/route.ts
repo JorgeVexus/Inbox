@@ -43,6 +43,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: parsedResponse.data });
   } catch (err) {
     if (err instanceof SiboxApiError) {
+      // Una guía que no existe llega como {result:1, data:""} (mensaje
+      // vacío, probado contra la API real) -- es "no encontrada", no un
+      // fallo del servidor.
+      if (err.message.trim() === "") {
+        return NextResponse.json({ error: "No encontramos esa guía." }, { status: 404 });
+      }
       return NextResponse.json({ error: err.message }, { status: 502 });
     }
     console.error("wsRastreo: error inesperado", err);
