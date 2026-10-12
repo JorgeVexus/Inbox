@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { formatMXN } from "@/lib/moneda";
 
 export function InfoEnvioCard({
   origenLabel,
@@ -78,7 +79,7 @@ export function InfoEnvioCard({
       <div className="flex items-center justify-between gap-2">
         <p className="font-display text-sm font-bold text-black">Total</p>
         <p className="font-sans text-2xl font-bold text-black">
-          ${total.toFixed(2)}{" "}
+          {formatMXN(total)}{" "}
           <span className="text-sm font-medium">MXN</span>
         </p>
       </div>

@@ -304,7 +304,7 @@ function ContactoForm({
       )}
       <div className="flex w-full flex-col gap-4">
         <Field label={nombreLabel}>
-          <input
+          <input autoComplete={titulo === "Origen" ? "name" : "off"}
             type="text"
             value={value.nombre}
             onChange={(e) => set("nombre", e.target.value)}
@@ -315,7 +315,7 @@ function ContactoForm({
 
         <div className="flex gap-2.5">
           <Field label="C.P" className="w-[86px]">
-            <input
+            <input autoComplete={titulo === "Origen" ? "postal-code" : "off"}
               type="text"
               inputMode="numeric"
               maxLength={5}
@@ -326,7 +326,7 @@ function ContactoForm({
             />
           </Field>
           <Field label="Ciudad" className="flex-1">
-            <input
+            <input autoComplete={titulo === "Origen" ? "address-level1" : "off"}
               type="text"
               value={value.ciudad}
               onChange={(e) => set("ciudad", e.target.value)}
@@ -335,7 +335,7 @@ function ContactoForm({
             />
           </Field>
           <Field label="Colonia" className="flex-1">
-            <input
+            <input autoComplete={titulo === "Origen" ? "off" : "off"}
               type="text"
               value={value.colonia}
               onChange={(e) => set("colonia", e.target.value)}
@@ -346,7 +346,7 @@ function ContactoForm({
         </div>
 
         <Field label="Dirección">
-          <input
+          <input autoComplete={titulo === "Origen" ? "address-line1" : "off"}
             type="text"
             value={value.direccion}
             onChange={(e) => set("direccion", e.target.value)}
@@ -358,7 +358,7 @@ function ContactoForm({
 
         <div className="flex gap-4">
           <Field label="No. Exterior" className="flex-1">
-            <input
+            <input autoComplete={titulo === "Origen" ? "off" : "off"}
               type="text"
               value={value.numExt}
               onChange={(e) => set("numExt", e.target.value)}
@@ -367,7 +367,7 @@ function ContactoForm({
             />
           </Field>
           <Field label="No. Interior" className="flex-1">
-            <input
+            <input autoComplete={titulo === "Origen" ? "off" : "off"}
               type="text"
               value={value.numInt}
               onChange={(e) => set("numInt", e.target.value)}
@@ -378,7 +378,7 @@ function ContactoForm({
         </div>
 
         <Field label="Teléfono">
-          <input
+          <input autoComplete={titulo === "Origen" ? "tel" : "off"}
             type="tel"
             value={value.telefono}
             onChange={(e) => set("telefono", e.target.value)}
@@ -388,7 +388,7 @@ function ContactoForm({
         </Field>
 
         <Field label="Email">
-          <input
+          <input autoComplete={titulo === "Origen" ? "email" : "off"}
             type="email"
             value={value.email}
             onChange={(e) => set("email", e.target.value)}

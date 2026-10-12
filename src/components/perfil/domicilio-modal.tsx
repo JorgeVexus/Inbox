@@ -101,7 +101,7 @@ export function DomicilioModal({
 
         <div className="flex flex-col gap-3">
           <Row label="Nombre">
-            <input
+            <input autoComplete="off"
               type="text"
               value={datos.alias}
               onChange={(e) => set("alias", e.target.value)}
@@ -111,7 +111,7 @@ export function DomicilioModal({
           </Row>
 
           <Row label="Contacto">
-            <input
+            <input autoComplete="off"
               type="text"
               value={datos.contacto}
               onChange={(e) => set("contacto", e.target.value)}
@@ -121,7 +121,7 @@ export function DomicilioModal({
           </Row>
 
           <Row label="Teléfono">
-            <input
+            <input autoComplete="tel"
               type="tel"
               value={datos.telefono}
               onChange={(e) => set("telefono", e.target.value)}
@@ -131,7 +131,7 @@ export function DomicilioModal({
           </Row>
 
           <Row label="C.P">
-            <input
+            <input autoComplete="postal-code"
               type="text"
               inputMode="numeric"
               maxLength={5}
@@ -167,7 +167,7 @@ export function DomicilioModal({
 
           <Row label="Calle y número">
             <div className="flex w-full gap-3">
-              <input
+              <input autoComplete="address-line1"
                 type="text"
                 value={datos.calle}
                 onChange={(e) => set("calle", e.target.value)}

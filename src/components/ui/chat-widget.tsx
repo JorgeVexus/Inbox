@@ -235,7 +235,7 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
         <p className="font-display text-base text-black">
           Da seguimiento a tu pedido
         </p>
-        <input
+        <input autoComplete="off"
           type="text"
           value={guia}
           onChange={(e) => setGuia(e.target.value)}
@@ -331,7 +331,7 @@ function ChatTab() {
         comenzar, por favor comparte tu correo electrónico.
       </p>
       <div className="flex flex-col gap-4">
-        <input
+        <input autoComplete="email"
           type="email"
           maxLength={120}
           value={email}
@@ -368,7 +368,7 @@ function HelpTab() {
   return (
     <div className="flex flex-col gap-5 py-6">
       <div className="flex h-[43px] items-center justify-between rounded-md bg-white px-5 shadow-card-sm">
-        <input
+        <input autoComplete="off"
           type="text"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}

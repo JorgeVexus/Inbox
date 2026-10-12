@@ -207,7 +207,7 @@ function DireccionCard({
             Ingrese el C.P de {label.toLowerCase()}
           </p>
           <div className="flex items-start gap-2.5">
-            <input
+            <input autoComplete={label === "Origen" ? "postal-code" : "off"}
               type="text"
               inputMode="numeric"
               maxLength={5}
@@ -227,14 +227,14 @@ function DireccionCard({
             </Link>
           </div>
         </div>
-        <input
+        <input autoComplete={label === "Origen" ? "address-level2" : "off"}
           type="text"
           value={value.ciudad}
           onChange={(e) => onChange({ ...value, ciudad: e.target.value })}
           aria-label={`Ciudad de ${label.toLowerCase()}`} placeholder="Ciudad"
           className="h-[48px] w-full rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
         />
-        <input
+        <input autoComplete={label === "Origen" ? "off" : "off"}
           type="text"
           value={value.colonia}
           onChange={(e) => onChange({ ...value, colonia: e.target.value })}

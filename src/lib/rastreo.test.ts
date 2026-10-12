@@ -102,3 +102,14 @@ describe("formato de guía inválido (400 del BFF)", () => {
     await expect(rastrearGuia("<script>")).resolves.toBeNull();
   });
 });
+
+describe("formatFechaCorta (fechas de SIBOX)", () => {
+  it("convierte meses en español e inglés", async () => {
+    const { formatFechaCorta } = await import("./fecha");
+    expect(formatFechaCorta("21-MAY-2026 13:09")).toBe("21/05/2026");
+    expect(formatFechaCorta("05-ENE-2026")).toBe("05/01/2026");
+    expect(formatFechaCorta("05-JAN-2026")).toBe("05/01/2026");
+    expect(formatFechaCorta("12-DEC-2026")).toBe("12/12/2026");
+    expect(formatFechaCorta("texto raro")).toBe("texto raro");
+  });
+});

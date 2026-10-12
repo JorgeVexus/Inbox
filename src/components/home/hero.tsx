@@ -26,6 +26,8 @@ export function Hero() {
   }
 
   useEffect(() => {
+    // Respeta "reducir movimiento" del sistema (WCAG 2.2.2): sin cambio automático de fotos.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
       setSlide((s) => (s + 1) % SLIDES.length);
     }, 5000);
@@ -58,7 +60,7 @@ export function Hero() {
             Rastree su envío
           </h1>
           <form onSubmit={handleRastrear} className="flex w-full max-w-[406px] items-center gap-4">
-            <input
+            <input autoComplete="off"
               type="text"
               value={guia}
               onChange={(e) => setGuia(e.target.value)}
@@ -483,7 +485,7 @@ function OriginDestinationField({
           <p className="text-xs font-medium text-[#707372]">{placeholder}</p>
           <div className="flex items-start gap-2.5">
             <div className="flex h-[53px] min-w-0 flex-1 items-center rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card-sm">
-              <input
+              <input autoComplete={label === "Origen" ? "postal-code" : "off"}
                 type="text"
                 inputMode="numeric"
                 maxLength={5}
@@ -505,7 +507,7 @@ function OriginDestinationField({
           </div>
         </div>
         <div className="flex h-[50px] items-center justify-between rounded-md border border-secondary-dark/50 bg-white pl-4 pr-3.5 shadow-card">
-          <input
+          <input autoComplete={label === "Origen" ? "address-level2" : "off"}
             type="text"
             value={ciudad}
             onChange={(e) => onCiudadChange(e.target.value)}

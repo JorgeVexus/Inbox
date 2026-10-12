@@ -23,6 +23,7 @@ export function RastreoView() {
 
   const [busqueda, setBusqueda] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
+  const [intento, setIntento] = useState(0);
   const [resultados, setResultados] = useState<
     Record<string, { resultado: Rastreo | null; error?: string }>
   >({});
@@ -44,7 +45,7 @@ export function RastreoView() {
     return () => {
       cancelado = true;
     };
-  }, [guias]);
+  }, [guias, intento]);
 
   function actualizarGuias(nuevas: string[]) {
     if (nuevas.length === 0) {
@@ -91,7 +92,7 @@ export function RastreoView() {
 
         <form onSubmit={handleBuscar} className="flex w-full max-w-[339px] items-center gap-3">
           <div className="flex h-[43px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card">
-            <input
+            <input autoComplete="off"
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
@@ -144,6 +145,7 @@ export function RastreoView() {
               resultado={resultados[guia]?.resultado ?? null}
               error={resultados[guia]?.error}
               onQuitar={() => quitarGuia(guia)}
+              onReintentar={() => setIntento((n) => n + 1)}
             />
           ))}
       </div>

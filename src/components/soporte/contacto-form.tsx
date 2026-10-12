@@ -70,7 +70,7 @@ export function ContactoForm() {
           <label className="text-sm font-medium text-black" htmlFor="soporte-nombre">
             Nombre
           </label>
-          <input
+          <input autoComplete="name"
             id="soporte-nombre"
             type="text"
             maxLength={100}
@@ -85,7 +85,7 @@ export function ContactoForm() {
           <label className="text-sm font-medium text-black" htmlFor="soporte-correo">
             Correo electrónico
           </label>
-          <input
+          <input autoComplete="email"
             id="soporte-correo"
             type="email"
             maxLength={120}

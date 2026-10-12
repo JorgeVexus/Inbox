@@ -222,7 +222,7 @@ export function FacturacionModal({
 
         <div className="flex flex-col gap-3">
           <Row label="RFC">
-            <input
+            <input autoComplete="off"
               type="text"
               value={datos.rfc}
               onChange={(e) => set("rfc", e.target.value.toUpperCase())}
@@ -249,7 +249,7 @@ export function FacturacionModal({
           </Row>
 
           <Row label="C.P">
-            <input
+            <input autoComplete="postal-code"
               type="text"
               inputMode="numeric"
               maxLength={5}
@@ -296,7 +296,7 @@ export function FacturacionModal({
               <span className="shrink-0 text-xs font-medium text-[#707372]">
                 Especificar colonia
               </span>
-              <input
+              <input autoComplete="off"
                 type="text"
                 value={datos.coloniaEspecificada}
                 onChange={(e) => set("coloniaEspecificada", e.target.value)}
@@ -307,7 +307,7 @@ export function FacturacionModal({
           </div>
 
           <Row label="Dirección">
-            <input
+            <input autoComplete="address-line1"
               type="text"
               value={datos.direccion}
               onChange={(e) => set("direccion", e.target.value)}
@@ -317,7 +317,7 @@ export function FacturacionModal({
           </Row>
 
           <Row label="Teléfono">
-            <input
+            <input autoComplete="tel"
               type="tel"
               value={datos.telefono}
               onChange={(e) => set("telefono", e.target.value)}
@@ -327,7 +327,7 @@ export function FacturacionModal({
           </Row>
 
           <Row label="Correo">
-            <input
+            <input autoComplete="email"
               type="email"
               value={datos.correo}
               onChange={(e) => set("correo", e.target.value)}

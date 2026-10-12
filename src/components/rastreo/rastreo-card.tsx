@@ -19,12 +19,15 @@ export function RastreoCard({
   resultado,
   error,
   onQuitar,
+  onReintentar,
 }: {
   guia: string;
   resultado: Rastreo | null;
   /** La consulta fallo (red/servidor) -- distinto de "guia no encontrada". */
   error?: string;
   onQuitar: () => void;
+  /** Solo cuando la consulta falló (no cuando la guía no existe). */
+  onReintentar?: () => void;
 }) {
   const [detalleAbierto, setDetalleAbierto] = useState(false);
   const [detalle, setDetalle] = useState<RastreoEvento[] | null>(null);
@@ -62,13 +65,24 @@ export function RastreoCard({
               </>
             )}
           </p>
-          <button
-            type="button"
-            onClick={onQuitar}
-            className="shrink-0 px-2 py-2 text-xs font-medium text-primary underline"
-          >
-            Quitar
-          </button>
+          <div className="flex shrink-0 items-center">
+            {error && onReintentar && (
+              <button
+                type="button"
+                onClick={onReintentar}
+                className="px-2 py-2 text-xs font-bold text-primary underline"
+              >
+                Reintentar
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onQuitar}
+              className="px-2 py-2 text-xs font-medium text-primary underline"
+            >
+              Quitar
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -105,13 +119,23 @@ export function RastreoCard({
         </button>
       </div>
 
+      <p className="w-full text-sm text-black">
+        <span className="font-medium text-[#707372]">Último estado: </span>
+        <span className="font-bold">{resultado.Estatus}</span>
+        {resultado.OficinaEstatus ? ` · ${resultado.OficinaEstatus}` : ""}
+        {resultado.F_Estatus ? ` · ${formatFechaCorta(resultado.F_Estatus)}` : ""}
+      </p>
+
       <div className="flex w-full items-center rounded-md border border-secondary-dark/20 px-6 py-8 sm:px-16">
-        {PASOS.map((p, i) => (
-          <div key={p.label} className="flex flex-1 items-center last:flex-none">
+        {PASOS.map((p, i) => {
+          // En el estado final (Entregado) el último paso también está completo.
+          const hecho = i < paso || (paso === PASOS.length - 1 && i === paso);
+          return (
+          <div key={p.label} aria-current={i === paso ? "step" : undefined} className="flex flex-1 items-center last:flex-none">
             <div className="flex flex-col items-center gap-2">
               <span
                 className={`flex size-[64px] items-center justify-center rounded-full border-2 p-3 sm:size-[80px] ${
-                  i < paso
+                  hecho
                     ? "border-primary bg-primary"
                     : i === paso
                       ? "border-primary bg-white"
@@ -123,7 +147,7 @@ export function RastreoCard({
                   alt=""
                   width={40}
                   height={40}
-                  className={i < paso ? "invert" : ""}
+                  className={hecho ? "invert" : ""}
                 />
               </span>
               <p
@@ -132,6 +156,7 @@ export function RastreoCard({
                 }`}
               >
                 {p.label}
+                <span className="sr-only">{hecho ? " (completado)" : i === paso ? " (paso actual)" : " (pendiente)"}</span>
               </p>
             </div>
             {i < PASOS.length - 1 && (
@@ -142,7 +167,8 @@ export function RastreoCard({
               />
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <button

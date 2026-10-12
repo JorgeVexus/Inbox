@@ -14,6 +14,8 @@ export function SomosHero() {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
+    // Respeta "reducir movimiento" del sistema (WCAG 2.2.2): sin cambio automático de fotos.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
       setSlide((s) => (s + 1) % SLIDES.length);
     }, 5000);

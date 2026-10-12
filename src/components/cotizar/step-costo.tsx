@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { formatMXN } from "@/lib/moneda";
 import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
 import { obtenerCotizacion } from "@/lib/cotizacion";
 import { pesoTotalPaquetes } from "@/lib/mock/cotizacion";
@@ -89,7 +90,7 @@ export function StepCosto({
                         Precio desde
                       </p>
                       <p className="font-display text-2xl font-bold uppercase text-black">
-                        ${opcion.precio.toFixed(2)}
+                        {formatMXN(opcion.precio)}
                       </p>
                     </div>
                   </div>
@@ -121,7 +122,7 @@ export function StepCosto({
                           className="flex w-full max-w-[230px] justify-between text-xs text-black"
                         >
                           <span>{linea.label}</span>
-                          <span>${linea.precio.toFixed(2)}</span>
+                          <span>{formatMXN(linea.precio)}</span>
                         </div>
                       ))}
                     </div>

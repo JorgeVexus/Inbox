@@ -42,6 +42,7 @@ test("rastreo: detalles se abren y 'Quitar' elimina la guía", async ({ page }) 
 
 test("rastreo del Hero lleva a /rastreo con la guía", async ({ page }) => {
   await page.goto("/");
+  await page.waitForLoadState("networkidle"); // esperar la hidratación de React antes de interactuar
   await page.getByLabel("Ingrese el número de rastreo").first().fill("4003229791");
   await page.getByRole("button", { name: "Rastrear" }).first().click();
   await expect(page).toHaveURL(/\/rastreo\?guias=4003229791/);

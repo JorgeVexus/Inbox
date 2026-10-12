@@ -11,6 +11,11 @@ const MESES: Record<string, string> = {
   OCT: "10",
   NOV: "11",
   DIC: "12",
+  // Si el servidor de SIBOX cambia de idioma, los meses en inglés también se entienden.
+  JAN: "01",
+  APR: "04",
+  AUG: "08",
+  DEC: "12",
 };
 
 /**

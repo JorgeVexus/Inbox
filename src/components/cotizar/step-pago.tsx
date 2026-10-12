@@ -220,7 +220,7 @@ function DatosPrincipales({
         <div className="flex flex-wrap items-center gap-3 text-base text-black">
           <span>Referencia</span>
           {editandoReferencia ? (
-            <input
+            <input autoComplete="off"
               type="text"
               autoFocus
               value={referencia}
@@ -247,7 +247,7 @@ function DatosPrincipales({
         <div className="flex w-full flex-wrap gap-8">
           <div className="flex w-full max-w-[303px] flex-col gap-2">
             <label className="text-xs font-medium text-black">Email</label>
-            <input
+            <input autoComplete="email"
               type="email"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
@@ -257,7 +257,7 @@ function DatosPrincipales({
           </div>
           <div className="flex w-full max-w-[303px] flex-col gap-2">
             <label className="text-xs font-medium text-black">Teléfono</label>
-            <input
+            <input autoComplete="tel"
               type="tel"
               value={telefono}
               onChange={(e) => onTelefonoChange(e.target.value)}
@@ -486,7 +486,7 @@ function TarjetaForm({
         <div className="flex flex-col items-center gap-6">
           <div className="flex w-full flex-col gap-4 rounded-md bg-white p-6 shadow-card sm:max-w-[400px]">
             <Field label="Número de tarjeta">
-              <input
+              <input autoComplete="cc-number"
                 type="text"
                 inputMode="numeric"
                 maxLength={19}
@@ -497,7 +497,7 @@ function TarjetaForm({
               />
             </Field>
             <Field label="Nombre del titular">
-              <input
+              <input autoComplete="cc-name"
                 type="text"
                 value={value.nombreTitular}
                 onChange={(e) => set("nombreTitular", e.target.value)}
@@ -507,7 +507,7 @@ function TarjetaForm({
             </Field>
             <div className="flex gap-4">
               <Field label="Vencimiento" className="flex-1">
-                <input
+                <input autoComplete="cc-exp"
                   type="text"
                   inputMode="numeric"
                   maxLength={5}
@@ -518,7 +518,7 @@ function TarjetaForm({
                 />
               </Field>
               <Field label="CVV" className="flex-1">
-                <input
+                <input autoComplete="cc-csc"
                   type="text"
                   inputMode="numeric"
                   maxLength={4}
