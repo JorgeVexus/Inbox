@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { RastreoCard } from "@/components/rastreo/rastreo-card";
 import { Faq } from "@/components/home/faq";
-import { rastrearGuias } from "@/lib/rastreo";
+import { rastrearGuias, rastreoEsDemo } from "@/lib/rastreo";
 import type { Rastreo } from "@/types/rastreo";
 
 function parseGuias(raw: string | null): string[] {
@@ -80,6 +80,11 @@ export function RastreoView() {
           <h1 className="font-display text-3xl font-bold text-black">
             Rastree su paquete
           </h1>
+          {rastreoEsDemo() && (
+            <span className="rounded-full bg-secondary/25 px-3 py-1 text-xs font-bold text-primary">
+              Datos de demostración — prueba con la guía 4003229791
+            </span>
+          )}
           <p className="max-w-xl text-xs text-black">
             ¿Tienes varios paquetes? Ingresa tus guías y mantente al tanto de
             múltiples envíos al mismo tiempo.

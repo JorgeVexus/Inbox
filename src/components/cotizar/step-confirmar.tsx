@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
 import { useAuth } from "@/components/auth/auth-provider";
+import { listarContactos } from "@/lib/contactos";
 import { pesoTotalPaquetes } from "@/lib/mock/cotizacion";
+import type { ContactoGuardado } from "@/types/contacto";
 import type {
   ConfirmarInput,
   ContactoEnvio,
@@ -65,6 +67,56 @@ export function StepConfirmar({
     destinatario.nombre.trim() !== "" &&
     destinatario.telefono.trim() !== "";
 
+  const usuario = session?.usuario ?? null;
+  const [contactos, setContactos] = useState<ContactoGuardado[]>([]);
+  const [avisos, setAvisos] = useState<{ remitente: string | null; destinatario: string | null }>({
+    remitente: null,
+    destinatario: null,
+  });
+
+  useEffect(() => {
+    if (!usuario) return;
+    let cancelado = false;
+    listarContactos(usuario).then((lista) => {
+      if (!cancelado) setContactos(lista);
+    });
+    return () => {
+      cancelado = true;
+    };
+  }, [usuario]);
+
+  // Sin sesión no se muestra el selector, aunque quede una lista en memoria
+  // de una sesión anterior.
+  const contactosVisibles = usuario ? contactos : [];
+
+  /**
+   * Vuelca un contacto guardado al formulario. El C.P./ciudad/colonia se
+   * CONSERVAN de la cotización (el precio ya se calculó con ellos); si el
+   * contacto tiene otro C.P. se avisa en vez de cambiarlo en silencio.
+   */
+  function elegirContacto(lado: "remitente" | "destinatario", id: string) {
+    const c = contactosVisibles.find((x) => x.id === id);
+    if (!c) return;
+    const set = lado === "remitente" ? setRemitente : setDestinatario;
+    set((actual) => ({
+      ...actual,
+      nombre: c.nombre,
+      direccion: c.direccion,
+      numExt: c.numExt,
+      numInt: c.numInt,
+      telefono: c.telefono,
+      email: c.email,
+    }));
+    const cpCotizado = (lado === "remitente" ? cotizacion.origen : cotizacion.destino).cp;
+    setAvisos((a) => ({
+      ...a,
+      [lado]:
+        c.cp && cpCotizado && c.cp !== cpCotizado
+          ? `El C.P. de este contacto (${c.cp}) es distinto al cotizado (${cpCotizado}). Se conservó el cotizado.`
+          : null,
+    }));
+  }
+
   function autocompletarConSesion() {
     if (!session) return openLogin();
     setRemitente((r) => ({ ...r, nombre: session.nombre, email: r.email }));
@@ -106,6 +158,9 @@ export function StepConfirmar({
               value={remitente}
               onChange={setRemitente}
               nombreLabel="Nombre del remitente"
+              contactos={contactosVisibles}
+              onElegirContacto={(id) => elegirContacto("remitente", id)}
+              aviso={avisos.remitente}
             />
           </div>
           <div className="hidden w-px shrink-0 self-stretch bg-neutral-line lg:block" />
@@ -115,6 +170,9 @@ export function StepConfirmar({
               value={destinatario}
               onChange={setDestinatario}
               nombreLabel="Nombre del destinatario"
+              contactos={contactosVisibles}
+              onElegirContacto={(id) => elegirContacto("destinatario", id)}
+              aviso={avisos.destinatario}
             />
           </div>
         </div>
@@ -183,11 +241,17 @@ function ContactoForm({
   value,
   onChange,
   nombreLabel,
+  contactos = [],
+  onElegirContacto,
+  aviso = null,
 }: {
   titulo: string;
   value: ContactoEnvio;
   onChange: (v: ContactoEnvio) => void;
   nombreLabel: string;
+  contactos?: ContactoGuardado[];
+  onElegirContacto?: (id: string) => void;
+  aviso?: string | null;
 }) {
   function set<K extends keyof ContactoEnvio>(key: K, v: ContactoEnvio[K]) {
     onChange({ ...value, [key]: v });
@@ -196,6 +260,24 @@ function ContactoForm({
   return (
     <div className="flex w-full max-w-[320px] flex-col items-center gap-6">
       <p className="font-display text-2xl font-bold text-black">{titulo}</p>
+      {contactos.length > 0 && onElegirContacto && (
+        <div className="flex w-full flex-col gap-1.5">
+          <select
+            aria-label={`Elegir contacto guardado para ${titulo.toLowerCase()}`}
+            value=""
+            onChange={(e) => e.target.value && onElegirContacto(e.target.value)}
+            className="h-[43px] w-full rounded-md border border-primary bg-white px-4 text-xs font-medium text-primary shadow-card outline-none"
+          >
+            <option value="">Elegir de mis contactos</option>
+            {contactos.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
+          {aviso && <p className="text-xs text-black/60">{aviso}</p>}
+        </div>
+      )}
       <div className="flex w-full flex-col gap-4">
         <Field label={nombreLabel}>
           <input

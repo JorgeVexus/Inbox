@@ -1,11 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { rastrearGuia, rastrearGuias, rastrearGuiaDetalle, RastreoError } from "./rastreo";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { rastrearGuia, rastrearGuias, rastrearGuiaDetalle, rastreoEsDemo, RastreoError } from "./rastreo";
 
 function respuesta(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status });
 }
 
-afterEach(() => vi.unstubAllGlobals());
+// Estos tests cubren el modo REAL (BFF); el modo demo tiene sus propios tests abajo.
+beforeEach(() => vi.stubEnv("NEXT_PUBLIC_SIBOX_REAL", "1"));
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
 
 describe("rastrearGuia", () => {
   it("regresa el primer registro del BFF", async () => {
@@ -68,5 +73,24 @@ describe("rastrearGuiaDetalle", () => {
     vi.stubGlobal("fetch", fetchMock);
     await expect(rastrearGuiaDetalle("1")).resolves.toHaveLength(1);
     expect(fetchMock.mock.calls[0][0]).toBe("/api/rastreo/detalle");
+  });
+});
+
+describe("modo demo (por defecto)", () => {
+  beforeEach(() => vi.unstubAllEnvs());
+
+  it("es demo salvo que NEXT_PUBLIC_SIBOX_REAL sea 1", () => {
+    expect(rastreoEsDemo()).toBe(true);
+    vi.stubEnv("NEXT_PUBLIC_SIBOX_REAL", "1");
+    expect(rastreoEsDemo()).toBe(false);
+  });
+
+  it("resuelve contra el mock y NO llama a la red", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(rastrearGuia("4003229791")).resolves.toMatchObject({ Estatus: "ENTREGADA" });
+    await expect(rastrearGuia("0001")).resolves.toBeNull();
+    await expect(rastrearGuiaDetalle("4003229791")).resolves.not.toHaveLength(0);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

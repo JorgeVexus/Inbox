@@ -8,8 +8,8 @@
 
 | | |
 |---|---|
-| **Última actualización** | 2026-10-12 |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 76 tests pasando |
+| **Última actualización** | 2026-10-12 (sesión 2) |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 84 tests pasando |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
 ---
@@ -56,7 +56,9 @@ la vea automáticamente.
   tienen la forma exacta de la API real.
 - **Lo único conectado a SIBOX de verdad**: **rastreo** (`/rastreo`, "Ver
   detalles" y el chat flotante) vía el BFF propio (`/api/rastreo`,
-  `/api/rastreo/detalle`).
+  `/api/rastreo/detalle`). **Por defecto corre en MODO DEMO** (datos simulados
+  + aviso visible) para que el sitio funcione aunque SIBOX no sea alcanzable;
+  se activa lo real con `NEXT_PUBLIC_SIBOX_REAL=1` (ver §7 y `.env.example`).
 - **Pero ni eso se puede ver funcionando desde la app todavía**: **Cloudflare
   bloquea las llamadas hechas desde Node** (el BFF) aunque la IP ya está en el
   whitelist del cliente. Con `curl` sí pasa. Ver §5, bloqueo B1.
@@ -92,10 +94,10 @@ inicio 2026-08-04) asumía una demo semanal en un link de Vercel. Estado real:
 | Ruta | Qué es | Datos hoy | Seam / archivo clave | Endpoint SIBOX futuro |
 |---|---|---|---|---|
 | `/` | Home: hero (rastreo + cotización 3 pasos), servicios, mapa de cobertura, CTA de sucursales, About, FAQ | mock (sucursales); rastreo **real** | `lib/sucursales.ts`, `components/home/*` | `ListadoOficinas`/`Cobertura` |
-| `/cotizar` | Wizard 4 pasos: cotizar → costo → confirmar → pago (invitado permitido) | mock | `lib/cotizacion.ts`, `components/cotizar/*` | `ObtieneDetalleCostos`, `wsGeneracionGuiaCliente`, pagos (pendiente) |
+| `/cotizar` | Wizard 4 pasos: cotizar → costo → confirmar → pago (invitado permitido; con sesión, el paso *Confirmar* ofrece elegir de "Mis contactos") | mock | `lib/cotizacion.ts`, `components/cotizar/*` | `ObtieneDetalleCostos`, `wsGeneracionGuiaCliente`, pagos (pendiente) |
 | `/rastreo` | Rastreo de varias guías + historial | **REAL vía BFF** | `lib/rastreo.ts`, `app/api/rastreo/*` | `wsRastreo`, `RastreoDetalle` |
 | `/envio` | "Mis envíos" (protegida por login demo) | mock | `lib/envios.ts` | no hay endpoint documentado |
-| `/perfil` | Cuenta, direcciones guardadas, datos de facturación (protegida) | mock + `localStorage` | `lib/domicilios.ts`, `lib/facturacion.ts` | `DomiciliosRecoleccionesCliente` (solo lectura documentada) |
+| `/perfil` | Cuenta, direcciones guardadas, **contactos**, datos de facturación (protegida) | mock + `localStorage` | `lib/domicilios.ts`, `lib/contactos.ts`, `lib/facturacion.ts` | `DomiciliosRecoleccionesCliente` (solo lectura documentada); contactos: sin endpoint (preguntado) |
 | `/recoleccion` | Agendar recolección (protegida) | mock | `lib/recoleccion.ts` | `ObtenerHorariosPorCP`, `wsGeneracionRecoleccion` |
 | `/cobertura` | Mapa Leaflet + panel de sucursal + "Estamos donde tú estás" | mock | `components/home/cobertura*.tsx` | `ListadoOficinas` |
 | `/somos`, `/soporte` | Páginas informativas; soporte tiene formulario de contacto (stub) | estático / stub | `lib/soporte.ts` | no hay endpoint de chat/ticket |
@@ -155,7 +157,7 @@ bloqueado, B1).
 
 **B. Avanzar ya, sin esperar a nadie**
 1. **Desplegar a Vercel** (proyecto + previews protegidos + variables de entorno): el plan lo pedía desde la semana 1 y el cliente aún no ve nada en un link. Probablemente choque con B1 en el preview, pero hay que tenerlo.
-2. **Agenda de "Contactos"** (pedido del cliente 2026-10-07): en `/perfil` + selector en el paso *Confirmar* de `/cotizar`. En mock con el patrón de seam.
+2. ~~Agenda de "Contactos"~~ **[HECHA en mock, 2026-10-12]**: `/perfil` → "Mis contactos" + selector en *Confirmar*. Queda cambiar el seam cuando backend responda si hay endpoint (§5 B2).
 3. **Rate limiting** de `/api/*` (necesita un store compartido, p.ej. Upstash Redis; ver TODO en `route-helpers.ts`).
 4. **Conectar al BFF los endpoints de lectura que ya funcionan**: `ListadoOficinas`/`Cobertura` (mapa y sucursales), `BusquedaCP`, `TipoEnvio`/`TipoEntrega`, `ObtenerHorariosPorCP` — con el mismo patrón de `proxySibox()`. Se podrán ver cuando B1 se resuelva.
 5. Mostrar en `/rastreo` la **firma** y quién recibió **solo** cuando exista el endpoint autenticado (hoy se anulan por privacidad).
@@ -182,6 +184,8 @@ las pruebas de conectividad contra `api.inbox.com.mx`.
 | 2026-09-23 | Whitelist del cliente es **por IP**; IP fija vía proxy en VPS, no Vercel Static IPs | $100/mes no aceptable |
 | 2026-10-02 | Token de `Login` en `resp.token`; BFF lo lee ahí y expone `K_Cliente` de servicio | Forma real distinta del PDF |
 | 2026-10-07 | **Comprar una guía NO requiere registro** (invitado); recolecciones **sí** | Regla del cliente; no frenar la venta |
+| 2026-10-12 | Rastreo con **interruptor demo/real** (`NEXT_PUBLIC_SIBOX_REAL=1`); por defecto demo con aviso visible | El sitio/previews deben funcionar mientras Cloudflare bloquee (B1); el plan pide identificar los datos simulados. Es un flag de comportamiento, no un secreto |
+| 2026-10-12 | Al elegir un contacto en *Confirmar* se **conserva el C.P. cotizado** y se avisa si difiere | El precio ya se calculó con ese C.P.; no cambiarlo en silencio |
 | 2026-10-12 | El BFF **anula** nombres, quién recibió, firma, coordenadas y `Observaciones` del rastreo público | Reglas de seguridad 3 y 7: la API los devuelve con solo conocer la guía |
 | 2026-10-12 | Errores internos de SIBOX **nunca** llegan al navegador (502/503/504 genéricos) | Se vio un error de SQL con nombre de stored procedure |
 | siempre | `procesarPago()` **nunca** se conecta a una pasarela sin decisión explícita | Pagos bloqueados por backend |
@@ -259,6 +263,10 @@ npx tsc --noEmit && npm run lint && npm test
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
 
+- **2026-10-12 (sesión 2)** — Modo demo/real del rastreo (con aviso en
+  `/rastreo`); agenda de **Contactos** en `/perfil` y selector en *Confirmar*
+  (mock); 84 tests. Se explica el flujo Vercel preview → producción al dueño del
+  proyecto (primera vez con un sistema así). Pendiente: desplegar a Vercel.
 - **2026-10-12** — Retomo tras ~10 días. Guías de prueba reales: se corrigió el
   timeline (LISTO PARA ENTREGAR se veía "Entregado") y se cerró una **fuga de
   datos personales** del rastreo. Auditoría completa del proyecto; probados 6

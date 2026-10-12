@@ -1,4 +1,20 @@
+import { MOCK_RASTREOS, MOCK_RASTREO_DETALLE } from "@/lib/mock/rastreo";
 import type { Rastreo, RastreoEvento } from "@/types/rastreo";
+
+/**
+ * Modo de datos del rastreo. Por defecto es **demo** (datos simulados con la
+ * forma real de la API): así el sitio y las previews funcionan aunque SIBOX no
+ * sea alcanzable (hoy Cloudflare bloquea al servidor, ver INDICE_MAESTRO.md
+ * B1). Con `NEXT_PUBLIC_SIBOX_REAL=1` se usa el BFF real (`/api/rastreo`).
+ * Es un interruptor de comportamiento, NO un secreto: por eso puede ser
+ * `NEXT_PUBLIC_*` (las credenciales de SIBOX jamás lo son). Se lee en cada
+ * llamada (y no al cargar el módulo) para poder probarlo.
+ */
+export function rastreoEsDemo(): boolean {
+  return process.env.NEXT_PUBLIC_SIBOX_REAL !== "1";
+}
+
+const esperar = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Error de red/servidor al consultar rastreo (distinto de "la guía no
@@ -40,6 +56,10 @@ async function postBff<T>(url: string, guia: string): Promise<T | null> {
 export async function rastrearGuia(guia: string): Promise<Rastreo | null> {
   const clean = guia.trim();
   if (!clean) return null;
+  if (rastreoEsDemo()) {
+    await esperar(400);
+    return MOCK_RASTREOS[clean] ?? null;
+  }
   const registros = await postBff<Rastreo[]>("/api/rastreo", clean);
   return registros?.[0] ?? null;
 }
@@ -75,5 +95,9 @@ export async function rastrearGuias(guias: string[]): Promise<ResultadoRastreo[]
 export async function rastrearGuiaDetalle(guia: string): Promise<RastreoEvento[] | null> {
   const clean = guia.trim();
   if (!clean) return null;
+  if (rastreoEsDemo()) {
+    await esperar(350);
+    return MOCK_RASTREO_DETALLE[clean] ?? null;
+  }
   return postBff<RastreoEvento[]>("/api/rastreo/detalle", clean);
 }

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/auth-provider";
+import { ContactosGuardados } from "@/components/perfil/contactos-guardados";
 import { DireccionesGuardadas } from "@/components/perfil/direcciones-guardadas";
 import { FacturacionGuardada } from "@/components/perfil/facturacion-guardada";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,7 @@ export function PerfilView() {
 
           <FacturacionGuardada usuario={session.usuario} />
           <DireccionesGuardadas usuario={session.usuario} />
+          <ContactosGuardados usuario={session.usuario} />
 
           <section className="flex flex-col items-start gap-3 rounded-md bg-white p-6 shadow-card-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
