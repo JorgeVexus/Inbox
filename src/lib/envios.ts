@@ -28,7 +28,7 @@ export async function listarEnvios(usuario: string): Promise<EnvioPerfil[]> {
 
     if (typeof window !== "undefined") {
       try {
-        nombre = window.localStorage.getItem(claveAliasEnvio(usuario, envio.guia)) ?? nombre;
+        nombre = window.localStorage.getItem(claveAliasEnvio(usuario, envio.guia))?.slice(0, 60) || nombre;
       } catch {
         // Storage can be unavailable in privacy mode; defaults remain usable.
       }

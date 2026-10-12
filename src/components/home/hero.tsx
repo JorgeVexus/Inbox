@@ -63,7 +63,7 @@ export function Hero() {
               value={guia}
               onChange={(e) => setGuia(e.target.value)}
               aria-label="Ingrese el número de rastreo" maxLength={200} placeholder="Ingrese el número de rastreo"
-              className="h-[53px] flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+              className="h-[53px] min-w-0 flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
             <Button type="submit">Rastrear</Button>
           </form>
@@ -249,9 +249,9 @@ function QuoteCard() {
                     />
                   </div>
                   <div className="flex justify-end gap-4 pr-3 text-xs text-[#707372]">
-                    <span className="w-[82px] text-right">Alto</span>
-                    <span className="w-[82px] text-right">Largo</span>
-                    <span className="w-[82px] text-right">Ancho</span>
+                    <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Alto</span>
+                    <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Largo</span>
+                    <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Ancho</span>
                   </div>
                 </div>
               </div>
@@ -446,7 +446,7 @@ function MedidaInput({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="flex h-[53px] w-[82px] items-center justify-end gap-1 rounded-md border border-[#707372]/70 bg-white px-3 shadow-card">
+    <div className="flex h-[53px] min-w-0 flex-1 items-center justify-end gap-1 sm:w-[82px] sm:flex-none rounded-md border border-[#707372]/70 bg-white px-3 shadow-card">
       <input
         type="number"
         min={0}
@@ -482,7 +482,7 @@ function OriginDestinationField({
         <div className="flex flex-col gap-2">
           <p className="text-xs font-medium text-[#707372]">{placeholder}</p>
           <div className="flex items-start gap-2.5">
-            <div className="flex h-[53px] flex-1 items-center rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card-sm">
+            <div className="flex h-[53px] min-w-0 flex-1 items-center rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card-sm">
               <input
                 type="text"
                 inputMode="numeric"

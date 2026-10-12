@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run --configLoader runner"
+    "test": "vitest run --configLoader runner",
+    "test:e2e": "playwright test",
+    "test:e2e:chrome": "playwright test --project=chrome"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
@@ -21,6 +23,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",

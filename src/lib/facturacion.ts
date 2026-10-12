@@ -1,3 +1,4 @@
+import { leerDatosFacturacion } from "@/lib/almacen-schemas";
 import { datosDesdeArchivoMock } from "@/lib/mock/facturacion";
 import type { DatosFacturacion } from "@/types/facturacion";
 
@@ -19,7 +20,7 @@ export function obtenerDatosFacturacionGuardados(usuario: string): DatosFacturac
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(claveFacturacionLocal(usuario));
-    return raw ? (JSON.parse(raw) as DatosFacturacion) : null;
+    return raw ? leerDatosFacturacion(JSON.parse(raw)) : null;
   } catch {
     return null;
   }

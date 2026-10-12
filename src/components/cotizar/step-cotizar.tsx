@@ -103,7 +103,7 @@ export function StepCotizar({
       onSubmit={handleSubmit}
       className="flex w-full flex-col items-center gap-10 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12"
     >
-      <div className="flex w-full flex-col items-center gap-8 xl:flex-row xl:items-start xl:justify-center">
+      <div className="flex w-full flex-col items-center gap-8 min-[1400px]:flex-row min-[1400px]:items-start min-[1400px]:justify-center">
         <DireccionCard label="Origen" value={origen} onChange={setOrigen} />
         <button
           type="button"
@@ -214,7 +214,7 @@ function DireccionCard({
               value={value.cp}
               onChange={(e) => onChange({ ...value, cp: e.target.value.replace(/\D/g, "").slice(0, 5) })}
               aria-label={`Código postal de ${label.toLowerCase()}`} placeholder="Código postal"
-              className="h-[53px] flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
+              className="h-[53px] min-w-0 flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
             />
             <Link
               href="/cobertura"
@@ -337,9 +337,9 @@ function PaqueteCard({
             />
           </div>
           <div className="flex justify-end gap-4 pr-3 text-xs text-[#707372]">
-            <span className="w-[82px] text-right">Alto</span>
-            <span className="w-[82px] text-right">Largo</span>
-            <span className="w-[82px] text-right">Ancho</span>
+            <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Alto</span>
+            <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Largo</span>
+            <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Ancho</span>
           </div>
         </div>
         <div className="flex flex-col items-end gap-3">
@@ -392,7 +392,7 @@ function MedidaInput({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="flex h-[53px] w-[82px] items-center justify-end gap-1 rounded-md border border-[#707372]/70 bg-white px-3 shadow-card">
+    <div className="flex h-[53px] min-w-0 flex-1 items-center justify-end gap-1 sm:w-[82px] sm:flex-none rounded-md border border-[#707372]/70 bg-white px-3 shadow-card">
       <input
         type="number"
         min={0}

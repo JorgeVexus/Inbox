@@ -9,7 +9,7 @@
 | | |
 |---|---|
 | **Última actualización** | 2026-10-12 (sesión 3, auditoría QA) |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 147 tests pasando; QA módulo por módulo completada (ver `docs/QA_MODULO_POR_MODULO.md`) |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 152 tests unitarios + suite E2E Playwright (248 pasan en Chrome/Firefox/WebKit/móvil); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
 ---
@@ -275,6 +275,8 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-12 (sesión 3, parte 4 — E2E y robustez)** — Suite Playwright en `e2e/` (`npm run build && npm run test:e2e`): 248 pasan en 4 navegadores. Encontró y se corrigió: desbordes a 320 px y a 1280 px (con barra de scroll), y datos locales corruptos / almacenamiento bloqueado que tumbaban /perfil y /cotizar (`src/lib/almacen-schemas.ts`). Carga del BFF: 3000 peticiones/300 simultáneas sin caídas, **sin límite de peticiones (pendiente)**. Reporte completo en `docs/REPORTE_SESION_2026-10-12.md`.
 
 - **2026-10-12 (sesión 3, parte 3 — QA módulo por módulo)** — Revisión de M1–M13 (ver `docs/QA_MODULO_POR_MODULO.md`). BFF probado contra la API real con un puente local (curl) porque Cloudflare sigue bloqueando a Node: 1 solo Login con 15 peticiones simultáneas, datos personales siempre en null. Contrato real fijado en `schemas/catalogos.ts`. Corregidos: parser de horarios (12 de 42 textos reales mostraban "Cerrado" sin saberlo), desbordes a 1024 px en cotizador/somos/navbar con sesión, controles muertos, límite de 10 guías, modales con foco atrapado, foco visible, páginas legales 404, CLS 0.39→0 en /cotizar (Lighthouse móvil: 95/100/100/100), mapa perezoso. Nuevos bloqueos B10 (contenido del cliente) y B11 (teselas del mapa). 147 tests.
 

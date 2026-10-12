@@ -1,3 +1,4 @@
+import { leerContactos } from "./almacen-schemas";
 import { MOCK_CONTACTOS } from "./mock/contactos";
 import type { ContactoGuardado, GuardarContactoResult } from "@/types/contacto";
 
@@ -14,7 +15,7 @@ function leerLocal(usuario: string): ContactoGuardado[] | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(claveContactos(usuario));
-    return raw ? (JSON.parse(raw) as ContactoGuardado[]) : null;
+    return raw ? leerContactos(JSON.parse(raw)) : null;
   } catch {
     return null;
   }

@@ -1,3 +1,4 @@
+import { leerDomicilios } from "./almacen-schemas";
 import { MOCK_DOMICILIOS } from "./mock/domicilios";
 import type { Domicilio, GuardarDomicilioResult } from "@/types/domicilio";
 
@@ -20,7 +21,7 @@ function leerListaLocal(usuario: string): Domicilio[] | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(claveDomicilios(usuario));
-    return raw ? (JSON.parse(raw) as Domicilio[]) : null;
+    return raw ? leerDomicilios(JSON.parse(raw)) : null;
   } catch {
     return null;
   }

@@ -1,3 +1,4 @@
+import { leerBorradorCotizacion } from "@/lib/almacen-schemas";
 import type { CotizacionInput } from "@/types/cotizacion";
 
 /**
@@ -14,16 +15,21 @@ const KEY = "inbox:cotizacion-draft";
 
 export function saveCotizacionDraft(input: CotizacionInput) {
   if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(KEY, JSON.stringify(input));
+  try {
+    window.sessionStorage.setItem(KEY, JSON.stringify(input));
+  } catch {
+    // Almacenamiento bloqueado (modo privado / datos del sitio bloqueados): el
+    // traspaso Home -> /cotizar es una comodidad, no debe romper el flujo.
+  }
 }
 
 export function readAndClearCotizacionDraft(): CotizacionInput | null {
   if (typeof window === "undefined") return null;
-  const raw = window.sessionStorage.getItem(KEY);
-  if (!raw) return null;
-  window.sessionStorage.removeItem(KEY);
   try {
-    return JSON.parse(raw) as CotizacionInput;
+    const raw = window.sessionStorage.getItem(KEY);
+    if (!raw) return null;
+    window.sessionStorage.removeItem(KEY);
+    return leerBorradorCotizacion(JSON.parse(raw));
   } catch {
     return null;
   }
