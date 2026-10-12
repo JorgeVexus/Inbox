@@ -14,7 +14,7 @@
 > principal edita después de cada feature); conviene revisar ambos y avisar
 > si hay contradicciones.
 >
-> Última actualización: 2026-10-02 (primera prueba real exitosa contra la API de SIBOX).
+> Última actualización: 2026-10-12 (guías de prueba reales, fuga de datos corregida, reglas de negocio del cliente).
 > whitelistear el acceso a la API).
 
 ---
@@ -376,6 +376,74 @@ probó por primera vez contra la API real **con respuestas exitosas**:
    endpoint de historial por cuenta). **Mientras Cloudflare siga bloqueando a
    Node, `/rastreo` mostrará el error 503 en desarrollo.**
 
+### Guías de prueba reales + reglas de negocio del cliente (2026-10-12)
+
+**Guías de prueba entregadas por el cliente**: `4159028044`, `4159050421`,
+`4159021743` (las tres ENTREGADA, mayo 2026; son envíos reales de clientes).
+Se probaron `wsRastreo` y `RastreoDetalle` con `curl`; hallazgos:
+
+1. **`F_Promesa_Entrega` viene poblado** (`"21/05/2026"`, formato DD/MM/YYYY,
+   distinto del `DD-MMM-YYYY HH:MM` de `F_Estatus`).
+2. **Catálogo REAL de `Estatus`** observado: VENDIDA, PRE-DOCUMENTADA,
+   DOCUMENTADA, RECOLECTADA, EMBARCADA, DESEMBARCADA, TRANSBORDADA,
+   TRANSMITIDA, LISTO PARA ENTREGAR, EN RUTA, ENTREGADA. **Bug encontrado y
+   corregido**: la heurística `pasoDesdeEstatus()` usaba `includes("ENTREG")`,
+   por lo que "LISTO PARA ENTREGAR" se mostraba como *Entregado*, y los
+   estatus de tránsito (EMBARCADA/TRANSBORDADA…) como *Paquete recibido*. Ahora
+   es una tabla por valor exacto (`src/types/rastreo.ts`, con tests). Sigue
+   sin ser un catálogo oficial: pedirle a backend la lista completa.
+3. **Fuga de datos personales (corregida en el BFF).** El rastreo es público por
+   número de guía, pero la API regresa nombres de remitente/destinatario,
+   quién recibió, la **imagen de la firma en base64**, coordenadas, y en
+   `RastreoDetalle.Observaciones` notas internas con datos de clientes (p.ej.
+   `Cliente MySibox: 974, Usuario: <correo>`). Con el BFF original, cualquiera
+   que conociera una guía recibía todo eso (viola la regla de seguridad 3).
+   Ahora `rastreoRegistroPublicoSchema` y `rastreoEventoPublicoSchema` los
+   anulan **en el servidor** (con tests que prueban que el JSON de salida no
+   los contiene). Si algún día se necesitan (p.ej. firma en "Mis envíos"),
+   deben salir por un endpoint autenticado que verifique que la guía es del
+   cliente. Preguntarle al cliente si alguna observación es pública.
+4. Las notas `Cliente MySibox: <n>, Usuario: <correo>` revelan que **ya existe
+   un sistema de cuentas de cliente ("MySibox")** con número de cliente y
+   usuario por correo — probablemente de ahí saldrán las cuentas del sitio.
+5. **Cloudflare sigue bloqueando a Node** (verificado hoy: 403 challenge) — el
+   pendiente con el cliente (regla en Cloudflare, no solo firewall de origen)
+   sigue abierto, así que `/rastreo` todavía no puede mostrar estas guías
+   desde el BFF en desarrollo.
+
+**Reglas de negocio confirmadas por el cliente (WhatsApp, 2026-10-07):**
+- **Registro obligatorio para programar recolecciones**: necesitan el
+  *número de cliente* de cada persona.
+- **Con sesión iniciada el cliente puede**: revisar los envíos que ha hecho,
+  registrar sus recolecciones y **registrar sus contactos** para agilizar la
+  documentación de sus envíos.
+- **Comprar una guía NO requiere registro**: debe poder hacerse **como
+  invitado**, para no frenar ni perder la venta. (El checkout de `/cotizar` ya
+  es así: el login ahí solo ofrece autocompletar. **Regla: nunca poner un
+  muro de login en el flujo de compra.**)
+
+**Corrección importante sobre `K_Cliente`**: más arriba (2026-10-02) se marcó
+como "resuelto" que `Login` regresa `K_Cliente`. Es **correcto solo a medias**:
+el `63105` ("PAGINA WEB") es el número de la **cuenta de servicio del sitio**,
+no el de cada persona. Sirve, por inferencia, para las compras como invitado
+(a confirmar), pero **usarlo en `/recoleccion` atribuiría todas las
+recolecciones a "PAGINA WEB"**. Para recolecciones hace falta el `K_Cliente`
+propio de cada cliente, que según el cliente viene del **registro** — y los
+endpoints de registro/login de usuario final siguen sin liberarse. `/recoleccion`
+debe seguir en mock hasta que existan.
+
+**Impacto en el plan:**
+1. `/cuenta/crear` (hoy "Próximamente") pasa de "nice to have" a **bloqueante**
+   para recolecciones: pedir a backend los endpoints de registro, login de
+   usuario final y cómo se obtiene su `K_Cliente` (¿MySibox?).
+2. **Nueva funcionalidad pedida: "Contactos"** (agenda de remitentes/
+   destinatarios frecuentes) en `/perfil`, con selector en el paso *Confirmar* de
+   `/cotizar` para autocompletar. Hoy solo existen "Direcciones guardadas"
+   (domicilios de recolección). Preguntar a backend si es el mismo
+   catálogo ("libreta de direcciones") o uno distinto.
+3. Compra como invitado: confirmar con backend qué `K_Cliente` usa
+   `wsGeneracionGuiaCliente` para invitados (¿el 63105 "PAGINA WEB"?).
+
 ### Cómo funcionará el cambio de Pruebas → Producción
 
 El diseño de la capa BFF (Route Handlers server-side, nunca el navegador
@@ -726,7 +794,7 @@ se llama a `wsGeneracionRecoleccion` → folio de confirmación
 
 Dos hallazgos importantes al construir esto, ambos documentados con más
 detalle en CLAUDE.md:
-- **[RESUELTO 2026-10-02: `Login` sí regresa `K_Cliente` (63105), ver sección 5]** **`wsGeneracionRecoleccion` pide `K_Cliente` (int) pero `Login` solo
+- **[CORREGIDO 2026-10-12: el K_Cliente del Login es el de la cuenta de servicio, no el de cada cliente — ver "Guías de prueba reales + reglas de negocio"]** **`wsGeneracionRecoleccion` pide `K_Cliente` (int) pero `Login` solo
   regresa un `token`** — no hay forma documentada de obtener el ID de
   cliente desde la sesión. El mock usa el 62801 de ejemplo del PDF como
   placeholder; hay que preguntarle a backend de dónde sale ese dato.

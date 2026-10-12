@@ -39,17 +39,35 @@ export type RastreoEvento = {
 /**
  * The 4-stage progress bar (Paquete recibido / En tránsito / En proceso de
  * entrega / Entregado) is a UI simplification the API doesn't provide
- * directly — `Estatus` is free text ("DOCUMENTADA", "EN RUTA", "ENTREGADA",
- * etc.), not a fixed stage enum. This keyword heuristic maps it to one of
- * the 4 steps for the timeline; it's not authoritative and should be
- * revisited once real Estatus values from production are known.
+ * directly — `Estatus` is free text, not a stage enum.
+ *
+ * Mapeo construido con los valores REALES de `Estatus` observados en
+ * apitest.inbox.com.mx (2026-10-12, 5 guías). Se compara por valor exacto,
+ * NO por `includes()`: "LISTO PARA ENTREGAR" contiene "ENTREG" y aparecía
+ * como "Entregado", y "DESEMBARCADA" contiene "EMBARCADA". Un estatus que no
+ * esté en la tabla cae al paso 0 (y debe agregarse aquí al descubrirlo).
+ * Sigue sin ser un catálogo oficial — pedirle a backend la lista completa.
  */
 export type PasoRastreo = 0 | 1 | 2 | 3;
 
+const PASO_POR_ESTATUS: Record<string, PasoRastreo> = {
+  // 0 — Paquete recibido / documentado
+  "VENDIDA": 0,
+  "PRE-DOCUMENTADA": 0,
+  "DOCUMENTADA": 0,
+  "RECOLECTADA": 0,
+  // 1 — En tránsito entre oficinas / con otra paquetería
+  "EMBARCADA": 1,
+  "DESEMBARCADA": 1,
+  "TRANSBORDADA": 1,
+  "TRANSMITIDA": 1,
+  // 2 — En proceso de entrega (ya en la oficina destino o saliendo a reparto)
+  "LISTO PARA ENTREGAR": 2,
+  "EN RUTA": 2,
+  // 3 — Entregado
+  "ENTREGADA": 3,
+};
+
 export function pasoDesdeEstatus(estatus: string): PasoRastreo {
-  const s = estatus.toUpperCase();
-  if (s.includes("ENTREG")) return 3;
-  if (s.includes("PROCESO") || s.includes("SUCURSAL") || s.includes("OCURRE")) return 2;
-  if (s.includes("RUTA") || s.includes("TRANSITO") || s.includes("TRÁNSITO") || s.includes("REPARTO")) return 1;
-  return 0;
+  return PASO_POR_ESTATUS[estatus.trim().toUpperCase()] ?? 0;
 }

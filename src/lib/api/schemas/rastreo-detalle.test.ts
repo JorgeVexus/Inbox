@@ -36,3 +36,36 @@ describe("rastreoDetalleResponseSchema", () => {
     expect(rastreoDetalleResponseSchema.safeParse([sin]).success).toBe(false);
   });
 });
+
+describe("versión pública del historial (sin datos de clientes)", () => {
+  it("anula Observaciones y Recibio (traen correos y notas internas)", () => {
+    const real = [
+      {
+        OficinaEstatus: "MYSIBOX",
+        F_Estatus: "08-MAY-2026  09:35",
+        Estatus: "PRE-DOCUMENTADA",
+        Recibio: null,
+        Observaciones: "Cliente MySibox: 974,   Usuario:  lupita27.ygc@gmail.com",
+        K_Estado_Guia: "0",
+        K_Historia_Guia: "1",
+        F_Historia: null,
+      },
+      {
+        OficinaEstatus: "TAMPICO AGUADULCE",
+        F_Estatus: "27-MAY-2026  12:59",
+        Estatus: "ENTREGADA",
+        Recibio: "CECILIO DOMINGUES",
+        Observaciones: "Entrega MOVIL",
+        K_Estado_Guia: "8",
+        K_Historia_Guia: "2",
+        F_Historia: null,
+      },
+    ];
+    const salida = rastreoDetalleResponseSchema.parse(real);
+    expect(salida.every((e) => e.Observaciones === null && e.Recibio === null)).toBe(true);
+    const json = JSON.stringify(salida);
+    expect(json).not.toContain("@");
+    expect(json).not.toContain("CECILIO");
+    expect(salida[1].Estatus).toBe("ENTREGADA");
+  });
+});

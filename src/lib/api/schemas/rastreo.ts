@@ -39,4 +39,26 @@ export const rastreoRegistroSchema = z.object({
 
 export type RastreoRegistro = z.infer<typeof rastreoRegistroSchema>;
 
-export const rastreoResponseSchema = z.array(rastreoRegistroSchema);
+/**
+ * Version PUBLICA del registro: lo que el BFF puede devolver al navegador.
+ *
+ * El rastreo es publico (cualquiera con un numero de guia lo consulta), pero
+ * wsRastreo regresa datos personales de terceros (observado 2026-10-12 con
+ * guias reales): nombre de remitente y destinatario, quien recibio, la
+ * imagen de la firma de entrega en base64 y coordenadas. Regla de seguridad 3
+ * (CLAUDE.md): conocer un folio no debe bastar para verlos. Se anulan aqui,
+ * en el servidor -- el cliente nunca los recibe, aunque la UI no los muestre.
+ * Si algun dia se necesitan, deben salir por un endpoint autenticado que
+ * verifique que la guia pertenece al cliente.
+ */
+export const rastreoRegistroPublicoSchema = rastreoRegistroSchema.transform((r) => ({
+  ...r,
+  Remitente: null,
+  Destinatario: null,
+  Recibio: null,
+  Firma: null,
+  Latitud: null,
+  Longitud: null,
+}));
+
+export const rastreoResponseSchema = z.array(rastreoRegistroPublicoSchema);

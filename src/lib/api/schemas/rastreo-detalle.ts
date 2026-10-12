@@ -21,4 +21,19 @@ export const rastreoEventoSchema = z.object({
   F_Historia: z.string().nullable(),
 });
 
-export const rastreoDetalleResponseSchema = z.array(rastreoEventoSchema);
+/**
+ * Version PUBLICA del evento. `Observaciones` es texto libre interno del
+ * operador y en guias reales trae datos de clientes (p.ej. "Cliente MySibox:
+ * 974, Usuario: <correo del cliente>") y de operacion ("MOVIL - Reco No.
+ * 1016947"); `Recibio` es el nombre de quien recibio. Se anulan en el
+ * servidor porque este historial es publico por numero de guia (regla de
+ * seguridad 3 y 7 de CLAUDE.md). Confirmar con el cliente si alguna
+ * observacion esta pensada para ser publica antes de reabrirla.
+ */
+export const rastreoEventoPublicoSchema = rastreoEventoSchema.transform((e) => ({
+  ...e,
+  Recibio: null,
+  Observaciones: null,
+}));
+
+export const rastreoDetalleResponseSchema = z.array(rastreoEventoPublicoSchema);

@@ -170,7 +170,12 @@ async function getToken(forceRefresh = false): Promise<string> {
   return (await getSession(forceRefresh)).token;
 }
 
-/** K_Cliente de la cuenta de servicio -- lo pide wsGeneracionRecoleccion. */
+/**
+ * K_Cliente de la CUENTA DE SERVICIO del sitio ("PAGINA WEB"), NO el de cada
+ * persona. Sirve (a confirmar con backend) para compras como invitado; NO debe
+ * usarse en recolecciones, que requieren el K_Cliente propio del cliente
+ * registrado (el cliente confirmo 2026-10-07 que viene del registro).
+ */
 export async function getSiboxCliente(): Promise<SiboxCliente> {
   return (await getSession()).cliente;
 }
