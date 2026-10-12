@@ -86,6 +86,9 @@ function getServiceCredentials(): { usuario: string; password: string } {
 const BROWSER_LIKE_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
+/** Tope por llamada a SIBOX: una API lenta no debe dejar colgado al visitante. */
+const TIMEOUT_MS = 20_000;
+
 function buildHeaders(baseUrl: string, token?: string): HeadersInit {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -142,6 +145,7 @@ async function login(): Promise<{ token: string; cliente: SiboxCliente }> {
     method: "POST",
     headers: buildHeaders(baseUrl),
     body: JSON.stringify({ Usuario: usuario, Password: password }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
 
   const json = (await readJson(res, "/Login")) as {
@@ -195,6 +199,7 @@ export async function siboxPost<T>(endpoint: string, body: unknown): Promise<T> 
       method: "POST",
       headers: buildHeaders(baseUrl, authToken),
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
 
   let res = await attempt(token);

@@ -66,7 +66,18 @@ export async function proxySibox<Req, Res>(
       if (err.message.trim() === "") {
         return NextResponse.json({ error: opts.notFoundMessage }, { status: 404 });
       }
-      return NextResponse.json({ error: err.message }, { status: 502 });
+      // El texto de SIBOX puede ser un error interno con detalles de base de
+      // datos (p.ej. "Could not find stored procedure 'GP_Valida_...'", visto
+      // en ObtieneDetalleCostos 2026-10-12): nunca llega al navegador.
+      console.error(`${opts.endpoint}: SIBOX respondio result:1 -> ${err.message}`);
+      return NextResponse.json({ error: opts.genericErrorMessage }, { status: 502 });
+    }
+    if (err instanceof DOMException && err.name === "TimeoutError") {
+      console.error(`${opts.endpoint}: SIBOX no respondio a tiempo`);
+      return NextResponse.json(
+        { error: "El servicio tardó demasiado en responder. Intenta de nuevo." },
+        { status: 504 },
+      );
     }
     console.error(`${opts.endpoint}: error inesperado`, err);
     return NextResponse.json({ error: opts.genericErrorMessage }, { status: 500 });

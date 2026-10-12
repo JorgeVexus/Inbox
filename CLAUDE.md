@@ -1,4 +1,5 @@
 @AGENTS.md
+@INDICE_MAESTRO.md
 
 # Inbox — Rediseño Web (reglas internas del proyecto)
 
@@ -6,6 +7,17 @@ Este archivo es la fuente de verdad para trabajar en este repo entre sesiones.
 Léelo completo antes de tocar código. La documentación fuente completa (PDF de
 API, plan de desarrollo, doc de pantallas) vive en `../Documentacion/` (un
 nivel arriba de este repo, fuera de git) — si necesitas releerla, está ahí.
+
+## 0. REGLA DE SESIÓN — mantener `INDICE_MAESTRO.md` al día (obligatoria)
+
+`INDICE_MAESTRO.md` (importado arriba) es el punto de entrada y el **estado
+vivo** del proyecto. **Antes de cerrar cualquier sesión de trabajo y antes del
+último commit, actualízalo** siguiendo su §0: fecha, estado (§1–§3), matriz de
+endpoints (§4), bloqueos (§5), qué sigue (§6), decisiones (§7) y bitácora (§11).
+Es lo que permite retomar el trabajo en otra sesión, con otro agente o en otro
+entorno sin perder contexto. Si el código y el índice se contradicen, gana el
+código: corrige el índice en el mismo commit. Este archivo (`CLAUDE.md`) guarda
+el *detalle técnico*; el índice guarda el *mapa y el estado*.
 
 ## 1. Qué es este proyecto
 
@@ -352,6 +364,21 @@ debe seguir en mock hasta que existan.
    catálogo ("libreta de direcciones") o uno distinto.
 3. Compra como invitado: confirmar con backend qué `K_Cliente` usa
    `wsGeneracionGuiaCliente` para invitados (¿el 63105 "PAGINA WEB"?).
+
+### Auditoría de endpoints de solo lectura (2026-10-12)
+
+Probados con `curl` (la matriz completa y vigente está en `INDICE_MAESTRO.md` §4):
+`Cobertura`, `ListadoOficinas` (71 oficinas), `BusquedaCP`, `TipoEntrega` y
+`DomiciliosRecoleccionesCliente` responden bien. **`ObtieneDetalleCostos` falla
+con el ejemplo del PDF**: `"Error interno: Could not find stored procedure
+'GP_Valida_OrigenCotizacion'."` (también con `Cliente=63105`) — es un defecto del
+ambiente de pruebas, no de nuestro request; bloquea el cotizador real. Dos
+consecuencias en el BFF: (1) ese tipo de mensaje interno **nunca** debe llegar al
+navegador (`proxySibox()` ahora responde 502 genérico y deja el detalle en logs,
+con test); (2) `DomiciliosRecoleccionesCliente` recibe `K_ClienteSIBOX` como
+parámetro: cuando se conecte, el BFF debe tomar ese número de la sesión del
+servidor, **nunca** del navegador, o cualquiera vería domicilios ajenos. El cliente
+SIBOX también tiene ahora un timeout de 20 s por llamada (504 si se agota).
 
 ### Producción vs Pruebas — solo tenemos acceso a Pruebas
 

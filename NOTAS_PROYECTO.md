@@ -1,5 +1,8 @@
 # Inbox — Notas de proyecto (para cualquier agente/colaborador)
 
+> **Primero lee `INDICE_MAESTRO.md`** (estado actual, bloqueos y qué sigue); este
+> documento es el detalle.
+>
 > Este documento es una síntesis autocontenida de todo lo que se sabe del
 > proyecto hasta ahora: qué es, cómo está construido, qué decisiones se
 > tomaron y por qué, y qué falta. Está pensado para que **cualquier agente
