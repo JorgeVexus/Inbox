@@ -35,24 +35,49 @@ export async function obtenerHorariosPorCP(cp: string): Promise<HorarioRecolecci
   return horario ? [horario] : [];
 }
 
-/** Next 7 calendar days (including today) where `horario` has pickup service. */
+function minutos(hhmm: string): number | null {
+  const m = /^(\d{1,2}):(\d{2})/.exec(hhmm ?? "");
+  return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+}
+
+function mismoDia(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+/**
+ * Next 7 calendar days (including today) where `horario` has pickup service
+ * AND still has at least one bookable window (hoy deja de estar disponible
+ * después de la hora límite de captura o cuando ya pasaron todas las ventanas).
+ */
 export function diasDisponibles(horario: HorarioRecoleccion, hoy: Date = new Date()): Date[] {
   const dias: Date[] = [];
   for (let i = 0; i < 7; i++) {
     const fecha = new Date(hoy);
     fecha.setDate(fecha.getDate() + i);
     const nombreDia = DIAS_SEMANA[fecha.getDay()];
-    if (horario.dias[nombreDia]) dias.push(fecha);
+    if (horario.dias[nombreDia] && ventanasDisponibles(horario, fecha, hoy).length > 0) dias.push(fecha);
   }
   return dias;
 }
 
 /** Time slots (1h windows) between horaMinima and horaMaxima, e.g. "14:00–15:00". */
-export function ventanasDisponibles(horario: HorarioRecoleccion): { inicio: string; fin: string }[] {
+export function ventanasDisponibles(
+  horario: HorarioRecoleccion,
+  fecha?: Date,
+  ahora: Date = new Date(),
+): { inicio: string; fin: string }[] {
   const [hMin] = horario.horaMinima.split(":").map(Number);
   const [hMax] = horario.horaMaxima.split(":").map(Number);
   const ventanas: { inicio: string; fin: string }[] = [];
+  // Si la fecha es HOY: no se puede pasado el límite de captura ni en ventanas que ya empezaron.
+  const esHoy = fecha ? mismoDia(fecha, ahora) : false;
+  const minAhora = ahora.getHours() * 60 + ahora.getMinutes();
+  if (esHoy) {
+    const limite = minutos(horario.horaLimiteCaptura);
+    if (limite !== null && minAhora >= limite) return [];
+  }
   for (let h = hMin; h < hMax; h++) {
+    if (esHoy && h * 60 <= minAhora) continue;
     ventanas.push({
       inicio: `${String(h).padStart(2, "0")}:00`,
       fin: `${String(Math.min(h + 1, hMax)).padStart(2, "0")}:00`,

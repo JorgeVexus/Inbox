@@ -231,7 +231,7 @@ export function EnviosView() {
 
   if (!session) {
     return (
-      <main className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
+      <div className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
         <section className="w-full max-w-xl rounded-md border border-neutral-line bg-white px-6 py-12 text-center shadow-card-sm sm:px-12">
           <p className="font-display text-sm font-bold text-primary">MIS ENVÍOS</p>
           <h1 className="mt-3 font-display text-3xl font-bold text-black sm:text-4xl">
@@ -246,12 +246,12 @@ export function EnviosView() {
             </Button>
           )}
         </section>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="bg-neutral-bg pb-20">
+    <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[1200px] px-5 pt-8 sm:px-8 lg:px-10">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
           <Link href="/" className="transition-colors hover:text-primary">Inicio</Link>
@@ -344,6 +344,6 @@ export function EnviosView() {
         }}
         onGuardar={guardarAlias}
       />
-    </main>
+    </div>
   );
 }

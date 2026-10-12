@@ -61,11 +61,26 @@ export function StepConfirmar({
     : "—";
   const total = opcion.precio + (seguro ? 200 : 0);
 
+  const telefonoValido = (t: string) => {
+    const digitos = t.replace(/\D/g, "");
+    return /^[\d\s()+-]+$/.test(t.trim()) && digitos.length >= 10 && digitos.length <= 13;
+  };
+  const emailValido = (e: string) => e.trim() === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
   const canSubmit =
     remitente.nombre.trim() !== "" &&
-    remitente.telefono.trim() !== "" &&
+    telefonoValido(remitente.telefono) &&
+    emailValido(remitente.email) &&
     destinatario.nombre.trim() !== "" &&
-    destinatario.telefono.trim() !== "";
+    telefonoValido(destinatario.telefono) &&
+    emailValido(destinatario.email);
+  const motivo =
+    remitente.nombre.trim() === "" || destinatario.nombre.trim() === ""
+      ? "Escribe el nombre del remitente y del destinatario."
+      : !telefonoValido(remitente.telefono) || !telefonoValido(destinatario.telefono)
+        ? "Escribe teléfonos de 10 dígitos."
+        : !emailValido(remitente.email) || !emailValido(destinatario.email)
+          ? "Revisa que los correos electrónicos sean válidos."
+          : "";
 
   const usuario = session?.usuario ?? null;
   const [contactos, setContactos] = useState<ContactoGuardado[]>([]);
@@ -186,7 +201,7 @@ export function StepConfirmar({
               type="text"
               value={contenido}
               onChange={(e) => setContenido(e.target.value)}
-              placeholder="Descripción del contenido"
+              aria-label="Descripción del contenido" placeholder="Descripción del contenido"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
             <button
@@ -207,7 +222,7 @@ export function StepConfirmar({
               type="text"
               value={tipoContenido}
               onChange={(e) => setTipoContenido(e.target.value)}
-              placeholder="Producto SAT"
+              aria-label="Producto SAT" placeholder="Producto SAT"
               className="h-[43px] w-full max-w-[303px] rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </div>
@@ -225,9 +240,15 @@ export function StepConfirmar({
         onToggleSeguro={() => setSeguro((v) => !v)}
         total={total}
       >
+        {motivo && (
+          <p role="status" className="text-center text-xs font-medium text-black/60">
+            {motivo}
+          </p>
+        )}
         <Button
           type="submit"
-          className={canSubmit ? "" : "pointer-events-none opacity-50"}
+          disabled={!canSubmit}
+          className="disabled:cursor-not-allowed disabled:opacity-50"
         >
           Continuar
         </Button>
@@ -284,7 +305,7 @@ function ContactoForm({
             type="text"
             value={value.nombre}
             onChange={(e) => set("nombre", e.target.value)}
-            placeholder="Nombre completo"
+            aria-label={`Nombre completo (${titulo.toLowerCase()})`} placeholder="Nombre completo"
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
         </Field>
@@ -296,7 +317,8 @@ function ContactoForm({
               inputMode="numeric"
               maxLength={5}
               value={value.cp}
-              onChange={(e) => set("cp", e.target.value)}
+              onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
+              aria-label={`Código postal (${titulo.toLowerCase()})`}
               className="h-[43px] w-[86px] rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black shadow-card outline-none"
             />
           </Field>
@@ -305,7 +327,7 @@ function ContactoForm({
               type="text"
               value={value.ciudad}
               onChange={(e) => set("ciudad", e.target.value)}
-              placeholder="Estado"
+              aria-label={`Estado (${titulo.toLowerCase()})`} placeholder="Estado"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
@@ -314,7 +336,7 @@ function ContactoForm({
               type="text"
               value={value.colonia}
               onChange={(e) => set("colonia", e.target.value)}
-              placeholder="Colonia"
+              aria-label={`Colonia (${titulo.toLowerCase()})`} placeholder="Colonia"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
@@ -325,6 +347,7 @@ function ContactoForm({
             type="text"
             value={value.direccion}
             onChange={(e) => set("direccion", e.target.value)}
+            aria-label={`Dirección (${titulo.toLowerCase()})`}
             placeholder={`Dirección del ${titulo === "Origen" ? "remitente" : "destinatario"}`}
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
@@ -336,7 +359,7 @@ function ContactoForm({
               type="text"
               value={value.numExt}
               onChange={(e) => set("numExt", e.target.value)}
-              placeholder="No. ext"
+              aria-label={`No. ext (${titulo.toLowerCase()})`} placeholder="No. ext"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
@@ -345,7 +368,7 @@ function ContactoForm({
               type="text"
               value={value.numInt}
               onChange={(e) => set("numInt", e.target.value)}
-              placeholder="No. int"
+              aria-label={`No. int (${titulo.toLowerCase()})`} placeholder="No. int"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
@@ -356,7 +379,7 @@ function ContactoForm({
             type="tel"
             value={value.telefono}
             onChange={(e) => set("telefono", e.target.value)}
-            placeholder="Número celular"
+            aria-label={`Número celular (${titulo.toLowerCase()})`} placeholder="Número celular"
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
         </Field>
@@ -366,7 +389,7 @@ function ContactoForm({
             type="email"
             value={value.email}
             onChange={(e) => set("email", e.target.value)}
-            placeholder="Correo electrónico"
+            aria-label={`Correo electrónico (${titulo.toLowerCase()})`} placeholder="Correo electrónico"
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
         </Field>

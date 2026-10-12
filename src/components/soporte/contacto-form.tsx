@@ -12,20 +12,31 @@ export function ContactoForm() {
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
 
-  const puedeEnviar =
-    nombre.trim() !== "" && correo.trim() !== "" && mensaje.trim() !== "";
+  const [error, setError] = useState<string | null>(null);
+
+  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim());
+  const puedeEnviar = nombre.trim() !== "" && correoValido && mensaje.trim() !== "";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!puedeEnviar || enviando) return;
     setEnviando(true);
-    const { ok } = await enviarContactoSoporte({ nombre, correo, mensaje });
-    setEnviando(false);
-    if (ok) {
+    setError(null);
+    try {
+      const { ok } = await enviarContactoSoporte({
+        nombre: nombre.trim(),
+        correo: correo.trim(),
+        mensaje: mensaje.trim(),
+      });
+      if (!ok) throw new Error("no enviado");
       setEnviado(true);
       setNombre("");
       setCorreo("");
       setMensaje("");
+    } catch {
+      setError("No pudimos enviar tu mensaje. Inténtalo de nuevo en unos minutos.");
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -62,6 +73,7 @@ export function ContactoForm() {
           <input
             id="soporte-nombre"
             type="text"
+            maxLength={100}
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Nombre personal o de empresa"
@@ -76,6 +88,7 @@ export function ContactoForm() {
           <input
             id="soporte-correo"
             type="email"
+            maxLength={120}
             value={correo}
             onChange={(e) => setCorreo(e.target.value)}
             placeholder="Ingrese su email"
@@ -89,6 +102,7 @@ export function ContactoForm() {
           </label>
           <textarea
             id="soporte-mensaje"
+            maxLength={1000}
             value={mensaje}
             onChange={(e) => setMensaje(e.target.value)}
             placeholder="¿En qué podemos ayudarle?"
@@ -97,6 +111,11 @@ export function ContactoForm() {
           />
         </div>
 
+        {error && (
+          <p role="alert" className="text-center text-sm font-medium text-red-600">
+            {error}
+          </p>
+        )}
         {enviado ? (
           <p className="text-center text-sm font-medium text-primary">
             ¡Gracias! Recibimos tu mensaje y te contactaremos pronto.

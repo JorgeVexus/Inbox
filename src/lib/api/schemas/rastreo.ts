@@ -1,9 +1,19 @@
 import { z } from "zod";
 
+/**
+ * Formato aceptado de un numero de guia. Las guias reales son numericas
+ * (10 digitos), pero no esta documentado que nunca lleven letras, asi que se
+ * permite alfanumerico + guion. Lo importante: NO se reenvia a SIBOX texto
+ * arbitrario (su backend es SQL Server: se vio un error de stored procedure),
+ * como defensa en profundidad contra inyeccion aunque ellos parametricen.
+ */
+const guiaSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9-]{1,40}$/, "Formato de guía inválido");
+
 /** Request de wsRastreo -- ver PDF de API seccion 5. */
-export const rastreoRequestSchema = z.object({
-  Guia: z.string().trim().min(1).max(40),
-});
+export const rastreoRequestSchema = z.object({ Guia: guiaSchema });
 
 export type RastreoRequest = z.infer<typeof rastreoRequestSchema>;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { guardarContacto } from "@/lib/contactos";
@@ -33,6 +33,15 @@ export function ContactoModal({
   onClose: () => void;
   onSuccess: (contacto: ContactoGuardado) => void;
 }) {
+  // Escape cierra el modal (accesibilidad por teclado).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   const [datos, setDatos] = useState<Omit<ContactoGuardado, "id"> & { id?: string }>(contacto ?? VACIO);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,23 +52,29 @@ export function ContactoModal({
 
   async function handleCpBlur() {
     if (datos.cp.trim().length !== 5) return;
-    const res = await buscarCodigoPostal(datos.cp.trim());
+    const res = await buscarCodigoPostal(datos.cp.trim()).catch(() => null);
     if (res) setDatos((d) => ({ ...d, ciudad: d.ciudad || res.ciudad }));
   }
 
   async function handleGuardar() {
+    if (!canSubmit || guardando) return;
     setError(null);
     setGuardando(true);
-    const res = await guardarContacto(usuario, datos);
-    setGuardando(false);
-    if (!res.ok) {
-      setError(res.mensaje);
-      return;
+    try {
+      const res = await guardarContacto(usuario, datos);
+      if (!res.ok) {
+        setError(res.mensaje);
+        return;
+      }
+      onSuccess(res.contacto);
+    } catch {
+      setError("No se pudo guardar el contacto. Inténtalo de nuevo.");
+    } finally {
+      setGuardando(false);
     }
-    onSuccess(res.contacto);
   }
 
-  const canSubmit = datos.nombre.trim() !== "" && datos.telefono.trim() !== "";
+  const canSubmit = datos.nombre.trim() !== "" && datos.telefono.replace(/\D/g, "").length >= 10;
 
   return (
     <div
@@ -90,26 +105,26 @@ export function ContactoModal({
 
         <div className="flex flex-col gap-3">
           <Row label="Nombre">
-            <input type="text" value={datos.nombre} onChange={(e) => set("nombre", e.target.value)} placeholder="Nombre completo" className={INPUT} />
+            <input type="text" value={datos.nombre} onChange={(e) => set("nombre", e.target.value)} aria-label="Nombre completo" placeholder="Nombre completo" className={INPUT} />
           </Row>
           <Row label="Teléfono">
-            <input type="tel" value={datos.telefono} onChange={(e) => set("telefono", e.target.value)} placeholder="10 dígitos" className={INPUT} />
+            <input type="tel" value={datos.telefono} onChange={(e) => set("telefono", e.target.value)} aria-label="Teléfono" placeholder="10 dígitos" className={INPUT} />
           </Row>
           <Row label="Correo">
-            <input type="email" value={datos.email} onChange={(e) => set("email", e.target.value)} placeholder="Opcional" className={INPUT} />
+            <input type="email" value={datos.email} onChange={(e) => set("email", e.target.value)} aria-label="Correo electrónico" placeholder="Opcional" className={INPUT} />
           </Row>
           <Row label="C.P">
-            <input type="text" inputMode="numeric" maxLength={5} value={datos.cp} onChange={(e) => set("cp", e.target.value)} onBlur={handleCpBlur} placeholder="Código postal" className={INPUT} />
+            <input type="text" inputMode="numeric" maxLength={5} value={datos.cp} onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))} onBlur={handleCpBlur} aria-label="Código postal" placeholder="Código postal" className={INPUT} />
           </Row>
           <Row label="Ciudad">
-            <input type="text" value={datos.ciudad} onChange={(e) => set("ciudad", e.target.value)} placeholder="Ciudad" className={INPUT} />
+            <input type="text" value={datos.ciudad} onChange={(e) => set("ciudad", e.target.value)} aria-label="Ciudad" placeholder="Ciudad" className={INPUT} />
           </Row>
           <Row label="Colonia">
-            <input type="text" value={datos.colonia} onChange={(e) => set("colonia", e.target.value)} placeholder="Colonia" className={INPUT} />
+            <input type="text" value={datos.colonia} onChange={(e) => set("colonia", e.target.value)} aria-label="Colonia" placeholder="Colonia" className={INPUT} />
           </Row>
           <Row label="Dirección">
             <div className="flex w-full gap-3">
-              <input type="text" value={datos.direccion} onChange={(e) => set("direccion", e.target.value)} placeholder="Calle" className={`${INPUT} min-w-0 flex-1`} />
+              <input type="text" value={datos.direccion} onChange={(e) => set("direccion", e.target.value)} aria-label="Calle" placeholder="Calle" className={`${INPUT} min-w-0 flex-1`} />
               <input type="text" value={datos.numExt} onChange={(e) => set("numExt", e.target.value)} placeholder="Ext." aria-label="Número exterior" className={`${INPUT} w-[78px] shrink-0 px-3`} />
               <input type="text" value={datos.numInt} onChange={(e) => set("numInt", e.target.value)} placeholder="Int." aria-label="Número interior" className={`${INPUT} w-[78px] shrink-0 px-3`} />
             </div>
@@ -124,7 +139,8 @@ export function ContactoModal({
 
         <Button
           onClick={handleGuardar}
-          className={`mx-auto ${!canSubmit || guardando ? "pointer-events-none opacity-50" : ""}`}
+          disabled={!canSubmit || guardando}
+          className="mx-auto disabled:cursor-not-allowed disabled:opacity-50"
         >
           {guardando ? "Guardando…" : "Guardar"}
         </Button>

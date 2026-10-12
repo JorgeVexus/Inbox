@@ -239,7 +239,7 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
           type="text"
           value={guia}
           onChange={(e) => setGuia(e.target.value)}
-          placeholder="Ingrese el número de rastreo"
+          aria-label="Ingrese el número de rastreo" placeholder="Ingrese el número de rastreo"
           className="h-[43px] w-full rounded-md border border-secondary-dark/50 px-4 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
         />
         <button
@@ -285,15 +285,23 @@ function ChatTab() {
   const [email, setEmail] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
+  const [error, setError] = useState(false);
 
   const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   async function handleEnviar() {
-    if (!emailValido) return;
+    if (!emailValido || enviando) return;
     setEnviando(true);
-    await enviarContactoChat(email.trim());
-    setEnviando(false);
-    setEnviado(true);
+    setError(false);
+    try {
+      const { ok } = await enviarContactoChat(email.trim());
+      if (!ok) throw new Error("no enviado");
+      setEnviado(true);
+    } catch {
+      setError(true);
+    } finally {
+      setEnviando(false);
+    }
   }
 
   if (enviado) {
@@ -325,11 +333,17 @@ function ChatTab() {
       <div className="flex flex-col gap-4">
         <input
           type="email"
+          maxLength={120}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Ingrese un correo electrónico"
+          aria-label="Ingrese un correo electrónico" placeholder="Ingrese un correo electrónico"
           className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black shadow-card-sm placeholder:text-secondary-dark outline-none"
         />
+        {error && (
+          <p role="alert" className="text-xs font-medium text-red-600">
+            No pudimos enviar tu correo. Inténtalo de nuevo.
+          </p>
+        )}
         <button
           type="button"
           onClick={handleEnviar}
@@ -358,7 +372,7 @@ function HelpTab() {
           type="text"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar"
+          aria-label="Buscar" placeholder="Buscar"
           className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
         />
         <Image src="/icons/search.svg" alt="" width={18} height={18} />

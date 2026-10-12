@@ -1,9 +1,8 @@
 import { z } from "zod";
+import { rastreoRequestSchema } from "./rastreo";
 
 /** Request de RastreoDetalle -- mismo parametro que wsRastreo. */
-export const rastreoDetalleRequestSchema = z.object({
-  Guia: z.string().trim().min(1).max(40),
-});
+export const rastreoDetalleRequestSchema = rastreoRequestSchema;
 
 /**
  * Un evento del historial de RastreoDetalle, segun la respuesta real

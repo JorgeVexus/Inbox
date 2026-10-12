@@ -87,3 +87,22 @@ describe("proxySibox", () => {
     expect(JSON.stringify(await res.json())).not.toContain("Cloudflare");
   });
 });
+
+describe("proxySibox: límites de entrada", () => {
+  it("rechaza con 413 un body mayor a 10 KB sin llamar a SIBOX", async () => {
+    vi.resetModules();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const { proxySibox } = await import("@/lib/api/route-helpers");
+    const grande = JSON.stringify({ Guia: "1", relleno: "a".repeat(20_000) });
+    const res = await proxySibox(new Request("http://localhost/api/x", { method: "POST", body: grande }), {
+      endpoint: "/wsX",
+      requestSchema: z.object({ Guia: z.string() }),
+      responseSchema: z.array(z.object({ Guia: z.string() })),
+      notFoundMessage: "x",
+      genericErrorMessage: "x",
+    });
+    expect(res.status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});

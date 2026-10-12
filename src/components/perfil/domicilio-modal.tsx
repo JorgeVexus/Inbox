@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { guardarDomicilio } from "@/lib/domicilios";
@@ -19,6 +19,15 @@ export function DomicilioModal({
   onClose: () => void;
   onSuccess: (domicilio: Domicilio) => void;
 }) {
+  // Escape cierra el modal (accesibilidad por teclado).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   const [datos, setDatos] = useState<Omit<Domicilio, "id"> & { id?: string }>(
     domicilio ?? domicilioVacio(),
   );
@@ -31,10 +40,11 @@ export function DomicilioModal({
   }
 
   async function handleCpBlur() {
-    if (!datos.cp.trim()) return;
+    if (datos.cp.trim().length !== 5) return;
     setBuscandoCP(true);
-    const resultado = await buscarCodigoPostal(datos.cp.trim());
-    setBuscandoCP(false);
+    const resultado = await buscarCodigoPostal(datos.cp.trim())
+      .catch(() => null)
+      .finally(() => setBuscandoCP(false));
     if (!resultado) {
       setDatos((d) => ({ ...d, estado: "", ciudad: "" }));
       return;
@@ -43,22 +53,28 @@ export function DomicilioModal({
   }
 
   async function handleGuardar() {
+    if (!canSubmit || guardando) return;
     setError(null);
     setGuardando(true);
-    const res = await guardarDomicilio(usuario, datos);
-    setGuardando(false);
-    if (!res.ok) {
-      setError(res.mensaje);
-      return;
+    try {
+      const res = await guardarDomicilio(usuario, datos);
+      if (!res.ok) {
+        setError(res.mensaje);
+        return;
+      }
+      onSuccess(res.domicilio);
+    } catch {
+      setError("No se pudo guardar la dirección. Inténtalo de nuevo.");
+    } finally {
+      setGuardando(false);
     }
-    onSuccess(res.domicilio);
   }
 
   const canSubmit =
     datos.alias.trim() !== "" &&
     datos.calle.trim() !== "" &&
     datos.cp.trim().length === 5 &&
-    datos.telefono.trim() !== "";
+    datos.telefono.replace(/\D/g, "").length >= 10;
 
   return (
     <div
@@ -66,6 +82,9 @@ export function DomicilioModal({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={domicilio ? "Editar dirección" : "Agregar dirección"}
         className="relative flex max-h-[90vh] w-full max-w-[560px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-6 pt-10 sm:px-10"
         onClick={(e) => e.stopPropagation()}
       >
@@ -90,7 +109,7 @@ export function DomicilioModal({
               type="text"
               value={datos.alias}
               onChange={(e) => set("alias", e.target.value)}
-              placeholder="Ej. Casa, Oficina"
+              aria-label="Alias de la dirección" placeholder="Ej. Casa, Oficina"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -100,7 +119,7 @@ export function DomicilioModal({
               type="text"
               value={datos.contacto}
               onChange={(e) => set("contacto", e.target.value)}
-              placeholder="Nombre de quien recibe"
+              aria-label="Nombre de quien recibe" placeholder="Nombre de quien recibe"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -110,7 +129,7 @@ export function DomicilioModal({
               type="tel"
               value={datos.telefono}
               onChange={(e) => set("telefono", e.target.value)}
-              placeholder="Ingrese número celular"
+              aria-label="Teléfono de contacto" placeholder="Ingrese número celular"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -121,9 +140,9 @@ export function DomicilioModal({
               inputMode="numeric"
               maxLength={5}
               value={datos.cp}
-              onChange={(e) => set("cp", e.target.value)}
+              onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
               onBlur={handleCpBlur}
-              placeholder="Ingrese código postal"
+              aria-label="Código postal" placeholder="Ingrese código postal"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -145,7 +164,7 @@ export function DomicilioModal({
               type="text"
               value={datos.colonia}
               onChange={(e) => set("colonia", e.target.value)}
-              placeholder="Colonia"
+              aria-label="Colonia" placeholder="Colonia"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -156,14 +175,14 @@ export function DomicilioModal({
                 type="text"
                 value={datos.calle}
                 onChange={(e) => set("calle", e.target.value)}
-                placeholder="Calle"
+                aria-label="Calle" placeholder="Calle"
                 className="h-[53px] w-full min-w-0 flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
               <input
                 type="text"
                 value={datos.numero}
                 onChange={(e) => set("numero", e.target.value)}
-                placeholder="Núm."
+                aria-label="Número exterior" placeholder="Núm."
                 className="h-[53px] w-[100px] shrink-0 rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </div>
@@ -173,7 +192,7 @@ export function DomicilioModal({
             <textarea
               value={datos.referencias}
               onChange={(e) => set("referencias", e.target.value)}
-              placeholder="Color de casa, entre calles, punto de referencia…"
+              aria-label="Referencias" placeholder="Color de casa, entre calles, punto de referencia…"
               rows={2}
               className="w-full resize-none rounded-md border border-secondary-dark/50 bg-white px-6 py-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
@@ -198,7 +217,8 @@ export function DomicilioModal({
 
         <Button
           onClick={handleGuardar}
-          className={`mx-auto ${!canSubmit || guardando ? "pointer-events-none opacity-50" : ""}`}
+          disabled={!canSubmit || guardando}
+          className="mx-auto disabled:cursor-not-allowed disabled:opacity-50"
         >
           {guardando ? "Guardando…" : "Guardar"}
         </Button>

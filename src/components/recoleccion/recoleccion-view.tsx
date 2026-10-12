@@ -20,8 +20,12 @@ const FORMATO_DIA = new Intl.DateTimeFormat("es-MX", {
   month: "short",
 });
 
+/** YYYY-MM-DD en hora LOCAL. `toISOString()` usa UTC y, después de las 6 pm en
+ *  México, adelantaba la fecha un día (auditoría 2026-10-12). */
 function claveFecha(fecha: Date): string {
-  return fecha.toISOString().slice(0, 10);
+  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+  const dia = String(fecha.getDate()).padStart(2, "0");
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
 }
 
 export function RecoleccionView() {
@@ -41,7 +45,7 @@ export function RecoleccionView() {
 
   if (!session) {
     return (
-      <main className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
+      <div className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
         <section className="w-full max-w-xl rounded-md border border-neutral-line bg-white px-6 py-12 text-center shadow-card-sm sm:px-12">
           <p className="font-display text-sm font-bold text-primary">SOLICITA TU RECOLECCIÓN</p>
           <h1 className="mt-3 font-display text-3xl font-bold text-black sm:text-4xl">
@@ -57,7 +61,7 @@ export function RecoleccionView() {
             </Button>
           )}
         </section>
-      </main>
+      </div>
     );
   }
 
@@ -81,12 +85,19 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
 
   useEffect(() => {
     let cancelado = false;
-    listarDomicilios(usuario).then((lista) => {
-      if (cancelado) return;
-      setDomicilios(lista);
-      const predeterminado = lista.find((d) => d.predeterminado) ?? lista[0];
-      if (predeterminado) setDomicilioId(predeterminado.id);
-    });
+    listarDomicilios(usuario)
+      .then((lista) => {
+        if (cancelado) return;
+        setDomicilios(lista);
+        const predeterminado = lista.find((d) => d.predeterminado) ?? lista[0];
+        if (predeterminado) setDomicilioId(predeterminado.id);
+      })
+      .catch(() => {
+        if (!cancelado) {
+          setDomicilios([]);
+          setError("No pudimos cargar tus direcciones. Recarga la página.");
+        }
+      });
     return () => {
       cancelado = true;
     };
@@ -106,11 +117,17 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
     setBuscandoHorarios(true);
     setFecha("");
     setVentana("");
-    obtenerHorariosPorCP(domicilioSeleccionado.cp).then((res) => {
-      if (cancelado) return;
-      setHorarios(res);
-      setBuscandoHorarios(false);
-    });
+    obtenerHorariosPorCP(domicilioSeleccionado.cp)
+      .then((res) => {
+        if (cancelado) return;
+        setHorarios(res);
+      })
+      .catch(() => {
+        if (!cancelado) setHorarios([]);
+      })
+      .finally(() => {
+        if (!cancelado) setBuscandoHorarios(false);
+      });
     return () => {
       cancelado = true;
     };
@@ -118,7 +135,11 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
 
   const horario = horarios?.[0] ?? null;
   const dias = useMemo(() => (horario ? diasDisponibles(horario) : []), [horario]);
-  const ventanas = useMemo(() => (horario ? ventanasDisponibles(horario) : []), [horario]);
+  const ventanas = useMemo(() => {
+    if (!horario || !fecha) return [];
+    const [a, m, d] = fecha.split("-").map(Number);
+    return ventanasDisponibles(horario, new Date(a, m - 1, d));
+  }, [horario, fecha]);
 
   const canSubmit =
     Boolean(domicilioId) && Boolean(fecha) && Boolean(ventana) && contacto.trim().length >= 3 && paquetes >= 1;
@@ -129,27 +150,36 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
     const [horaInicio, horaFin] = ventana.split("-");
     setEnviando(true);
     setError(null);
-    const res = await programarRecoleccion({
-      domicilioId,
-      fecha,
-      horaInicio,
-      horaFin,
-      paquetes,
-      contacto,
-      observaciones,
-      guiasReferencia: guias.split(",").map((g) => g.trim()).filter(Boolean),
-    });
-    setEnviando(false);
-    if (!res.ok) {
-      setError(res.mensaje);
-      return;
+    try {
+      const res = await programarRecoleccion({
+        domicilioId,
+        fecha,
+        horaInicio,
+        horaFin,
+        paquetes,
+        contacto,
+        observaciones,
+        guiasReferencia: guias
+          .split(",")
+          .map((g) => g.trim())
+          .filter((g) => /^[A-Za-z0-9-]{1,40}$/.test(g))
+          .slice(0, 20),
+      });
+      if (!res.ok) {
+        setError(res.mensaje);
+        return;
+      }
+      setFolio(res.folio);
+    } catch {
+      setError("No pudimos programar la recolección. Inténtalo de nuevo.");
+    } finally {
+      setEnviando(false);
     }
-    setFolio(res.folio);
   }
 
   if (folio) {
     return (
-      <main className="bg-neutral-bg pb-20">
+      <div className="bg-neutral-bg pb-20">
         <div className="mx-auto flex w-full max-w-[700px] flex-col items-center gap-5 px-5 pt-16 text-center sm:px-8">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <svg viewBox="0 0 24 24" className="h-8 w-8 fill-primary" aria-hidden>
@@ -170,12 +200,12 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
             <Button href="/rastreo">Rastrear un envío</Button>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="bg-neutral-bg pb-20">
+    <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[860px] px-5 pt-8 sm:px-8">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
           <Link href="/" className="transition-colors hover:text-primary">Inicio</Link>
@@ -208,6 +238,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
           <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-6 rounded-md bg-white p-6 shadow-card-sm sm:p-8">
             <Campo label="Dirección de recolección">
               <select
+                aria-label="Dirección de recolección"
                 value={domicilioId}
                 onChange={(e) => setDomicilioId(e.target.value)}
                 className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card-sm outline-none"
@@ -241,8 +272,12 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
 
                 <Campo label="Fecha">
                   <select
+                aria-label="Fecha de recolección"
                     value={fecha}
-                    onChange={(e) => setFecha(e.target.value)}
+                    onChange={(e) => {
+                      setFecha(e.target.value);
+                      setVentana("");
+                    }}
                     className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card-sm outline-none"
                   >
                     <option value="">Selecciona un día</option>
@@ -256,6 +291,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
 
                 <Campo label="Horario">
                   <select
+                aria-label="Horario de recolección"
                     value={ventana}
                     onChange={(e) => setVentana(e.target.value)}
                     className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card-sm outline-none"
@@ -276,7 +312,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                 type="text"
                 value={guias}
                 onChange={(e) => setGuias(e.target.value)}
-                placeholder="Ej. 4003229791, 4159473741"
+                aria-label="Guías a recolectar (separadas por coma)" placeholder="Ej. 4003229791, 4159473741"
                 className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
               />
             </Campo>
@@ -286,7 +322,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                 type="text"
                 value={contacto}
                 onChange={(e) => setContacto(e.target.value)}
-                placeholder="Nombre completo"
+                aria-label="Nombre completo" placeholder="Nombre completo"
                 className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
               />
             </Campo>
@@ -315,9 +351,10 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
 
             <Campo label="Observaciones (opcional)">
               <textarea
+                maxLength={300}
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
-                placeholder="Notas para el mensajero"
+                aria-label="Notas para el mensajero" placeholder="Notas para el mensajero"
                 rows={3}
                 className="w-full resize-none rounded-md border border-secondary-dark/50 bg-white px-6 py-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
               />
@@ -339,7 +376,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
           </form>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -49,14 +49,20 @@ export function StepPago({
     cvv: "",
   });
   const [procesando, setProcesando] = useState(false);
+  const [errorPago, setErrorPago] = useState<string | null>(null);
+  const [errorGuia, setErrorGuia] = useState(false);
 
   const total = opcion.precio + (confirmar.seguro ? 200 : 0);
 
   useEffect(() => {
     let cancelado = false;
-    generarGuia(cotizacion, confirmar, opcion).then((res) => {
-      if (!cancelado) setGuia(res);
-    });
+    generarGuia(cotizacion, confirmar, opcion)
+      .then((res) => {
+        if (!cancelado) setGuia(res);
+      })
+      .catch(() => {
+        if (!cancelado) setErrorGuia(true);
+      });
     return () => {
       cancelado = true;
     };
@@ -64,10 +70,18 @@ export function StepPago({
   }, []);
 
   async function finalizarPago(metodo: MetodoPago) {
+    if (procesando) return; // evita doble envío (p. ej. Enter repetido)
     setProcesando(true);
-    await procesarPago(metodo, metodo === "tarjeta" ? tarjeta : undefined);
-    setProcesando(false);
-    setSub("exito");
+    setErrorPago(null);
+    try {
+      const { ok } = await procesarPago(metodo, metodo === "tarjeta" ? tarjeta : undefined);
+      if (!ok) throw new Error("pago rechazado");
+      setSub("exito");
+    } catch {
+      setErrorPago("No pudimos procesar el pago. Revisa tus datos e inténtalo de nuevo.");
+    } finally {
+      setProcesando(false);
+    }
   }
 
   if (sub === "exito" && guia) {
@@ -82,9 +96,20 @@ export function StepPago({
   return (
     <div className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 lg:flex-row lg:items-start">
       <div className="flex w-full max-w-[729px] flex-col items-end gap-6">
+        {errorGuia && (
+          <p role="alert" className="w-full rounded-md bg-white p-4 text-sm font-medium text-red-700 shadow-card-sm">
+            No pudimos generar tu guía. Regresa e inténtalo de nuevo en unos minutos.
+          </p>
+        )}
+        {errorPago && (
+          <p role="alert" className="w-full rounded-md bg-white p-4 text-sm font-medium text-red-700 shadow-card-sm">
+            {errorPago}
+          </p>
+        )}
         {sub === "datos" && (
           <DatosPrincipales
             folio={guia?.folio ?? null}
+            errorGuia={errorGuia}
             email={email}
             telefono={telefono}
             onEmailChange={setEmail}
@@ -148,6 +173,7 @@ export function StepPago({
 }
 
 function DatosPrincipales({
+  errorGuia,
   folio,
   email,
   telefono,
@@ -173,8 +199,14 @@ function DatosPrincipales({
   rellenado: boolean;
   onRellenar: () => void;
   onContinuar: () => void;
+  errorGuia: boolean;
 }) {
-  const canSubmit = email.trim() !== "" && telefono.trim() !== "";
+  const digitos = telefono.replace(/\D/g, "");
+  const canSubmit =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
+    /^[\d\s()+-]+$/.test(telefono.trim()) &&
+    digitos.length >= 10 &&
+    digitos.length <= 13;
   return (
     <div className="flex w-full flex-col items-end gap-6">
       <div className="flex w-full flex-col gap-3">
@@ -194,7 +226,7 @@ function DatosPrincipales({
               value={referencia}
               onChange={(e) => onReferenciaChange(e.target.value)}
               onBlur={onToggleEditarReferencia}
-              placeholder="XAXX0101001000"
+              aria-label="Referencia del envío" placeholder="XAXX0101001000"
               className="h-[36px] w-[180px] rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
             />
           ) : (
@@ -219,7 +251,7 @@ function DatosPrincipales({
               type="email"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
-              placeholder="Correo electrónico"
+              aria-label="Correo electrónico" placeholder="Correo electrónico"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </div>
@@ -229,7 +261,7 @@ function DatosPrincipales({
               type="tel"
               value={telefono}
               onChange={(e) => onTelefonoChange(e.target.value)}
-              placeholder="Número celular"
+              aria-label="Número celular" placeholder="Número celular"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </div>
@@ -258,9 +290,15 @@ function DatosPrincipales({
         Rellenar con la info del remitente
       </button>
 
+      {!canSubmit && (
+        <p role="status" className="self-start text-xs font-medium text-black/60">
+          Escribe un correo válido y un teléfono de 10 dígitos para continuar.
+        </p>
+      )}
       <Button
         onClick={onContinuar}
-        className={!canSubmit || !folio ? "pointer-events-none opacity-50" : ""}
+        disabled={!canSubmit || !folio || errorGuia}
+        className="disabled:cursor-not-allowed disabled:opacity-50"
       >
         Continuar
       </Button>
@@ -371,6 +409,34 @@ function formatVencimiento(raw: string): string {
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
 
+/** Algoritmo de Luhn: detecta números de tarjeta mal capturados. */
+function luhnValido(numero: string): boolean {
+  const digitos = numero.replace(/\D/g, "");
+  if (digitos.length < 13 || digitos.length > 19) return false;
+  let suma = 0;
+  let doble = false;
+  for (let i = digitos.length - 1; i >= 0; i--) {
+    let d = Number(digitos[i]);
+    if (doble) {
+      d *= 2;
+      if (d > 9) d -= 9;
+    }
+    suma += d;
+    doble = !doble;
+  }
+  return suma % 10 === 0;
+}
+
+/** MM/AA con mes 01–12 y que no esté vencida (vale hasta el fin del mes indicado). */
+function vencimientoValido(valor: string, hoy: Date = new Date()): boolean {
+  const m = /^(\d{2})\/(\d{2})$/.exec(valor);
+  if (!m) return false;
+  const mes = Number(m[1]);
+  const anio = 2000 + Number(m[2]);
+  if (mes < 1 || mes > 12) return false;
+  return anio > hoy.getFullYear() || (anio === hoy.getFullYear() && mes >= hoy.getMonth() + 1);
+}
+
 type MarcaTarjeta = "visa" | "mastercard" | "amex" | null;
 
 function detectarMarca(numero: string): MarcaTarjeta {
@@ -398,11 +464,12 @@ function TarjetaForm({
     onChange({ ...value, [key]: v });
   }
 
+  const cvvEsperado = detectarMarca(value.numero) === "amex" ? 4 : 3;
   const canSubmit =
-    value.numero.replace(/\s/g, "").length >= 15 &&
-    value.nombreTitular.trim() !== "" &&
-    value.vencimiento.trim() !== "" &&
-    value.cvv.trim().length >= 3;
+    luhnValido(value.numero) &&
+    value.nombreTitular.trim().length >= 3 &&
+    vencimientoValido(value.vencimiento) &&
+    value.cvv.length === cvvEsperado;
 
   return (
     <div className="flex w-full flex-col items-end gap-8">
@@ -425,7 +492,7 @@ function TarjetaForm({
                 maxLength={19}
                 value={value.numero}
                 onChange={(e) => set("numero", formatNumeroTarjeta(e.target.value))}
-                placeholder="0000 0000 0000 0000"
+                aria-label="Número de tarjeta" placeholder="0000 0000 0000 0000"
                 className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </Field>
@@ -434,7 +501,7 @@ function TarjetaForm({
                 type="text"
                 value={value.nombreTitular}
                 onChange={(e) => set("nombreTitular", e.target.value)}
-                placeholder="Como aparece en la tarjeta"
+                aria-label="Nombre del titular" placeholder="Como aparece en la tarjeta"
                 className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </Field>
@@ -446,7 +513,7 @@ function TarjetaForm({
                   maxLength={5}
                   value={value.vencimiento}
                   onChange={(e) => set("vencimiento", formatVencimiento(e.target.value))}
-                  placeholder="MM/AA"
+                  aria-label="Vencimiento (MM/AA)" placeholder="MM/AA"
                   className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
                 />
               </Field>
@@ -457,7 +524,7 @@ function TarjetaForm({
                   maxLength={4}
                   value={value.cvv}
                   onChange={(e) => set("cvv", e.target.value.replace(/\D/g, ""))}
-                  placeholder="123"
+                  aria-label="Código de seguridad CVV" placeholder="123"
                   className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
                 />
               </Field>
@@ -472,9 +539,15 @@ function TarjetaForm({
         </div>
       </div>
 
+      {!canSubmit && (
+        <p role="status" className="self-start text-xs font-medium text-black/60">
+          Revisa el número, el vencimiento (MM/AA, no vencida) y el CVV de la tarjeta.
+        </p>
+      )}
       <Button
         onClick={onConfirmar}
-        className={!canSubmit || procesando ? "pointer-events-none opacity-50" : ""}
+        disabled={!canSubmit || procesando}
+        className="disabled:cursor-not-allowed disabled:opacity-50"
       >
         {procesando ? "Procesando…" : "Confirmar pago"}
       </Button>

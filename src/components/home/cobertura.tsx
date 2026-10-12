@@ -98,6 +98,7 @@ export function Cobertura({
 
         <div className="pointer-events-none absolute left-1/2 top-4 z-[500] flex w-full max-w-[560px] -translate-x-1/2 flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-center">
           <select
+            aria-label="Estado"
             value={kEstado}
             onChange={(e) => {
               setKEstado(e.target.value === "" ? "" : Number(e.target.value));
@@ -113,6 +114,7 @@ export function Cobertura({
             ))}
           </select>
           <select
+            aria-label="Ciudad"
             value={kCiudad}
             onChange={(e) =>
               setKCiudad(e.target.value === "" ? "" : Number(e.target.value))
@@ -134,7 +136,7 @@ export function Cobertura({
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar"
+              aria-label="Buscar" placeholder="Buscar"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <Image src="/icons/search2.svg" alt="" width={20} height={20} />
@@ -377,7 +379,7 @@ export function CoberturaCTA() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar"
+              aria-label="Buscar" placeholder="Buscar"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <Image src="/icons/search2.svg" alt="" width={20} height={20} />
@@ -408,6 +410,7 @@ export function CoberturaCTA() {
               Seleccione un estado del país
             </p>
             <select
+              aria-label="Estado"
               value={kEstado}
               onChange={(e) => {
                 setKEstado(e.target.value === "" ? "" : Number(e.target.value));
@@ -438,6 +441,7 @@ export function CoberturaCTA() {
               Seleccione una ciudad del estado
             </p>
             <select
+              aria-label="Ciudad"
               value={kCiudad}
               disabled={kEstado === ""}
               onChange={(e) =>

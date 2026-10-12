@@ -61,6 +61,9 @@ function LoginModalForm() {
       onClick={closeLogin}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Iniciar sesión"
         className="relative flex w-full max-w-[460px] flex-col items-center gap-6 rounded-md bg-neutral-bg p-8 shadow-card sm:p-10"
         onClick={(e) => e.stopPropagation()}
       >

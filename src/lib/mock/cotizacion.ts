@@ -4,6 +4,17 @@ import type {
   Paquete,
 } from "@/types/cotizacion";
 
+/** "Sáb, 02 de agosto" para hoy + `dias` (hora local). Solo para datos de demo. */
+export function fechaDemo(dias: number, base: Date = new Date()): string {
+  const d = new Date(base);
+  d.setDate(d.getDate() + dias);
+  const dia = new Intl.DateTimeFormat("es-MX", { weekday: "short" })
+    .format(d)
+    .replace(".", "");
+  const mes = new Intl.DateTimeFormat("es-MX", { month: "long" }).format(d);
+  return `${dia.charAt(0).toUpperCase()}${dia.slice(1)}, ${String(d.getDate()).padStart(2, "0")} de ${mes}`;
+}
+
 /**
  * MOCK pricing — placeholder for `ObtieneDetalleCostos`. The formula below
  * is not SIBOX's real rate table, just something weight/size-sensitive
@@ -29,7 +40,7 @@ export function calcularCostoMock(input: CotizacionInput): CostoOpcion[] {
   const iva = subtotal * 0.16;
   const total = Math.round((subtotal + iva) * 100) / 100;
 
-  const entregaEstimada = "Sáb, 02 de agosto";
+  const entregaEstimada = fechaDemo(2);
   const reservaAntes =
     "Reserve antes de la(s) 03:00 PM para su recolección hoy mismo";
 

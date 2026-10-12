@@ -87,6 +87,8 @@ export function CoberturaMap({
             key={s.K_Oficina}
             position={[s.Latitud as number, s.Longitud as number]}
             icon={icons[s.tipo]}
+            title={s.D_Oficina}
+            alt={`Sucursal ${s.D_Oficina}`}
             eventHandlers={{
               click: () => onSelect?.(s),
             }}

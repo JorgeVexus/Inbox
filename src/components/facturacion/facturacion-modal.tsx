@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { extraerDatosConstanciaFiscal, guardarDatosFacturacion } from "@/lib/facturacion";
@@ -39,6 +39,15 @@ export function FacturacionModal({
   const [guardando, setGuardando] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState<string | null>(null);
 
+  // Escape cierra el modal (accesibilidad por teclado).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   function set<K extends keyof DatosFacturacion>(key: K, value: DatosFacturacion[K]) {
     setDatos((d) => ({ ...d, [key]: value }));
   }
@@ -65,10 +74,16 @@ export function FacturacionModal({
   }
 
   async function handleCpBlur() {
-    if (!datos.cp.trim()) return;
+    if (!/^\d{5}$/.test(datos.cp.trim())) return;
     setBuscandoCP(true);
-    const resultado = await buscarCodigoPostal(datos.cp.trim());
-    setBuscandoCP(false);
+    let resultado: Awaited<ReturnType<typeof buscarCodigoPostal>> = null;
+    try {
+      resultado = await buscarCodigoPostal(datos.cp.trim());
+    } catch {
+      resultado = null;
+    } finally {
+      setBuscandoCP(false);
+    }
     if (!resultado) {
       setColonias([]);
       setDatos((d) => ({ ...d, estado: "", ciudad: "", colonia: "" }));
@@ -78,22 +93,43 @@ export function FacturacionModal({
     setDatos((d) => ({ ...d, estado: resultado.estado, ciudad: resultado.ciudad }));
   }
 
+  // RFC mexicano: 3 letras (moral) o 4 (física) + fecha AAMMDD + homoclave de 3.
+  const rfcValido = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(datos.rfc.trim());
+  const digitosTel = datos.telefono.replace(/\D/g, "");
+  const telefonoValido = datos.telefono.trim() === "" || (digitosTel.length >= 10 && digitosTel.length <= 13);
+  const correoValido = datos.correo.trim() === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo.trim());
   const canSubmit =
-    datos.rfc.trim() !== "" &&
+    rfcValido &&
     datos.regimenFiscal !== "" &&
-    datos.cp.trim() !== "" &&
-    (datos.colonia !== "" || datos.coloniaEspecificada.trim() !== "");
+    /^\d{5}$/.test(datos.cp.trim()) &&
+    (datos.colonia !== "" || datos.coloniaEspecificada.trim() !== "") &&
+    telefonoValido &&
+    correoValido;
+  const motivo =
+    datos.rfc.trim() !== "" && !rfcValido
+      ? "El RFC no tiene un formato válido (12 o 13 caracteres, p. ej. VECJ880326XXX)."
+      : !telefonoValido
+        ? "El teléfono debe tener 10 dígitos."
+        : !correoValido
+          ? "El correo electrónico no es válido."
+          : "";
 
   async function handleAceptar() {
+    if (!canSubmit || guardando) return;
     setErrorGuardar(null);
     setGuardando(true);
-    const res = await guardarDatosFacturacion(datos, usuario);
-    setGuardando(false);
-    if (!res.ok) {
-      setErrorGuardar(res.mensaje ?? "No se pudieron guardar los datos.");
-      return;
+    try {
+      const res = await guardarDatosFacturacion(datos, usuario);
+      if (!res.ok) {
+        setErrorGuardar(res.mensaje ?? "No se pudieron guardar los datos.");
+        return;
+      }
+      onSuccess(datos);
+    } catch {
+      setErrorGuardar("No se pudieron guardar los datos. Inténtalo de nuevo.");
+    } finally {
+      setGuardando(false);
     }
-    onSuccess(datos);
   }
 
   return (
@@ -102,6 +138,9 @@ export function FacturacionModal({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Datos de facturación"
         className="relative flex max-h-[90vh] w-full max-w-[612px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-5 pt-10 sm:px-10"
         onClick={(e) => e.stopPropagation()}
       >
@@ -191,7 +230,7 @@ export function FacturacionModal({
               type="text"
               value={datos.rfc}
               onChange={(e) => set("rfc", e.target.value.toUpperCase())}
-              placeholder="Ejem: VECJ880326XXX"
+              aria-label="RFC" placeholder="Ejem: VECJ880326XXX"
               maxLength={13}
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
@@ -199,6 +238,7 @@ export function FacturacionModal({
 
           <Row label="Régimen fiscal">
             <select
+              aria-label="Régimen fiscal"
               value={datos.regimenFiscal}
               onChange={(e) => set("regimenFiscal", e.target.value)}
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none"
@@ -218,9 +258,9 @@ export function FacturacionModal({
               inputMode="numeric"
               maxLength={5}
               value={datos.cp}
-              onChange={(e) => set("cp", e.target.value)}
+              onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
               onBlur={handleCpBlur}
-              placeholder="Ingrese código postal"
+              aria-label="Código postal" placeholder="Ingrese código postal"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -240,6 +280,7 @@ export function FacturacionModal({
           <div className="flex flex-col gap-2">
             <Row label="Colonia">
               <select
+                aria-label="Colonia"
                 value={datos.colonia}
                 onChange={(e) => set("colonia", e.target.value)}
                 disabled={colonias.length === 0}
@@ -263,7 +304,7 @@ export function FacturacionModal({
                 type="text"
                 value={datos.coloniaEspecificada}
                 onChange={(e) => set("coloniaEspecificada", e.target.value)}
-                placeholder="Colonia"
+                aria-label="Especificar colonia" placeholder="Colonia"
                 className="h-[34px] w-[144px] rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </div>
@@ -274,7 +315,7 @@ export function FacturacionModal({
               type="text"
               value={datos.direccion}
               onChange={(e) => set("direccion", e.target.value)}
-              placeholder="Calle y número"
+              aria-label="Calle y número" placeholder="Calle y número"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -284,7 +325,7 @@ export function FacturacionModal({
               type="tel"
               value={datos.telefono}
               onChange={(e) => set("telefono", e.target.value)}
-              placeholder="Ingrese número celular"
+              aria-label="Teléfono" placeholder="Ingrese número celular"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -294,7 +335,7 @@ export function FacturacionModal({
               type="email"
               value={datos.correo}
               onChange={(e) => set("correo", e.target.value)}
-              placeholder="Ingrese correo electrónico"
+              aria-label="Correo electrónico" placeholder="Ingrese correo electrónico"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -306,9 +347,16 @@ export function FacturacionModal({
           </p>
         )}
 
+        {motivo && (
+          <p role="status" className="text-center text-xs font-medium text-black/60">
+            {motivo}
+          </p>
+        )}
+
         <Button
           onClick={handleAceptar}
-          className={`mx-auto ${!canSubmit || guardando ? "pointer-events-none opacity-50" : ""}`}
+          disabled={!canSubmit || guardando}
+          className="mx-auto disabled:cursor-not-allowed disabled:opacity-50"
         >
           {guardando ? "Guardando…" : "Aceptar"}
         </Button>

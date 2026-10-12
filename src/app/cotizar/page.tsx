@@ -51,6 +51,7 @@ export default function CotizarPage() {
 
   return (
     <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-6 py-10 lg:flex-row lg:px-16 lg:py-16">
+      <h1 className="sr-only">Cotizar y enviar un paquete</h1>
       <WizardStepper current={step} completed={completed} onNavigate={goTo} />
 
       <div className="flex w-full flex-1 flex-col">

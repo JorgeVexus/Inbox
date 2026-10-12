@@ -6,6 +6,7 @@ import { EstamosDonde } from "@/components/cobertura/estamos-donde";
 export default function CoberturaPage() {
   return (
     <>
+      <h1 className="sr-only">Cobertura de Inbox</h1>
       <div className="mx-auto flex max-w-[1440px] items-center justify-end gap-2 px-6 pt-6 lg:px-16">
         <Link
           href="/"

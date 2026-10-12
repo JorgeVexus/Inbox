@@ -59,6 +59,9 @@ export async function guardarDatosFacturacion(
   return { ok: true };
 }
 
+/** Tope de tamaño de la constancia (misma regla de 5 MB que los demás uploads del proyecto). */
+export const MAX_CONSTANCIA_BYTES = 5 * 1024 * 1024;
+
 /**
  * Seam 2 of 2 — "sube tu constancia fiscal y te llenamos el formulario".
  * No real parsing happens here (see doc comment in
@@ -74,6 +77,9 @@ export async function extraerDatosConstanciaFiscal(
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (extension !== "pdf" && extension !== "xml") {
     throw new Error("Solo se aceptan archivos PDF o XML.");
+  }
+  if (file.size > MAX_CONSTANCIA_BYTES) {
+    throw new Error("El archivo supera el máximo de 5 MB.");
   }
   await new Promise((resolve) => setTimeout(resolve, 900));
   return datosDesdeArchivoMock();

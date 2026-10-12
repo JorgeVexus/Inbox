@@ -60,7 +60,7 @@ export function AboutUs() {
 
         <div className="relative h-[280px] w-full shrink-0 overflow-hidden rounded-md lg:h-auto lg:w-[557px]">
           <Image
-            src="/images/about-truck.png"
+            src="/images/about-truck.webp"
             alt="Camión de reparto Inbox"
             fill
             className="object-cover"

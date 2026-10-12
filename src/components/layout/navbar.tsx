@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 
 const NAV_LINKS = [
@@ -16,6 +16,16 @@ const NAV_LINKS = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const { session, openLogin, logout } = useAuth();
+
+  // Escape cierra el menú móvil.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-[1100] bg-primary shadow-nav">
@@ -31,7 +41,7 @@ export function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-10 lg:flex">
+        <nav aria-label="Principal" className="hidden items-center gap-10 lg:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
@@ -91,7 +101,9 @@ export function Navbar() {
 
         <button
           type="button"
-          aria-label="Abrir menú"
+          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={open}
+          aria-controls="menu-movil"
           className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
           onClick={() => setOpen((v) => !v)}
         >
@@ -102,8 +114,8 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t border-white/20 bg-primary px-6 pb-6 lg:hidden">
-          <nav className="flex flex-col gap-4 pt-4">
+        <div id="menu-movil" className="border-t border-white/20 bg-primary px-6 pb-6 lg:hidden">
+          <nav aria-label="Principal (móvil)" className="flex flex-col gap-4 pt-4">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}

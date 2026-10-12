@@ -14,6 +14,8 @@ import { siboxPost, SiboxApiError, SiboxBlockedError } from "@/lib/api/sibox-cli
  * internos. Una respuesta `{result:1, data:""}` (mensaje vacio) es como SIBOX
  * dice "no encontrado" (probado con wsRastreo) -> 404.
  */
+const MAX_BODY_CHARS = 10_000;
+
 export async function proxySibox<Req, Res>(
   request: Request,
   opts: {
@@ -24,9 +26,21 @@ export async function proxySibox<Req, Res>(
     genericErrorMessage: string;
   },
 ) {
+  // Limite de tamano (auditoria 2026-10-12: se aceptaban 2 MB). Los requests
+  // de este BFF son JSON diminutos; se lee como texto para cubrir tambien
+  // bodies sin Content-Length (chunked).
+  let raw: string;
+  try {
+    raw = await request.text();
+  } catch {
+    return NextResponse.json({ error: "Body invalido, se esperaba JSON." }, { status: 400 });
+  }
+  if (raw.length > MAX_BODY_CHARS) {
+    return NextResponse.json({ error: "Request demasiado grande." }, { status: 413 });
+  }
   let body: unknown;
   try {
-    body = await request.json();
+    body = JSON.parse(raw);
   } catch {
     return NextResponse.json({ error: "Body invalido, se esperaba JSON." }, { status: 400 });
   }

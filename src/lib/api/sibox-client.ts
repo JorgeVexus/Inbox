@@ -164,10 +164,42 @@ async function login(): Promise<{ token: string; cliente: SiboxCliente }> {
   };
 }
 
+/**
+ * Protecciones del Login (auditoria 2026-10-12): sin ellas, si el Login falla
+ * (credencial mala, Cloudflare, SIBOX caido), CADA peticion entrante volvia a
+ * intentarlo -- un atacante podia hacer que nuestro servidor martillara SIBOX,
+ * bloquear la cuenta de servicio por intentos fallidos, o que baneen la IP.
+ *  - single-flight: peticiones simultaneas comparten UN solo Login en curso.
+ *  - enfriamiento: tras un fallo no se reintenta durante LOGIN_COOLDOWN_MS; se
+ *    repite el mismo error de inmediato. (Un error de configuracion no entra.)
+ */
+const LOGIN_COOLDOWN_MS = 30_000;
+let loginEnCurso: Promise<{ token: string; cliente: SiboxCliente }> | null = null;
+let ultimoFalloLogin: { en: number; error: unknown } | null = null;
+
 async function getSession(forceRefresh = false) {
   if (cachedSession && !forceRefresh) return cachedSession;
-  cachedSession = await login();
-  return cachedSession;
+  if (ultimoFalloLogin && Date.now() - ultimoFalloLogin.en < LOGIN_COOLDOWN_MS) {
+    throw ultimoFalloLogin.error;
+  }
+  if (!loginEnCurso) {
+    loginEnCurso = login()
+      .then((sesion) => {
+        cachedSession = sesion;
+        ultimoFalloLogin = null;
+        return sesion;
+      })
+      .catch((error: unknown) => {
+        if (!(error instanceof SiboxConfigError)) {
+          ultimoFalloLogin = { en: Date.now(), error };
+        }
+        throw error;
+      })
+      .finally(() => {
+        loginEnCurso = null;
+      });
+  }
+  return loginEnCurso;
 }
 
 async function getToken(forceRefresh = false): Promise<string> {

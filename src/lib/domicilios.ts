@@ -71,7 +71,7 @@ export function validarDomicilio(
   if (!datos.calle.trim()) return { ok: false, mensaje: "La calle es obligatoria." };
   if (!datos.cp.trim() || datos.cp.trim().length !== 5) return { ok: false, mensaje: "Ingresa un código postal válido de 5 dígitos." };
   if (!datos.ciudad.trim() || !datos.estado.trim()) return { ok: false, mensaje: "Falta estado o ciudad — verifica el código postal." };
-  if (!datos.telefono.trim()) return { ok: false, mensaje: "El teléfono de contacto es obligatorio." };
+  if (datos.telefono.replace(/\D/g, "").length < 10) return { ok: false, mensaje: "Escribe un teléfono de contacto de 10 dígitos." };
   return { ok: true };
 }
 

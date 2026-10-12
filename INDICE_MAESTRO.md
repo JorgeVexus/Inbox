@@ -8,8 +8,8 @@
 
 | | |
 |---|---|
-| **Última actualización** | 2026-10-12 (sesión 2) |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 84 tests pasando |
+| **Última actualización** | 2026-10-12 (sesión 3, auditoría QA) |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 107 tests pasando; auditoría QA pre-Vercel aplicada |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
 ---
@@ -144,6 +144,8 @@ bloqueado, B1).
 | **B4** | Endpoints de **pago**, webhooks, sandbox. | Backend | Checkout productivo (`procesarPago` queda simulado) | Plan semana 3; sin novedades. |
 | **B5** | **IP fija para producción**. Vercel no da IP de salida fija (Static IPs = $100/mes, descartado). Plan: proxy en VPS barato (~$5–8, Vultr/Hetzner). **Ojo**: el proxy solo resuelve la IP; **igual hace falta B1** para esa IP. | Decisión del jefe + provisionar VPS | Producción | Resumen técnico para el otro dev: artifact "IP Fija SIBOX" (`.scratch/ip-fija-sibox.html`). |
 | **B6** | Sin URL/credenciales de **producción** (`api.inbox.com.mx`) ni confirmar que tenga la misma protección. | Cliente | Lanzamiento | Pendiente de preguntar. |
+| **B8** | **Los formularios de contacto no envían nada**: el de `/soporte` y el del chat (`src/lib/soporte.ts`) solo simulan éxito. En producción un cliente creería que su mensaje llegó. Hay que decidir el destino (correo vía Resend, CRM, webhook o widget de terceros). | Producto / cliente | **No lanzar a producción así** (o quitar/ocultar los formularios) | Pendiente de decidir. |
+| **B9** | **Modo demo en producción**: login mock (`INBOX`/`Prueba`), `/envio`, `/perfil`, `/recoleccion`, cotizador y pago son mock y muestran datos de ejemplo. Antes de lanzar: o se conectan (B2/B3/B4) o se ocultan los links del Navbar y se marcan claramente. | Depende de B2–B4 | Producción | Pendiente. |
 | **B7** | Más guías de prueba: las 3 entregadas son todas `ENTREGADA`. Faltan guías en tránsito / "LISTO PARA ENTREGAR" para validar el timeline y la fecha prometida. | Cliente | Validación del timeline | En el mensaje. |
 
 ---
@@ -161,6 +163,13 @@ bloqueado, B1).
 3. **Rate limiting** de `/api/*` (necesita un store compartido, p.ej. Upstash Redis; ver TODO en `route-helpers.ts`).
 4. **Conectar al BFF los endpoints de lectura que ya funcionan**: `ListadoOficinas`/`Cobertura` (mapa y sucursales), `BusquedaCP`, `TipoEnvio`/`TipoEntrega`, `ObtenerHorariosPorCP` — con el mismo patrón de `proxySibox()`. Se podrán ver cuando B1 se resuelva.
 5. Mostrar en `/rastreo` la **firma** y quién recibió **solo** cuando exista el endpoint autenticado (hoy se anulan por privacidad).
+
+**B2. Auditoría QA pre-Vercel (2026-10-12) — pendientes menores**
+- CSP completa con nonce (hoy solo `frame-ancestors`/`form-action`; no se probó una estricta con el mapa de OpenStreetMap).
+- Botón de búsqueda del Navbar (lupa) es decorativo: no hace nada.
+- Pasos de Costo/Pago: precios y fechas son mock (las fechas ya se calculan desde hoy, pero siguen siendo demo).
+- El campo "Descripción del contenido" del paso Confirmar no es obligatorio (confirmar con backend si `wsGeneracionGuiaCliente` lo exige).
+- Pruebas E2E automatizadas (Playwright) siguen pendientes.
 
 **C. Antes de producción**
 Etiqueta PDF (`Genera_Etiqueta`, decodificar en servidor), pruebas E2E (Playwright),
@@ -262,6 +271,29 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-12 (sesión 3, parte 2 — correcciones de la auditoría)** — Probado en navegador con
+  casos hostiles. Corregido: validación real (CP de 5 dígitos solo numérico, peso/medidas > 0,
+  teléfono 10 dígitos, correo, RFC con formato, tarjeta con Luhn + vencimiento) con botones
+  `disabled` de verdad (antes solo `pointer-events-none`: se podían activar con Enter → doble envío);
+  errores de red que dejaban "Generando…"/"Procesando…" para siempre (guía, pago, facturación,
+  recolección, contactos, direcciones, soporte, chat); fechas de entrega fijas ("02 de agosto") →
+  calculadas desde hoy; recolección permitía ventanas de hoy ya pasadas y ignoraba la hora límite
+  de captura; archivo de constancia ≤ 5 MB; modales con `role="dialog"` y Escape; menú móvil con
+  `aria-expanded` y Escape; etiquetas accesibles en todos los campos; pines del mapa con nombre;
+  imágenes pesadas (4–9 MB) → WebP de ~150 KB (originales en `../originales-imagenes`, fuera del
+  repo); `sitemap.xml` y `robots.txt` (requieren `SITE_URL` en Vercel). Nuevos bloqueos B8 y B9.
+  107 tests.
+
+- **2026-10-12 (sesión 3, auditoría QA pre-Vercel)** — Next 16.4.0 (parche RCE), headers
+  de seguridad (`next.config.ts`), blindaje del BFF (login single-flight + enfriamiento,
+  límite de body, regex de guía, errores genéricos), privacidad en rastreo público, 100 tests.
+  Corregido: fecha de `/recoleccion` se adelantaba un día después de las 6 pm (UTC vs local),
+  `<main>` anidado en 4 vistas, h1 en `/cotizar` y `/cobertura`, `not-found`/`error`/`robots`,
+  títulos por página. **Pendiente de la auditoría**: aria-label en ~10 inputs/selects por página,
+  nombre accesible de pines Leaflet, sitemap, comprimir imágenes pesadas (about-truck 8.9 MB),
+  pruebas interactivas restantes, commit+push.
+  *(Actualización misma sesión: todo lo anterior ya está hecho salvo CSP/E2E.)*
 
 - **2026-10-12 (sesión 2)** — Modo demo/real del rastreo (con aviso en
   `/rastreo`); agenda de **Contactos** en `/perfil` y selector en *Confirmar*

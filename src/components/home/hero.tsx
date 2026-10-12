@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { saveCotizacionDraft } from "@/lib/cotizacion-draft";
 
 const SLIDES = [
-  "/images/hero-1.png",
-  "/images/hero-2.png",
-  "/images/hero-3.png",
-  "/images/hero-4.png",
+  "/images/hero-1.webp",
+  "/images/hero-2.webp",
+  "/images/hero-3.webp",
+  "/images/hero-4.webp",
 ];
 
 export function Hero() {
@@ -61,7 +61,7 @@ export function Hero() {
               type="text"
               value={guia}
               onChange={(e) => setGuia(e.target.value)}
-              placeholder="Ingrese el número de rastreo"
+              aria-label="Ingrese el número de rastreo" maxLength={200} placeholder="Ingrese el número de rastreo"
               className="h-[53px] flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
             <Button type="submit">Rastrear</Button>
@@ -139,9 +139,9 @@ function QuoteCard() {
   }
 
   const canContinue =
-    form.origenCP.trim() !== "" &&
+    /^\d{5}$/.test(form.origenCP) &&
     form.origenCiudad.trim() !== "" &&
-    form.destinoCP.trim() !== "" &&
+    /^\d{5}$/.test(form.destinoCP) &&
     form.destinoCiudad.trim() !== "";
 
   function swapOrigenDestino() {
@@ -214,6 +214,7 @@ function QuoteCard() {
                 <div className="flex flex-col gap-3">
                   <p className="text-xl font-medium text-black">Peso</p>
                   <MedidaInput
+                    label="Peso"
                     unit="Kg"
                     value={paquete.peso}
                     onChange={(v) => setPaquete((p) => ({ ...p, peso: v }))}
@@ -223,16 +224,19 @@ function QuoteCard() {
                   <p className="text-xl font-medium text-black">Medidas</p>
                   <div className="flex items-center gap-4">
                     <MedidaInput
+                      label="Alto"
                       unit="Cm"
                       value={paquete.alto}
                       onChange={(v) => setPaquete((p) => ({ ...p, alto: v }))}
                     />
                     <MedidaInput
+                      label="Largo"
                       unit="Cm"
                       value={paquete.largo}
                       onChange={(v) => setPaquete((p) => ({ ...p, largo: v }))}
                     />
                     <MedidaInput
+                      label="Ancho"
                       unit="Cm"
                       value={paquete.ancho}
                       onChange={(v) => setPaquete((p) => ({ ...p, ancho: v }))}
@@ -418,10 +422,12 @@ function EnvioOption({
 }
 
 function MedidaInput({
+  label,
   unit,
   value,
   onChange,
 }: {
+  label: string;
   unit: string;
   value: string;
   onChange: (v: string) => void;
@@ -433,7 +439,7 @@ function MedidaInput({
         min={0}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="0"
+        aria-label={label} placeholder="0"
         className="w-full min-w-0 text-right text-xs font-medium text-black outline-none"
       />
       <span className="shrink-0 text-xs font-medium text-black">{unit}</span>
@@ -469,8 +475,8 @@ function OriginDestinationField({
                 inputMode="numeric"
                 maxLength={5}
                 value={cp}
-                onChange={(e) => onCpChange(e.target.value)}
-                placeholder="Código postal"
+                onChange={(e) => onCpChange(e.target.value.replace(/\D/g, "").slice(0, 5))}
+                aria-label={`Código postal de ${label.toLowerCase()}`} placeholder="Código postal"
                 className="w-full min-w-0 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
               />
             </div>
@@ -488,7 +494,7 @@ function OriginDestinationField({
             type="text"
             value={ciudad}
             onChange={(e) => onCiudadChange(e.target.value)}
-            placeholder="Ciudad"
+            aria-label={`Ciudad de ${label.toLowerCase()}`} placeholder="Ciudad"
             className="w-full min-w-0 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
           />
           <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 rotate-90 fill-secondary-dark" aria-hidden>

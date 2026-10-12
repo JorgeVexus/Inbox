@@ -94,3 +94,11 @@ describe("modo demo (por defecto)", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe("formato de guía inválido (400 del BFF)", () => {
+  beforeEach(() => vi.stubEnv("NEXT_PUBLIC_SIBOX_REAL", "1"));
+  it("se trata como 'no encontrada', no como error del servidor", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(respuesta({ error: "Request invalido." }, 400)));
+    await expect(rastrearGuia("<script>")).resolves.toBeNull();
+  });
+});

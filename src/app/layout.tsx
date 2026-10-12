@@ -15,7 +15,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Inbox | Paquetería y Envíos",
+  title: { default: "Inbox | Paquetería y Envíos", template: "%s | Inbox" },
   description:
     "Rastrea, cotiza y envía tus paquetes con Inbox. Cobertura nacional, recolección a domicilio y entrega segura.",
 };

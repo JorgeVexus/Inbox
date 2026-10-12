@@ -97,7 +97,7 @@ export function RastreoView() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar envío"
+              aria-label="Buscar envío" placeholder="Buscar envío"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <button type="submit" aria-label="Buscar">

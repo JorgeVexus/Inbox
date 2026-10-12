@@ -110,3 +110,22 @@ describe("versión pública del rastreo (sin datos personales)", () => {
     }
   });
 });
+
+describe("rastreoRequestSchema: solo formato de guía (defensa contra inyección)", () => {
+  it.each([
+    "<script>alert(1)</script>",
+    "1' OR '1'='1",
+    "1; DROP TABLE guias",
+    "12\u000034",
+    "📦",
+    "../../etc/passwd",
+    "a b",
+    "9".repeat(41),
+  ])("rechaza %j", (guia) => {
+    expect(rastreoRequestSchema.safeParse({ Guia: guia }).success).toBe(false);
+  });
+
+  it.each(["4003229791", "0000000000", "AB-123"])("acepta %j", (guia) => {
+    expect(rastreoRequestSchema.safeParse({ Guia: guia }).success).toBe(true);
+  });
+});

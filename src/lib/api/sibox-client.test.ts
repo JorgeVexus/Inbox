@@ -176,3 +176,69 @@ describe("reto anti-bot de Cloudflare", () => {
     await expect(siboxPost("/wsRastreo", { Guia: "1" })).rejects.toBeInstanceOf(SiboxBlockedError);
   });
 });
+
+describe("protecciones del Login (anti-martilleo hacia SIBOX)", () => {
+  beforeEach(() => {
+    process.env.SIBOX_API_BASE_URL = BASE_URL;
+    process.env.SIBOX_SERVICE_USER = "servicio";
+    process.env.SIBOX_SERVICE_PASSWORD = "clave";
+    vi.resetModules();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    delete process.env.SIBOX_API_BASE_URL;
+    delete process.env.SIBOX_SERVICE_USER;
+    delete process.env.SIBOX_SERVICE_PASSWORD;
+  });
+
+  it("peticiones simultáneas comparten UN solo Login", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation(async (url) => {
+      if (String(url).endsWith("/Login")) {
+        await new Promise((r) => setTimeout(r, 20));
+        return loginOk("tok");
+      }
+      return jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { siboxPost } = await importFreshClient();
+    await Promise.all(Array.from({ length: 10 }, () => siboxPost("/wsRastreo", { Guia: "1" })));
+
+    const logins = fetchMock.mock.calls.filter(([u]) => String(u).endsWith("/Login"));
+    expect(logins).toHaveLength(1);
+  });
+
+  it("tras un Login fallido NO reintenta durante el enfriamiento, y sí después", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      jsonResponse({ resp: { result: 1, data: "USUARIO/CONTRASEÑA INVALIDOS.", token: null } }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { siboxPost } = await importFreshClient();
+    for (let i = 0; i < 25; i++) {
+      await expect(siboxPost("/wsRastreo", { Guia: "1" })).rejects.toThrow("USUARIO/CONTRASEÑA INVALIDOS.");
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(1); // 25 peticiones, 1 solo intento de Login
+
+    vi.advanceTimersByTime(31_000);
+    await expect(siboxPost("/wsRastreo", { Guia: "1" })).rejects.toThrow();
+    expect(fetchMock).toHaveBeenCalledTimes(2); // pasado el enfriamiento, reintenta
+  });
+
+  it("un error de configuración (sin variables) NO activa el enfriamiento", async () => {
+    delete process.env.SIBOX_SERVICE_PASSWORD;
+    const { siboxPost } = await importFreshClient();
+    await expect(siboxPost("/wsRastreo", { Guia: "1" })).rejects.toThrow("SIBOX_SERVICE_PASSWORD");
+    process.env.SIBOX_SERVICE_PASSWORD = "ya-configurada";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>()
+        .mockResolvedValueOnce(loginOk("tok"))
+        .mockResolvedValueOnce(jsonResponse({ resp: { result: 0, data: [] } })),
+    );
+    await expect(siboxPost("/wsRastreo", { Guia: "1" })).resolves.toEqual([]);
+  });
+});

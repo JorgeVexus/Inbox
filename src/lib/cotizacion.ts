@@ -1,4 +1,4 @@
-import { calcularCostoMock } from "@/lib/mock/cotizacion";
+import { calcularCostoMock, fechaDemo } from "@/lib/mock/cotizacion";
 import type {
   ConfirmarInput,
   CostoOpcion,
@@ -47,8 +47,8 @@ export async function generarGuia(
   const folio = String(Math.floor(4_000_000_000 + Math.random() * 900_000_000));
   return {
     folio,
-    fechaEnvioEstimada: "Vie, 01 de agosto",
-    fechaLlegadaEstimada: "Sáb, 02 de agosto",
+    fechaEnvioEstimada: fechaDemo(1),
+    fechaLlegadaEstimada: fechaDemo(2),
   };
 }
 

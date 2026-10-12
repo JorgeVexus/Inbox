@@ -111,3 +111,35 @@ describe("observacionesConGuias", () => {
     ).toBe("Guías a recolectar: 4003229791");
   });
 });
+
+describe("disponibilidad del día actual", () => {
+  // horario: lunes/miércoles/viernes, ventanas 14–19, límite de captura 13:30
+  const lunes = (h: number, m = 0) => new Date(2026, 7, 17, h, m); // lunes 17-ago-2026
+
+  it("hoy pasada la hora límite de captura no ofrece ninguna ventana", () => {
+    const ahora = lunes(15, 10);
+    const ventanas = ventanasDisponibles(horario, lunes(0), ahora);
+    expect(ventanas).toEqual([]);
+  });
+
+  it("antes del límite de captura, hoy ofrece todas las ventanas futuras", () => {
+    const ahora = lunes(12, 0);
+    expect(ventanasDisponibles(horario, lunes(0), ahora)).toHaveLength(5);
+  });
+
+  it("otro día no se ve afectado por la hora actual", () => {
+    const ahora = lunes(18, 0);
+    const miercoles = new Date(2026, 7, 19);
+    expect(ventanasDisponibles(horario, miercoles, ahora)).toHaveLength(5);
+  });
+
+  it("después del límite hoy desaparece de los días disponibles", () => {
+    const ahora = lunes(14, 0);
+    const dias = diasDisponibles(horario, ahora).map((d) => d.getDay());
+    expect(dias).toEqual([3, 5]); // sin el lunes de hoy
+  });
+
+  it("sin fecha devuelve todas las ventanas del horario", () => {
+    expect(ventanasDisponibles(horario)).toHaveLength(5);
+  });
+});

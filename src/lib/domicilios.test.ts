@@ -5,14 +5,14 @@ import { domicilioVacio } from "../types/domicilio";
 
 describe("validarDomicilio", () => {
   it("exige un alias", () => {
-    expect(validarDomicilio({ ...domicilioVacio(), calle: "x", cp: "12345", ciudad: "y", estado: "z", telefono: "1" })).toEqual({
+    expect(validarDomicilio({ ...domicilioVacio(), calle: "x", cp: "12345", ciudad: "y", estado: "z", telefono: "8112345678" })).toEqual({
       ok: false,
       mensaje: "Ponle un nombre a esta dirección (ej. Casa, Oficina).",
     });
   });
 
   it("exige un C.P de 5 dígitos", () => {
-    const base = { ...domicilioVacio(), alias: "Casa", calle: "x", ciudad: "y", estado: "z", telefono: "1" };
+    const base = { ...domicilioVacio(), alias: "Casa", calle: "x", ciudad: "y", estado: "z", telefono: "8112345678" };
     expect(validarDomicilio({ ...base, cp: "123" })).toEqual({
       ok: false,
       mensaje: "Ingresa un código postal válido de 5 dígitos.",
