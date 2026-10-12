@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { Proximamente } from "@/components/cuenta/proximamente";
+
+export const metadata: Metadata = { title: "Recuperar contraseña", robots: { index: false } };
 
 export default function RecuperarContrasenaPage() {
   return (

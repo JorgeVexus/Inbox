@@ -94,7 +94,7 @@ export function StepPago({
     : "—";
 
   return (
-    <div className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 lg:flex-row lg:items-start">
+    <div className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 min-[1400px]:flex-row min-[1400px]:items-start">
       <div className="flex w-full max-w-[729px] flex-col items-end gap-6">
         {errorGuia && (
           <p role="alert" className="w-full rounded-md bg-white p-4 text-sm font-medium text-red-700 shadow-card-sm">
@@ -236,7 +236,7 @@ function DatosPrincipales({
           <button
             type="button"
             onClick={onToggleEditarReferencia}
-            className="font-display text-xs text-primary"
+            className="py-2 font-display text-xs text-primary"
           >
             {referencia ? "Editar referencia" : "Asignar referencia"}
           </button>
@@ -682,7 +682,7 @@ function PagoExitoso({
           </p>
           <Link
             href="/cobertura"
-            className="font-display text-sm text-primary underline"
+            className="inline-block py-2 font-display text-sm text-primary underline"
           >
             Buscar otra sucursal
           </Link>
@@ -747,10 +747,10 @@ function PagoExitoso({
       )}
 
       <div className="flex items-center gap-8 font-display text-sm text-primary">
-        <Link href="/" className="underline">
+        <Link href="/" className="inline-block py-2 underline">
           Ir a inicio
         </Link>
-        <Link href="/cuenta/crear" className="underline">
+        <Link href="/cuenta/crear" className="inline-block py-2 underline">
           Regístrate para llevar un seguimiento de tu envío
         </Link>
       </div>

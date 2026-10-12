@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -144,6 +145,11 @@ function QuoteCard() {
     /^\d{5}$/.test(form.destinoCP) &&
     form.destinoCiudad.trim() !== "";
 
+  const positivo = (v: string) => Number.isFinite(Number(v)) && Number(v) > 0 && Number(v) <= 1000;
+  const paqueteValido =
+    envio === "sobre" ||
+    (positivo(paquete.peso) && positivo(paquete.alto) && positivo(paquete.largo) && positivo(paquete.ancho));
+
   function swapOrigenDestino() {
     setForm((f) => ({
       ...f,
@@ -207,7 +213,7 @@ function QuoteCard() {
           </div>
         </div>
 
-        {envio === "paquete" && (
+        {envio !== "sobre" && (
           <div className="flex w-full flex-col gap-4">
             <div className="flex flex-wrap items-start justify-between gap-6">
               <div className="flex gap-6 sm:gap-12">
@@ -242,7 +248,7 @@ function QuoteCard() {
                       onChange={(v) => setPaquete((p) => ({ ...p, ancho: v }))}
                     />
                   </div>
-                  <div className="flex justify-end gap-4 pr-3 text-xs text-secondary-dark">
+                  <div className="flex justify-end gap-4 pr-3 text-xs text-[#707372]">
                     <span className="w-[82px] text-right">Alto</span>
                     <span className="w-[82px] text-right">Largo</span>
                     <span className="w-[82px] text-right">Ancho</span>
@@ -261,9 +267,9 @@ function QuoteCard() {
                       type="button"
                       aria-label="Aumentar cantidad"
                       onClick={() =>
-                        setPaquete((p) => ({ ...p, cantidad: p.cantidad + 1 }))
+                        setPaquete((p) => ({ ...p, cantidad: Math.min(99, p.cantidad + 1) }))
                       }
-                      className="rotate-180"
+                      className="flex h-6 w-6 items-center justify-center rotate-180"
                     >
                       <svg viewBox="0 0 24 24" className="h-4 w-4 fill-black">
                         <path d="M7 10l5 5 5-5z" />
@@ -278,6 +284,7 @@ function QuoteCard() {
                           cantidad: Math.max(1, p.cantidad - 1),
                         }))
                       }
+                      className="flex h-6 w-6 items-center justify-center"
                     >
                       <svg viewBox="0 0 24 24" className="h-4 w-4 fill-black">
                         <path d="M7 10l5 5 5-5z" />
@@ -285,7 +292,7 @@ function QuoteCard() {
                     </button>
                   </div>
                 </div>
-                <p className="text-xs font-medium text-secondary-dark">
+                <p className="text-xs font-medium text-[#707372]">
                   Peso total {(Number(paquete.peso) || 0) * paquete.cantidad} kg
                 </p>
               </div>
@@ -300,7 +307,7 @@ function QuoteCard() {
             >
               <span
                 className={`text-xs font-medium ${
-                  paquete.pais === "US" ? "text-primary" : "text-secondary-dark"
+                  paquete.pais === "US" ? "text-primary" : "text-[#707372]"
                 }`}
               >
                 US
@@ -308,7 +315,7 @@ function QuoteCard() {
               <Image src="/icons/us-mx-switch.svg" alt="" width={44} height={20} />
               <span
                 className={`text-xs font-medium ${
-                  paquete.pais === "MX" ? "text-primary" : "text-secondary-dark"
+                  paquete.pais === "MX" ? "text-primary" : "text-[#707372]"
                 }`}
               >
                 MX
@@ -317,10 +324,16 @@ function QuoteCard() {
           </div>
         )}
 
+        {!paqueteValido && (
+          <p role="status" className="text-center text-xs font-medium text-black/60">
+            Indica peso y medidas mayores a 0 para continuar.
+          </p>
+        )}
         <Button
           type="button"
           onClick={handleConfirmar}
-          className="w-full max-w-[300px] sm:w-auto"
+          disabled={!paqueteValido}
+          className="w-full max-w-[300px] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           Confirmar
         </Button>
@@ -467,7 +480,7 @@ function OriginDestinationField({
       <p className="text-2xl font-bold text-black">{label}</p>
       <div className="flex w-full flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium text-secondary-dark">{placeholder}</p>
+          <p className="text-xs font-medium text-[#707372]">{placeholder}</p>
           <div className="flex items-start gap-2.5">
             <div className="flex h-[53px] flex-1 items-center rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card-sm">
               <input
@@ -477,16 +490,18 @@ function OriginDestinationField({
                 value={cp}
                 onChange={(e) => onCpChange(e.target.value.replace(/\D/g, "").slice(0, 5))}
                 aria-label={`Código postal de ${label.toLowerCase()}`} placeholder="Código postal"
-                className="w-full min-w-0 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
+                className="h-full w-full min-w-0 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
               />
             </div>
-            <button
-              type="button"
-              aria-label="Buscar sucursal"
+            <Link
+              href="/cobertura"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Buscar sucursal (abre el mapa de cobertura)"
               className="flex h-[53px] w-[53px] shrink-0 items-center justify-center rounded-md border-2 border-primary bg-white p-1"
             >
               <Image src="/icons/map-search.svg" alt="" width={24} height={24} />
-            </button>
+            </Link>
           </div>
         </div>
         <div className="flex h-[50px] items-center justify-between rounded-md border border-secondary-dark/50 bg-white pl-4 pr-3.5 shadow-card">
@@ -495,7 +510,7 @@ function OriginDestinationField({
             value={ciudad}
             onChange={(e) => onCiudadChange(e.target.value)}
             aria-label={`Ciudad de ${label.toLowerCase()}`} placeholder="Ciudad"
-            className="w-full min-w-0 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
+            className="h-full w-full min-w-0 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
           />
           <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 rotate-90 fill-secondary-dark" aria-hidden>
             <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z" />

@@ -38,7 +38,7 @@ export function EnviosLista({
             value={busqueda}
             onChange={(event) => onBusquedaChange(event.target.value)}
             placeholder="Buscar envío"
-            className="min-w-0 flex-1 bg-transparent font-display text-sm text-black outline-none placeholder:text-secondary-dark"
+            className="h-full min-w-0 flex-1 bg-transparent font-display text-sm text-black outline-none placeholder:text-secondary-dark"
           />
           <Image src="/icons/search2.svg" alt="" width={20} height={20} />
         </div>

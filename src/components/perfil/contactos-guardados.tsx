@@ -70,14 +70,14 @@ export function ContactosGuardados({ usuario }: { usuario: string }) {
               <p className="text-sm text-black/70">Tel. {c.telefono}</p>
               {c.email && <p className="text-sm text-black/70">{c.email}</p>}
               <div className="mt-2 flex gap-4 text-xs font-bold">
-                <button type="button" onClick={() => setModal(c)} className="text-primary underline">
+                <button type="button" onClick={() => setModal(c)} className="px-2 py-2 text-primary underline">
                   Editar
                 </button>
                 <button
                   type="button"
                   onClick={() => handleEliminar(c.id)}
                   disabled={eliminando === c.id}
-                  className="text-black/60 underline disabled:opacity-50"
+                  className="px-2 py-2 text-black/60 underline disabled:opacity-50"
                 >
                   {eliminando === c.id ? "Eliminando…" : "Eliminar"}
                 </button>

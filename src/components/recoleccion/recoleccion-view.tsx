@@ -208,7 +208,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
     <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[860px] px-5 pt-8 sm:px-8">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
-          <Link href="/" className="transition-colors hover:text-primary">Inicio</Link>
+          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">Inicio</Link>
           <span aria-hidden="true" className="mx-2">›</span>
           <span aria-current="page" className="font-bold text-black">Solicita tu recolección</span>
         </nav>
@@ -333,7 +333,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                   type="button"
                   aria-label="Disminuir cantidad"
                   onClick={() => setPaquetes((p) => Math.max(1, p - 1))}
-                  className="text-lg font-bold text-black"
+                  className="flex h-8 w-8 items-center justify-center text-lg font-bold text-black"
                 >
                   −
                 </button>
@@ -341,8 +341,8 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                 <button
                   type="button"
                   aria-label="Aumentar cantidad"
-                  onClick={() => setPaquetes((p) => p + 1)}
-                  className="text-lg font-bold text-black"
+                  onClick={() => setPaquetes((p) => Math.min(99, p + 1))}
+                  className="flex h-8 w-8 items-center justify-center text-lg font-bold text-black"
                 >
                   +
                 </button>

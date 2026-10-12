@@ -54,3 +54,15 @@ body {
 .font-display {
   font-family: var(--font-trebuchet);
 }
+
+/* Indicador de foco para teclado (WCAG 2.4.7). Va SIN capa para ganarle a las
+   utilidades `outline-none` que usan casi todos los campos del sitio. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Sobre el navbar naranja el contorno naranja no se ve: blanco. */
+header :focus-visible {
+  outline-color: #fff;
+}

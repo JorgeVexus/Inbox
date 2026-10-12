@@ -6,17 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { RastreoCard } from "@/components/rastreo/rastreo-card";
 import { Faq } from "@/components/home/faq";
+import { MAX_GUIAS, normalizarGuias } from "@/lib/guias";
 import { rastrearGuias, rastreoEsDemo } from "@/lib/rastreo";
 import type { Rastreo } from "@/types/rastreo";
 
 function parseGuias(raw: string | null): string[] {
-  if (!raw) return [];
-  const vistas = new Set<string>();
-  for (const parte of raw.split(",")) {
-    const limpio = parte.trim();
-    if (limpio) vistas.add(limpio);
-  }
-  return [...vistas];
+  return normalizarGuias(raw).validas;
 }
 
 export function RastreoView() {
@@ -27,6 +22,7 @@ export function RastreoView() {
   const guias = useMemo(() => parseGuias(searchParams.get("guias")), [searchParams]);
 
   const [busqueda, setBusqueda] = useState("");
+  const [aviso, setAviso] = useState<string | null>(null);
   const [resultados, setResultados] = useState<
     Record<string, { resultado: Rastreo | null; error?: string }>
   >({});
@@ -60,12 +56,14 @@ export function RastreoView() {
 
   function handleBuscar(e: React.FormEvent) {
     e.preventDefault();
-    const agregadas = busqueda
-      .split(/[\s,]+/)
-      .map((v) => v.trim())
-      .filter(Boolean);
-    if (agregadas.length === 0) return;
-    actualizarGuias([...new Set([...guias, ...agregadas])]);
+    const { validas, invalidas, excedentes } = normalizarGuias(busqueda);
+    const combinadas = [...new Set([...guias, ...validas])];
+    const avisos: string[] = [];
+    if (invalidas.length) avisos.push("Se ignoraron entradas con formato inválido (solo letras, números y guiones).");
+    if (combinadas.length > MAX_GUIAS || excedentes) avisos.push(`Puedes rastrear hasta ${MAX_GUIAS} guías a la vez.`);
+    setAviso(avisos.length ? avisos.join(" ") : null);
+    if (validas.length === 0) return;
+    actualizarGuias(combinadas.slice(0, MAX_GUIAS));
     setBusqueda("");
   }
 
@@ -97,14 +95,20 @@ export function RastreoView() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
+              maxLength={400}
               aria-label="Buscar envío" placeholder="Buscar envío"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
-            <button type="submit" aria-label="Buscar">
+            <button type="submit" aria-label="Buscar" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center">
               <Image src="/icons/search2.svg" alt="" width={22} height={22} />
             </button>
           </div>
         </form>
+        {aviso && (
+          <p role="status" className="max-w-[339px] text-center text-xs font-medium text-black/70">
+            {aviso}
+          </p>
+        )}
 
         {!session && (
           <button

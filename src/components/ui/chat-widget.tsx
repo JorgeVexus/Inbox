@@ -225,7 +225,7 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
         onClick={() => onNavigate("chat")}
         className="flex h-[43px] items-center justify-between rounded-md bg-white px-5 shadow-card-sm"
       >
-        <span className="font-display text-base text-secondary-dark">
+        <span className="font-display text-base text-[#707372]">
           Envíanos un mensaje
         </span>
         <Image src="/icons/forum.svg" alt="" width={18} height={18} />
@@ -274,7 +274,7 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
         onClick={() => onNavigate("help")}
         className="flex h-[43px] items-center justify-between rounded-md bg-white px-5 shadow-card-sm"
       >
-        <span className="font-display text-base text-secondary-dark">Buscar</span>
+        <span className="font-display text-base text-[#707372]">Buscar</span>
         <Image src="/icons/search.svg" alt="" width={18} height={18} />
       </button>
     </div>

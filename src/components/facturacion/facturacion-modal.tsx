@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useModalA11y } from "@/components/ui/use-modal-a11y";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { extraerDatosConstanciaFiscal, guardarDatosFacturacion } from "@/lib/facturacion";
 import { REGIMENES_FISCALES } from "@/lib/mock/facturacion";
@@ -39,14 +40,8 @@ export function FacturacionModal({
   const [guardando, setGuardando] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState<string | null>(null);
 
-  // Escape cierra el modal (accesibilidad por teclado).
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModalA11y(panelRef, onClose);
 
   function set<K extends keyof DatosFacturacion>(key: K, value: DatosFacturacion[K]) {
     setDatos((d) => ({ ...d, [key]: value }));
@@ -138,6 +133,7 @@ export function FacturacionModal({
       onClick={onClose}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Datos de facturación"
@@ -204,7 +200,7 @@ export function FacturacionModal({
                 para rellenar información
               </p>
             )}
-            <p className="text-xs text-secondary-dark">Archivos aceptados: PDF y XML</p>
+            <p className="text-xs text-[#707372]">Archivos aceptados: PDF y XML</p>
             {errorArchivo && (
               <p role="alert" className="text-xs font-medium text-red-600">
                 {errorArchivo}

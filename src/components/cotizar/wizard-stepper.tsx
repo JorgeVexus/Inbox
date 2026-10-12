@@ -36,7 +36,7 @@ export function WizardStepper({
                 ? "border-2 border-primary bg-white text-primary"
                 : isCurrent
                   ? "bg-black/[0.04] text-black"
-                  : "text-secondary-dark"
+                  : "text-[#707372]"
             } ${clickable ? "cursor-pointer" : "cursor-default"}`}
           >
             {isCompleted ? (

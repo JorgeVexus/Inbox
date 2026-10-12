@@ -42,7 +42,7 @@ export function FacturacionGuardada({ usuario }: { usuario: string }) {
               datos.regimenFiscal}
           </p>
           <p>
-            {datos.direccion}, {datos.colonia || datos.coloniaEspecificada}
+            {[datos.direccion, datos.colonia || datos.coloniaEspecificada].filter(Boolean).join(", ")}
             <br />
             {datos.ciudad}, {datos.estado} — CP {datos.cp}
           </p>

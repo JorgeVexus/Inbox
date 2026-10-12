@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useModalA11y } from "@/components/ui/use-modal-a11y";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { guardarContacto } from "@/lib/contactos";
 import type { ContactoGuardado } from "@/types/contacto";
@@ -33,14 +34,8 @@ export function ContactoModal({
   onClose: () => void;
   onSuccess: (contacto: ContactoGuardado) => void;
 }) {
-  // Escape cierra el modal (accesibilidad por teclado).
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModalA11y(panelRef, onClose);
 
   const [datos, setDatos] = useState<Omit<ContactoGuardado, "id"> & { id?: string }>(contacto ?? VACIO);
   const [guardando, setGuardando] = useState(false);
@@ -82,6 +77,7 @@ export function ContactoModal({
       onClick={onClose}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={contacto ? "Editar contacto" : "Agregar contacto"}

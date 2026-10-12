@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
@@ -146,13 +147,13 @@ export function StepConfirmar({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 lg:flex-row lg:items-start"
+      className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 min-[1400px]:flex-row min-[1400px]:items-start"
     >
       <div className="flex w-full flex-col gap-6">
         <button
           type="button"
           onClick={autocompletarConSesion}
-          className="self-end font-display text-sm"
+          className="self-end py-2 font-display text-sm"
         >
           {session ? (
             <span className="text-black">
@@ -166,8 +167,8 @@ export function StepConfirmar({
           )}
         </button>
 
-        <div className="flex flex-col gap-8 rounded-md bg-white p-6 shadow-card lg:flex-row lg:items-stretch">
-          <div className="flex w-full lg:flex-1 lg:justify-end lg:pr-8">
+        <div className="flex flex-col gap-8 rounded-md bg-white p-6 shadow-card xl:flex-row xl:items-stretch">
+          <div className="flex w-full xl:flex-1 xl:justify-end xl:pr-8">
             <ContactoForm
               titulo="Origen"
               value={remitente}
@@ -178,8 +179,8 @@ export function StepConfirmar({
               aviso={avisos.remitente}
             />
           </div>
-          <div className="hidden w-px shrink-0 self-stretch bg-neutral-line lg:block" />
-          <div className="flex w-full lg:flex-1 lg:justify-start lg:pl-8">
+          <div className="hidden w-px shrink-0 self-stretch bg-neutral-line xl:block" />
+          <div className="flex w-full xl:flex-1 xl:justify-start xl:pl-8">
             <ContactoForm
               titulo="Destino"
               value={destinatario}
@@ -204,15 +205,17 @@ export function StepConfirmar({
               aria-label="Descripción del contenido" placeholder="Descripción del contenido"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
-            <button
-              type="button"
-              className="mt-2 flex items-center gap-3 text-sm text-black"
+            <Link
+              href="/soporte"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 flex items-center gap-3 py-2 text-sm text-black"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5 fill-black/70" aria-hidden>
                 <path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
               </svg>
               Artículos prohibidos
-            </button>
+            </Link>
           </div>
           <div className="flex flex-1 flex-col gap-2">
             <label className="text-xs font-medium text-black">

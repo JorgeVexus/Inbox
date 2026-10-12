@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useModalA11y } from "@/components/ui/use-modal-a11y";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { guardarDomicilio } from "@/lib/domicilios";
 import { domicilioVacio } from "@/types/domicilio";
@@ -19,14 +20,8 @@ export function DomicilioModal({
   onClose: () => void;
   onSuccess: (domicilio: Domicilio) => void;
 }) {
-  // Escape cierra el modal (accesibilidad por teclado).
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModalA11y(panelRef, onClose);
 
   const [datos, setDatos] = useState<Omit<Domicilio, "id"> & { id?: string }>(
     domicilio ?? domicilioVacio(),
@@ -82,6 +77,7 @@ export function DomicilioModal({
       onClick={onClose}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={domicilio ? "Editar dirección" : "Agregar dirección"}

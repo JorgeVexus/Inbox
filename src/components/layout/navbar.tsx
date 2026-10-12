@@ -30,7 +30,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-[1100] bg-primary shadow-nav">
       <div className="mx-auto flex h-[91px] max-w-[1440px] items-center justify-between gap-6 px-6 lg:px-10">
-        <Link href="/" className="relative h-[64px] w-[220px] shrink-0">
+        <Link href="/" className="relative h-[64px] w-[170px] shrink-0 xl:w-[220px]">
           <Image
             src="/images/logo-blanco-horizontal.png"
             alt="Inbox"
@@ -41,12 +41,12 @@ export function Navbar() {
           />
         </Link>
 
-        <nav aria-label="Principal" className="hidden items-center gap-10 lg:flex">
+        <nav aria-label="Principal" className="hidden items-center gap-5 lg:flex xl:gap-10">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
               href={link.href}
-              className="flex items-center gap-2 font-display text-lg font-bold text-white/80 transition-colors hover:text-white"
+              className="flex items-center gap-2 font-display text-lg font-bold text-white transition-colors hover:underline hover:underline-offset-4"
             >
               {link.label}
               {link.hasChevron && (
@@ -62,28 +62,28 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-8 lg:flex">
-          <button
-            type="button"
-            aria-label="Buscar"
+        <div className="hidden min-w-0 items-center gap-4 lg:flex xl:gap-8">
+          <Link
+            href="/rastreo"
+            aria-label="Buscar un envío"
             className="group flex h-[43px] w-[42px] items-center justify-center overflow-hidden rounded-md border-2 border-white/80 bg-primary transition-[width] duration-200 hover:w-[169px]"
           >
             <span className="flex h-full w-[42px] shrink-0 items-center justify-center">
               <Image src="/icons/search.svg" alt="" width={22} height={22} />
             </span>
-          </button>
+          </Link>
           {session ? (
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/perfil"
-                className="font-display text-base font-bold text-white underline-offset-4 hover:underline"
+                className="max-w-[130px] truncate font-display text-base font-bold text-white underline-offset-4 hover:underline xl:max-w-[260px]"
               >
                 Hola, {session.nombre}
               </Link>
               <button
                 type="button"
                 onClick={logout}
-                className="inline-flex items-center justify-center rounded-md border-2 border-white/60 px-4 py-3 font-display text-sm font-bold text-white transition-colors hover:border-white"
+                className="inline-flex shrink-0 items-center justify-center rounded-md border-2 border-white/60 px-3 py-3 font-display text-sm font-bold text-white transition-colors hover:border-white xl:px-4"
               >
                 Cerrar sesión
               </button>
@@ -120,7 +120,7 @@ export function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="font-display text-lg font-bold text-white/90"
+                className="font-display text-lg font-bold text-white"
                 onClick={() => setOpen(false)}
               >
                 {link.label}

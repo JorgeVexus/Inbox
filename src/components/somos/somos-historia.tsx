@@ -26,21 +26,21 @@ const CARDS = [
 export function SomosHistoria() {
   return (
     <section className="mx-auto flex max-w-[1330px] flex-col items-center gap-10 px-6 py-16 lg:flex-row lg:items-center lg:px-16">
-      <div className="flex w-full flex-col divide-y divide-neutral-line lg:max-w-[796px]">
+      <div className="flex w-full flex-col divide-y divide-neutral-line lg:min-w-0 lg:max-w-[796px] lg:flex-1">
         {CARDS.map((card) => (
           <div
             key={card.title}
             className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:gap-8"
           >
-            <h3 className="w-full shrink-0 font-display text-xl font-bold text-black sm:w-[220px] sm:text-[25px]">
+            <h2 className="w-full shrink-0 font-display text-xl font-bold text-black sm:w-[220px] sm:text-[25px]">
               {card.title}
-            </h3>
+            </h2>
             <p className="text-xs text-black">{card.description}</p>
           </div>
         ))}
       </div>
 
-      <div className="relative h-[280px] w-full shrink-0 lg:h-[444px] lg:w-[665px]">
+      <div className="relative h-[280px] w-full shrink-0 lg:h-[340px] lg:w-[340px] xl:h-[444px] xl:w-[665px]">
         <Image
           src="/images/somos-auto.png"
           alt="Camioneta de reparto Inbox"

@@ -91,7 +91,12 @@ export function Servicios() {
         </div>
       </div>
 
-      <div className="-mx-6 flex gap-6 overflow-x-auto px-6 pb-4 lg:-mx-16 lg:px-16">
+      <div
+        role="region"
+        aria-label="Servicios de Inbox (desplazable)"
+        tabIndex={0}
+        className="-mx-6 flex gap-6 overflow-x-auto px-6 pb-4 lg:-mx-16 lg:px-16"
+      >
         {SERVICES.map((service) => (
           <article
             key={service.title}

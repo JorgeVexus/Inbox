@@ -9,7 +9,7 @@
 | | |
 |---|---|
 | **Última actualización** | 2026-10-12 (sesión 3, auditoría QA) |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 107 tests pasando; auditoría QA pre-Vercel aplicada |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 147 tests pasando; QA módulo por módulo completada (ver `docs/QA_MODULO_POR_MODULO.md`) |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
 ---
@@ -146,6 +146,8 @@ bloqueado, B1).
 | **B6** | Sin URL/credenciales de **producción** (`api.inbox.com.mx`) ni confirmar que tenga la misma protección. | Cliente | Lanzamiento | Pendiente de preguntar. |
 | **B8** | **Los formularios de contacto no envían nada**: el de `/soporte` y el del chat (`src/lib/soporte.ts`) solo simulan éxito. En producción un cliente creería que su mensaje llegó. Hay que decidir el destino (correo vía Resend, CRM, webhook o widget de terceros). | Producto / cliente | **No lanzar a producción así** (o quitar/ocultar los formularios) | Pendiente de decidir. |
 | **B9** | **Modo demo en producción**: login mock (`INBOX`/`Prueba`), `/envio`, `/perfil`, `/recoleccion`, cotizador y pago son mock y muestran datos de ejemplo. Antes de lanzar: o se conectan (B2/B3/B4) o se ocultan los links del Navbar y se marcan claramente. | Depende de B2–B4 | Producción | Pendiente. |
+| **B10** | **Contenido provisional que hay que pedir al cliente**: respuestas reales del FAQ (las 4 muestran el mismo texto) y del chat; URLs reales de Facebook/Instagram/LinkedIn; correo oficial de soporte (el sitio mezcla `soporte@` e `info@`); **aviso de privacidad y términos y condiciones** (obligatorios en México; hoy `/privacidad` y `/terminos` son páginas "Próximamente"); bolsa de trabajo; aclarar el interruptor US/MX del Hero. | Cliente | No lanzar con textos de relleno | Pendiente (agregar al próximo mensaje). |
+| **B11** | **Mapa**: el sitio usa teselas públicas de OpenStreetMap, cuya política no permite tráfico comercial intenso. Decidir proveedor de teselas (MapTiler, Stadia, propio) antes de producción. Además solo 32 de 71 oficinas reales traen coordenadas. | Jefe / presupuesto | Producción | Pendiente de decidir. |
 | **B7** | Más guías de prueba: las 3 entregadas son todas `ENTREGADA`. Faltan guías en tránsito / "LISTO PARA ENTREGAR" para validar el timeline y la fecha prometida. | Cliente | Validación del timeline | En el mensaje. |
 
 ---
@@ -163,6 +165,8 @@ bloqueado, B1).
 3. **Rate limiting** de `/api/*` (necesita un store compartido, p.ej. Upstash Redis; ver TODO en `route-helpers.ts`).
 4. **Conectar al BFF los endpoints de lectura que ya funcionan**: `ListadoOficinas`/`Cobertura` (mapa y sucursales), `BusquedaCP`, `TipoEnvio`/`TipoEntrega`, `ObtenerHorariosPorCP` — con el mismo patrón de `proxySibox()`. Se podrán ver cuando B1 se resuelva.
 5. Mostrar en `/rastreo` la **firma** y quién recibió **solo** cuando exista el endpoint autenticado (hoy se anulan por privacidad).
+
+**B3. Para conectar los endpoints de lectura (contrato ya verificado)**: `src/lib/api/schemas/catalogos.ts` (con pruebas contra las 71 oficinas reales) contiene los esquemas de `ListadoOficinas`, `BusquedaCP` y `ObtenerHorariosPorCP`. Falta crear las rutas `/api/*` y cambiar los seams (`sucursales.ts`, `codigo-postal.ts`, `recoleccion.ts`). Ojo: `BusquedaCP`/`ObtenerHorariosPorCP` NO devuelven vacío con un CP inexistente (el esquema ya lo trata como "no encontrado"), y `DomiciliosRecoleccionesCliente` ignora `K_ClienteSIBOX` y responde según el token (por eso "Mis direcciones" por persona requiere login por cliente, B2). Poner rate limit antes de abrir esas rutas.
 
 **B2. Auditoría QA pre-Vercel (2026-10-12) — pendientes menores**
 - CSP completa con nonce (hoy solo `frame-ancestors`/`form-action`; no se probó una estricta con el mapa de OpenStreetMap).
@@ -271,6 +275,8 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-12 (sesión 3, parte 3 — QA módulo por módulo)** — Revisión de M1–M13 (ver `docs/QA_MODULO_POR_MODULO.md`). BFF probado contra la API real con un puente local (curl) porque Cloudflare sigue bloqueando a Node: 1 solo Login con 15 peticiones simultáneas, datos personales siempre en null. Contrato real fijado en `schemas/catalogos.ts`. Corregidos: parser de horarios (12 de 42 textos reales mostraban "Cerrado" sin saberlo), desbordes a 1024 px en cotizador/somos/navbar con sesión, controles muertos, límite de 10 guías, modales con foco atrapado, foco visible, páginas legales 404, CLS 0.39→0 en /cotizar (Lighthouse móvil: 95/100/100/100), mapa perezoso. Nuevos bloqueos B10 (contenido del cliente) y B11 (teselas del mapa). 147 tests.
 
 - **2026-10-12 (sesión 3, parte 2 — correcciones de la auditoría)** — Probado en navegador con
   casos hostiles. Corregido: validación real (CP de 5 dígitos solo numérico, peso/medidas > 0,

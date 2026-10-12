@@ -82,7 +82,7 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
                 )}
               </div>
               <p className="text-sm text-black/80">
-                {d.calle} {d.numero}, {d.colonia}
+                {[`${d.calle} ${d.numero}`.trim(), d.colonia].filter(Boolean).join(", ")}
                 <br />
                 {d.ciudad}, {d.estado} — CP {d.cp}
               </p>
@@ -95,7 +95,7 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
                 <button
                   type="button"
                   onClick={() => setModal(d)}
-                  className="text-primary underline"
+                  className="px-2 py-2 text-primary underline"
                 >
                   Editar
                 </button>
@@ -103,7 +103,7 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
                   type="button"
                   onClick={() => handleEliminar(d.id)}
                   disabled={eliminando === d.id}
-                  className="text-black/60 underline disabled:opacity-50"
+                  className="px-2 py-2 text-black/60 underline disabled:opacity-50"
                 >
                   {eliminando === d.id ? "Eliminando…" : "Eliminar"}
                 </button>

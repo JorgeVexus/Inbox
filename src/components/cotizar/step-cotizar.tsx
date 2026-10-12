@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type {
@@ -102,7 +103,7 @@ export function StepCotizar({
       onSubmit={handleSubmit}
       className="flex w-full flex-col items-center gap-10 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12"
     >
-      <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-start lg:justify-center">
+      <div className="flex w-full flex-col items-center gap-8 xl:flex-row xl:items-start xl:justify-center">
         <DireccionCard label="Origen" value={origen} onChange={setOrigen} />
         <button
           type="button"
@@ -202,7 +203,7 @@ function DireccionCard({
       <p className="font-display text-2xl font-bold text-black">{label}</p>
       <div className="flex w-full flex-col gap-3 rounded-md bg-white p-5 shadow-card">
         <div className="flex flex-col gap-1.5">
-          <p className="text-xs font-medium text-secondary-dark">
+          <p className="text-xs font-medium text-[#707372]">
             Ingrese el C.P de {label.toLowerCase()}
           </p>
           <div className="flex items-start gap-2.5">
@@ -215,13 +216,15 @@ function DireccionCard({
               aria-label={`Código postal de ${label.toLowerCase()}`} placeholder="Código postal"
               className="h-[53px] flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
             />
-            <button
-              type="button"
-              aria-label="Buscar sucursal"
+            <Link
+              href="/cobertura"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Buscar sucursal (abre el mapa de cobertura)"
               className="flex h-[53px] w-[53px] shrink-0 items-center justify-center rounded-md border-2 border-primary bg-white p-1"
             >
               <Image src="/icons/map-search.svg" alt="" width={24} height={24} />
-            </button>
+            </Link>
           </div>
         </div>
         <input
@@ -333,7 +336,7 @@ function PaqueteCard({
               onChange={(v) => onChange({ ancho: v })}
             />
           </div>
-          <div className="flex justify-end gap-4 pr-3 text-xs text-secondary-dark">
+          <div className="flex justify-end gap-4 pr-3 text-xs text-[#707372]">
             <span className="w-[82px] text-right">Alto</span>
             <span className="w-[82px] text-right">Largo</span>
             <span className="w-[82px] text-right">Ancho</span>
@@ -348,7 +351,7 @@ function PaqueteCard({
                 type="button"
                 aria-label="Aumentar cantidad"
                 onClick={() => onChange({ cantidad: Math.min(99, paquete.cantidad + 1) })}
-                className="rotate-180"
+                className="flex h-6 w-6 items-center justify-center rotate-180"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-black">
                   <path d="M7 10l5 5 5-5z" />
@@ -360,6 +363,7 @@ function PaqueteCard({
                 onClick={() =>
                   onChange({ cantidad: Math.max(1, paquete.cantidad - 1) })
                 }
+                className="flex h-6 w-6 items-center justify-center"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-black">
                   <path d="M7 10l5 5 5-5z" />
@@ -367,7 +371,7 @@ function PaqueteCard({
               </button>
             </div>
           </div>
-          <p className="text-xs font-medium text-secondary-dark">
+          <p className="text-xs font-medium text-[#707372]">
             Peso total {(Number(paquete.peso) || 0) * paquete.cantidad} kg
           </p>
         </div>
@@ -395,7 +399,7 @@ function MedidaInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label} placeholder="0"
-        className="w-full min-w-0 text-right text-xs font-medium text-black outline-none"
+        className="h-full w-full min-w-0 text-right text-xs font-medium text-black outline-none"
       />
       <span className="shrink-0 text-xs font-medium text-black">{unit}</span>
     </div>

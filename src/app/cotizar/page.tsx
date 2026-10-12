@@ -55,6 +55,7 @@ export default function CotizarPage() {
       <WizardStepper current={step} completed={completed} onNavigate={goTo} />
 
       <div className="flex w-full flex-1 flex-col">
+        {step === "cotizar" && !ready && <div aria-hidden className="min-h-[1100px] rounded-xl bg-neutral-bg" />}
         {step === "cotizar" && ready && (
           <StepCotizar
             initial={cotizacion}

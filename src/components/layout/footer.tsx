@@ -82,9 +82,9 @@ export function Footer() {
         <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center justify-center gap-4 font-display text-xs font-bold text-white lg:gap-6">
             <p>{new Date().getFullYear()} Inbox todos los derechos reservados</p>
-            <Link href="/trabaja-en-inbox">Trabaja en Inbox</Link>
-            <Link href="/privacidad">Política de privacidad</Link>
-            <Link href="/terminos">Términos y condiciones</Link>
+            <Link href="/trabaja-en-inbox" className="inline-block py-2">Trabaja en Inbox</Link>
+            <Link href="/privacidad" className="inline-block py-2">Política de privacidad</Link>
+            <Link href="/terminos" className="inline-block py-2">Términos y condiciones</Link>
           </div>
 
           <div className="flex items-center gap-5">

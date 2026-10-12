@@ -49,7 +49,7 @@ export function PerfilView() {
     <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[1200px] px-5 pt-8 sm:px-8 lg:px-10">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
-          <Link href="/" className="transition-colors hover:text-primary">Inicio</Link>
+          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">Inicio</Link>
           <span aria-hidden="true" className="mx-2">›</span>
           <span aria-current="page" className="font-bold text-black">Mi perfil</span>
         </nav>

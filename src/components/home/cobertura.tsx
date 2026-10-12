@@ -2,9 +2,21 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { LazyMount } from "@/components/ui/lazy-mount";
 import { useMemo, useState } from "react";
 import { getCiudades, getEstados, getSucursales } from "@/lib/sucursales";
-import { estaAbiertoAhora } from "@/lib/horario";
+import { estadoHorario, type EstadoHorario } from "@/lib/horario";
+
+const PUNTO_ESTADO: Record<EstadoHorario, string> = {
+  abierto: "bg-green-500",
+  cerrado: "bg-secondary-dark",
+  desconocido: "bg-secondary-dark/40",
+};
+const ETIQUETA_ESTADO: Record<EstadoHorario, string> = {
+  abierto: "Abierto",
+  cerrado: "Cerrado",
+  desconocido: "Horario no disponible",
+};
 import type { Sucursal } from "@/types/sucursal";
 
 const CoberturaMap = dynamic(
@@ -12,7 +24,7 @@ const CoberturaMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-neutral-bg text-sm text-secondary-dark">
+      <div className="flex h-full w-full items-center justify-center bg-neutral-bg text-sm text-[#707372]">
         Cargando mapa…
       </div>
     ),
@@ -64,7 +76,7 @@ export function Cobertura({
       <div className="flex flex-col items-center gap-8 lg:flex-row">
         {headlineImage && (
           <div className="relative h-[220px] w-full shrink-0 sm:h-[280px] lg:h-[320px] lg:w-[480px]">
-            <Image src={headlineImage} alt="" fill className="object-contain" />
+            <Image src={headlineImage} alt="" fill priority sizes="(min-width: 1024px) 480px, 100vw" className="object-contain" />
           </div>
         )}
         <div className="flex flex-col gap-4">
@@ -89,16 +101,18 @@ export function Cobertura({
 
       <div className="relative flex h-[480px] w-full flex-col overflow-hidden rounded-xl sm:h-[629px]">
         <div className="absolute inset-0">
-          <CoberturaMap
-            sucursales={filtradas}
-            onSelect={setSeleccionada}
-            selectedOficina={seleccionada?.K_Oficina ?? null}
-          />
+          <LazyMount className="h-full w-full">
+            <CoberturaMap
+              sucursales={filtradas}
+              onSelect={setSeleccionada}
+              selectedOficina={seleccionada?.K_Oficina ?? null}
+            />
+          </LazyMount>
         </div>
 
         <div className="pointer-events-none absolute left-1/2 top-4 z-[500] flex w-full max-w-[560px] -translate-x-1/2 flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-center">
           <select
-            aria-label="Estado"
+            aria-label="Filtrar el mapa por estado"
             value={kEstado}
             onChange={(e) => {
               setKEstado(e.target.value === "" ? "" : Number(e.target.value));
@@ -114,7 +128,7 @@ export function Cobertura({
             ))}
           </select>
           <select
-            aria-label="Ciudad"
+            aria-label="Filtrar el mapa por ciudad"
             value={kCiudad}
             onChange={(e) =>
               setKCiudad(e.target.value === "" ? "" : Number(e.target.value))
@@ -136,7 +150,7 @@ export function Cobertura({
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              aria-label="Buscar" placeholder="Buscar"
+              aria-label="Buscar sucursal en el mapa" placeholder="Buscar"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <Image src="/icons/search2.svg" alt="" width={20} height={20} />
@@ -150,6 +164,7 @@ export function Cobertura({
             </p>
             <button
               type="button"
+              aria-pressed={tiposVisibles.sucursal}
               onClick={() =>
                 setTiposVisibles((v) => ({ ...v, sucursal: !v.sucursal }))
               }
@@ -163,6 +178,7 @@ export function Cobertura({
             </button>
             <button
               type="button"
+              aria-pressed={tiposVisibles.distribucion}
               onClick={() =>
                 setTiposVisibles((v) => ({ ...v, distribucion: !v.distribucion }))
               }
@@ -178,6 +194,14 @@ export function Cobertura({
             </button>
           </div>
         </div>
+
+        {filtradas.length === 0 && (
+          <div role="status" className="pointer-events-none absolute inset-0 z-[400] flex items-center justify-center px-6">
+            <p className="rounded-md bg-white px-5 py-3 text-center text-sm font-medium text-black shadow-card">
+              No encontramos sucursales con esos filtros.
+            </p>
+          </div>
+        )}
 
         {seleccionada && (
           <SucursalPanel
@@ -201,7 +225,7 @@ function SucursalPanel({
   sucursal: Sucursal;
   onClose: () => void;
 }) {
-  const abierto = estaAbiertoAhora(sucursal.Observaciones);
+  const estado = estadoHorario(sucursal.Observaciones);
 
   return (
     <div className="absolute inset-0 z-[600] flex justify-end sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[380px]">
@@ -218,7 +242,7 @@ function SucursalPanel({
             </svg>
           </button>
           <div className="flex h-[53px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card">
-            <span className="text-sm text-secondary-dark">Buscar</span>
+            <span className="text-sm text-[#707372]">Buscar</span>
             <Image src="/icons/search2.svg" alt="" width={18} height={18} />
           </div>
         </div>
@@ -241,14 +265,8 @@ function SucursalPanel({
 
         <div className="flex flex-col gap-6 rounded-md bg-white px-6 py-5 shadow-card-sm">
           <div className="flex items-center gap-1.5">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${
-                abierto ? "bg-green-500" : "bg-secondary-dark"
-              }`}
-            />
-            <span className="text-xs font-semibold text-black">
-              {abierto ? "Abierto" : "Cerrado"}
-            </span>
+            <span className={`h-2.5 w-2.5 rounded-full ${PUNTO_ESTADO[estado]}`} />
+            <span className="text-xs font-semibold text-black">{ETIQUETA_ESTADO[estado]}</span>
           </div>
 
           <p className="font-display text-lg font-bold text-black">
@@ -379,7 +397,7 @@ export function CoberturaCTA() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              aria-label="Buscar" placeholder="Buscar"
+              aria-label="Buscar sucursal en la lista" placeholder="Buscar"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <Image src="/icons/search2.svg" alt="" width={20} height={20} />
@@ -410,7 +428,7 @@ export function CoberturaCTA() {
               Seleccione un estado del país
             </p>
             <select
-              aria-label="Estado"
+              aria-label="Estado de la sucursal"
               value={kEstado}
               onChange={(e) => {
                 setKEstado(e.target.value === "" ? "" : Number(e.target.value));
@@ -441,7 +459,7 @@ export function CoberturaCTA() {
               Seleccione una ciudad del estado
             </p>
             <select
-              aria-label="Ciudad"
+              aria-label="Ciudad de la sucursal"
               value={kCiudad}
               disabled={kEstado === ""}
               onChange={(e) =>
@@ -506,7 +524,7 @@ export function CoberturaCTA() {
 }
 
 function FilaCobertura({ sucursal }: { sucursal: Sucursal }) {
-  const abierto = estaAbiertoAhora(sucursal.Observaciones);
+  const estado = estadoHorario(sucursal.Observaciones);
   const direccionesHref =
     sucursal.Latitud != null && sucursal.Longitud != null
       ? `https://www.google.com/maps/search/?api=1&query=${sucursal.Latitud},${sucursal.Longitud}`
@@ -520,12 +538,8 @@ function FilaCobertura({ sucursal }: { sucursal: Sucursal }) {
       style={{ gridTemplateColumns: COLUMN_TEMPLATE }}
     >
       <span className="flex items-center gap-1.5">
-        <span
-          className={`h-2.5 w-2.5 rounded-full ${
-            abierto ? "bg-green-500" : "bg-secondary-dark"
-          }`}
-        />
-        {abierto ? "abierto" : "cerrado"}
+        <span className={`h-2.5 w-2.5 rounded-full ${PUNTO_ESTADO[estado]}`} />
+        {ETIQUETA_ESTADO[estado].toLowerCase()}
       </span>
       <span>{sucursal.D_Ciudad}</span>
       <span className="flex items-center gap-3">
@@ -544,7 +558,7 @@ function FilaCobertura({ sucursal }: { sucursal: Sucursal }) {
       </span>
       <span>{sucursal.Telefono ?? "—"}</span>
       <span>{sucursal.D_Oficina}</span>
-      <span>{sucursal.Observaciones ?? "—"}</span>
+      <span className="whitespace-pre-line">{sucursal.Observaciones ?? "—"}</span>
     </div>
   );
 }

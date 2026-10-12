@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { useModalA11y } from "@/components/ui/use-modal-a11y";
 
 type Status = "idle" | "submitting" | "error";
 
@@ -23,13 +24,8 @@ function LoginModalForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") closeLogin();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [closeLogin]);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModalA11y(panelRef, closeLogin);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,6 +57,7 @@ function LoginModalForm() {
       onClick={closeLogin}
     >
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Iniciar sesión"
@@ -139,7 +136,7 @@ function LoginModalForm() {
             <Link
               href="/cuenta/recuperar"
               onClick={closeLogin}
-              className="font-display text-sm text-black hover:text-primary"
+              className="inline-block py-2 font-display text-sm text-black hover:text-primary"
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -162,7 +159,7 @@ function LoginModalForm() {
             <Link
               href="/cuenta/crear"
               onClick={closeLogin}
-              className="text-primary hover:underline"
+              className="inline-block py-2 text-primary hover:underline"
             >
               Crear cuenta
             </Link>

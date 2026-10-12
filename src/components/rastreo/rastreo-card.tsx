@@ -65,7 +65,7 @@ export function RastreoCard({
           <button
             type="button"
             onClick={onQuitar}
-            className="shrink-0 text-xs font-medium text-primary underline"
+            className="shrink-0 px-2 py-2 text-xs font-medium text-primary underline"
           >
             Quitar
           </button>
@@ -97,7 +97,7 @@ export function RastreoCard({
           type="button"
           onClick={onQuitar}
           aria-label={`Quitar guía ${guia}`}
-          className="text-black/40 hover:text-black"
+          className="-m-2 flex h-10 w-10 items-center justify-center text-black/40 hover:text-black"
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
             <path d="M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.29 1.41 1.41 6.3-6.29 6.3 6.29 1.41-1.41-6.3-6.29 6.3-6.3z" />
@@ -128,7 +128,7 @@ export function RastreoCard({
               </span>
               <p
                 className={`max-w-[110px] text-center text-xs font-medium sm:text-sm ${
-                  i <= paso ? "text-black" : "text-secondary-dark"
+                  i <= paso ? "text-black" : "text-[#707372]"
                 }`}
               >
                 {p.label}
@@ -187,7 +187,7 @@ export function RastreoCard({
                   <span className="text-xs text-black/50">{evento.Observaciones}</span>
                 )}
               </div>
-              <span className="text-xs font-medium text-secondary-dark">
+              <span className="text-xs font-medium text-[#707372]">
                 {formatFechaCorta(evento.F_Estatus)}
               </span>
             </div>
