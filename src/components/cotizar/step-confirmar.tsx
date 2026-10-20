@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { AvisoPrivacidadCorto } from "@/components/ui/aviso-privacidad-corto";
 import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
 import { useAuth } from "@/components/auth/auth-provider";
 import { listarContactos } from "@/lib/contactos";
@@ -240,6 +241,7 @@ export function StepConfirmar({
             {motivo}
           </p>
         )}
+        <AvisoPrivacidadCorto finalidad="generar tu guía y entregar tu envío" />
         <Button type="submit" disabled={!canSubmit} className="disabled:cursor-not-allowed disabled:opacity-50">
           Continuar
         </Button>

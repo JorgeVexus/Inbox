@@ -111,5 +111,9 @@ describe("proxySibox con límite", () => {
     expect(limiteDesactivado()).toBe(true);
     vi.stubEnv("RATE_LIMIT_DISABLED", "");
     expect(limiteDesactivado()).toBe(false);
+    // En Vercel se ignora aunque alguien lo defina por error.
+    vi.stubEnv("RATE_LIMIT_DISABLED", "1");
+    vi.stubEnv("VERCEL", "1");
+    expect(limiteDesactivado()).toBe(false);
   });
 });

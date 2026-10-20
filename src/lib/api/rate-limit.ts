@@ -80,12 +80,17 @@ export function ipDelCliente(request: Request): string {
 export const LIMITES = {
   rastreo: { nombre: "rastreo", max: 30, ventanaMs: 60_000 },
   rastreoDetalle: { nombre: "rastreo-detalle", max: 30, ventanaMs: 60_000 },
+  // Los monitores externos de disponibilidad consultan cada minuto o menos desde pocas IP.
+  salud: { nombre: "salud", max: 60, ventanaMs: 60_000 },
 } as const satisfies Record<string, ConfigLimite>;
 
 /** Limitador compartido por todos los Route Handlers de esta instancia. */
 export const revisarLimite = crearLimitador();
 
-/** `RATE_LIMIT_DISABLED=1` solo para la suite E2E, que repite muchas peticiones desde una misma IP. */
+/**
+ * `RATE_LIMIT_DISABLED=1` solo para la suite E2E, que repite muchas peticiones desde una misma IP.
+ * Se ignora en Vercel (que define `VERCEL`): un descuido de configuración no debe dejar producción sin límite.
+ */
 export function limiteDesactivado(): boolean {
-  return process.env.RATE_LIMIT_DISABLED === "1";
+  return process.env.RATE_LIMIT_DISABLED === "1" && !process.env.VERCEL;
 }

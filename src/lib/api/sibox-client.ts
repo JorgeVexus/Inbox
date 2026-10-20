@@ -209,6 +209,16 @@ async function getSession(forceRefresh = false) {
   return loginEnCurso;
 }
 
+/**
+ * Estado grueso de la conexión con SIBOX, para `/api/salud` (sin detalles internos, que son públicos):
+ * "ok" = hay sesión; "degradado" = el último Login falló y se está en enfriamiento; "desconocido" =
+ * aún no se ha intentado (arranque en frío).
+ */
+export function estadoSibox(): "ok" | "degradado" | "desconocido" {
+  if (ultimoFalloLogin && Date.now() - ultimoFalloLogin.en < LOGIN_COOLDOWN_MS) return "degradado";
+  return cachedSession ? "ok" : "desconocido";
+}
+
 async function getToken(forceRefresh = false): Promise<string> {
   return (await getSession(forceRefresh)).token;
 }

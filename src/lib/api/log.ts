@@ -26,8 +26,15 @@ function aTexto(valor: unknown): string {
   }
 }
 
-/** `console.error` seguro: nunca imprime objetos de error completos (pueden traer cuerpos de respuesta). */
-export function logError(contexto: string, detalle?: unknown): void {
-  const resto = detalle === undefined ? "" : ` -> ${enmascarar(aTexto(detalle).slice(0, 2000)).slice(0, 500)}`;
-  console.error(`${contexto}${resto}`);
+/**
+ * Registro de errores del servidor en una línea JSON (se puede buscar y filtrar en los registros de
+ * Vercel). `requestId` correlaciona todas las líneas de una misma petición con el encabezado
+ * `X-Request-Id` que recibe quien llamó: si alguien reporta un fallo, ese identificador lleva a la
+ * línea exacta. Nunca imprime objetos de error completos (pueden traer cuerpos de respuesta).
+ */
+export function logError(contexto: string, detalle?: unknown, requestId?: string): void {
+  const linea: Record<string, string> = { nivel: "error", evento: contexto, t: new Date().toISOString() };
+  if (detalle !== undefined) linea.detalle = enmascarar(aTexto(detalle).slice(0, 2000)).slice(0, 500);
+  if (requestId) linea.requestId = requestId;
+  console.error(JSON.stringify(linea));
 }

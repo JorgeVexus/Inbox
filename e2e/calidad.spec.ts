@@ -135,3 +135,19 @@ test("rastreo: muestra el último estado y la línea de tiempo accesible", async
   await expect(page.locator("[aria-current='step']")).toHaveCount(1);
   await expect(page.getByText("(completado)").first()).toBeAttached();
 });
+
+test("los formularios con datos personales muestran el aviso de privacidad corto con enlace", async ({ page }) => {
+  // Soporte: formulario de contacto.
+  await page.goto("/soporte");
+  const aviso = page.getByText("Usaremos tus datos únicamente para responder tu mensaje");
+  await expect(aviso).toBeVisible();
+  const enlace = page.getByRole("link", { name: "Aviso de privacidad" }).first();
+  await expect(enlace).toHaveAttribute("href", "/privacidad");
+  await expect(enlace).toHaveAttribute("rel", /noopener/);
+  await expect(enlace).toHaveAttribute("target", "_blank");
+
+  // Chat flotante: formulario de correo.
+  await page.getByRole("button", { name: "Abrir chat de soporte" }).click();
+  await page.getByRole("button", { name: "Chat", exact: true }).click();
+  await expect(page.getByText("Usaremos tus datos únicamente para que un asesor te contacte")).toBeVisible();
+});

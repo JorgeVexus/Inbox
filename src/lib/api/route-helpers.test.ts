@@ -169,3 +169,64 @@ describe("proxySibox: defensa entre sitios", () => {
     expect((await llamar({})).res.status).toBe(415);
   });
 });
+
+describe("proxySibox: correlación", () => {
+  async function llamar(headers: Record<string, string>) {
+    vi.resetModules();
+    vi.stubGlobal("fetch", vi.fn());
+    const { proxySibox } = await import("@/lib/api/route-helpers");
+    return proxySibox(
+      new Request("http://localhost/api/x", {
+        method: "POST",
+        headers: { "content-type": "application/json", ...headers },
+        body: "{roto",
+      }),
+      {
+        endpoint: "/wsX",
+        requestSchema: z.object({ Guia: z.string() }),
+        responseSchema: z.unknown(),
+        notFoundMessage: "n",
+        genericErrorMessage: "g",
+      },
+    );
+  }
+
+  it("toda respuesta (también los rechazos) lleva X-Request-Id, propio o el de Vercel", async () => {
+    const propio = await llamar({});
+    expect(propio.status).toBe(400);
+    expect(propio.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{36}$/);
+    const deVercel = await llamar({ "x-vercel-id": "dfw1::abcde-123" });
+    expect(deVercel.headers.get("X-Request-Id")).toBe("dfw1::abcde-123");
+  });
+});
+
+describe("proxySibox: SIBOX inalcanzable", () => {
+  it("responde 503 genérico (no 500) cuando fetch ni siquiera conecta", async () => {
+    vi.resetModules();
+    process.env.SIBOX_API_BASE_URL = BASE_URL;
+    process.env.SIBOX_SERVICE_USER = "u";
+    process.env.SIBOX_SERVICE_PASSWORD = "p";
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("fetch failed")));
+    const espia = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { proxySibox } = await import("@/lib/api/route-helpers");
+    const res = await proxySibox(
+      new Request("http://localhost/api/x", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ Guia: "1" }),
+      }),
+      {
+        endpoint: "/wsX",
+        requestSchema: z.object({ Guia: z.string() }),
+        responseSchema: z.unknown(),
+        notFoundMessage: "n",
+        genericErrorMessage: "g",
+      },
+    );
+    expect(res.status).toBe(503);
+    expect(JSON.stringify(await res.json())).not.toMatch(/fetch failed|localhost/);
+    expect(String(espia.mock.calls[0]?.[0])).toContain("inalcanzable");
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+});

@@ -22,6 +22,7 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm run lint
+      - run: npm run qa:formato
       - run: npm run test:cobertura
       - run: npm run qa:muerto
       - name: Auditoría de dependencias de producción

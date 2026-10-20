@@ -1,0 +1,30 @@
+name: Nocturno
+
+# Pruebas pesadas que no conviene correr en cada push: toda la suite E2E en los 4 navegadores
+# (Chrome, Firefox, WebKit/Safari y móvil) y el análisis de pesos. Si falla, GitHub avisa por correo.
+on:
+  schedule:
+    - cron: "0 8 * * *" # 08:00 UTC = 02:00 en Ciudad de México
+  workflow_dispatch:
+
+jobs:
+  e2e-completo:
+    name: E2E en 4 navegadores
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npm run build
+      - run: npx playwright test --workers=2
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-nocturno
+          path: test-results/
+          retention-days: 14

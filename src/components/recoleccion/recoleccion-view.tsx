@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/auth/auth-provider";
 import { PantallaSinSesion, useAbrirLoginSinSesion } from "@/components/auth/pantalla-sin-sesion";
 import { Button } from "@/components/ui/button";
+import { AvisoPrivacidadCorto } from "@/components/ui/aviso-privacidad-corto";
 import { listarDomicilios } from "@/lib/domicilios";
 import { diasDisponibles, obtenerHorariosPorCP, programarRecoleccion, ventanasDisponibles } from "@/lib/recoleccion";
 import type { Domicilio } from "@/types/domicilio";
@@ -344,6 +345,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
               </p>
             )}
 
+            <AvisoPrivacidadCorto finalidad="programar tu recolección" />
             <Button
               type="submit"
               disabled={!canSubmit || enviando}

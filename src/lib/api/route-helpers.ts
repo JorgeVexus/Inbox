@@ -74,9 +74,13 @@ async function leerJson(request: Request): Promise<{ body: unknown } | { rechazo
 }
 
 /** Traduce un fallo al hablar con SIBOX a una respuesta genérica; el detalle solo va a los registros. */
-function traducirError(err: unknown, opts: { endpoint: string; notFoundMessage: string; genericErrorMessage: string }) {
+function traducirError(
+  err: unknown,
+  opts: { endpoint: string; notFoundMessage: string; genericErrorMessage: string },
+  requestId: string,
+) {
   if (err instanceof SiboxBlockedError) {
-    logError(err.message);
+    logError(err.message, undefined, requestId);
     return respuesta("El servicio no está disponible por el momento. Intenta más tarde.", 503);
   }
   if (err instanceof SiboxApiError) {
@@ -84,29 +88,44 @@ function traducirError(err: unknown, opts: { endpoint: string; notFoundMessage: 
     // El texto de SIBOX puede ser un error interno con detalles de base de datos (p.ej. "Could
     // not find stored procedure 'GP_Valida_...'", visto en ObtieneDetalleCostos 2026-10-12):
     // nunca llega al navegador.
-    logError(`${opts.endpoint}: SIBOX respondio result:1`, err.message);
+    logError(`${opts.endpoint}: SIBOX respondio result:1`, err.message, requestId);
     return respuesta(opts.genericErrorMessage, 502);
   }
   if (err instanceof DOMException && err.name === "TimeoutError") {
-    logError(`${opts.endpoint}: SIBOX no respondio a tiempo`);
+    logError(`${opts.endpoint}: SIBOX no respondio a tiempo`, undefined, requestId);
     return respuesta("El servicio tardó demasiado en responder. Intenta de nuevo.", 504);
   }
-  logError(`${opts.endpoint}: error inesperado`, err);
+  // `fetch` no pudo ni conectar (SIBOX apagado, DNS, red caída): es indisponibilidad, no un error nuestro.
+  if (err instanceof TypeError && err.message === "fetch failed") {
+    logError(`${opts.endpoint}: SIBOX inalcanzable`, err, requestId);
+    return respuesta("El servicio no está disponible por el momento. Intenta más tarde.", 503);
+  }
+  logError(`${opts.endpoint}: error inesperado`, err, requestId);
   return respuesta(opts.genericErrorMessage, 500);
 }
 
-export async function proxySibox<Req, Res>(
-  request: Request,
-  opts: {
-    endpoint: string;
-    requestSchema: z.ZodType<Req>;
-    responseSchema: z.ZodType<Res>;
-    notFoundMessage: string;
-    genericErrorMessage: string;
-    /** Límite de peticiones por IP (429 + Retry-After). Ver `rate-limit.ts`. */
-    limite?: ConfigLimite;
-  },
-) {
+type OpcionesProxy<Req, Res> = {
+  endpoint: string;
+  requestSchema: z.ZodType<Req>;
+  responseSchema: z.ZodType<Res>;
+  notFoundMessage: string;
+  genericErrorMessage: string;
+  /** Límite de peticiones por IP (429 + Retry-After). Ver `rate-limit.ts`. */
+  limite?: ConfigLimite;
+};
+
+/**
+ * Toda respuesta lleva `X-Request-Id` (el de Vercel si existe, o uno propio) y el mismo valor
+ * aparece en las líneas de registro de esa petición, para poder seguir un reporte de punta a punta.
+ */
+export async function proxySibox<Req, Res>(request: Request, opts: OpcionesProxy<Req, Res>) {
+  const requestId = request.headers.get("x-vercel-id") ?? crypto.randomUUID();
+  const respuestaFinal = await manejar(request, opts, requestId);
+  respuestaFinal.headers.set("X-Request-Id", requestId);
+  return respuestaFinal;
+}
+
+async function manejar<Req, Res>(request: Request, opts: OpcionesProxy<Req, Res>, requestId: string) {
   const rechazo = await rechazarEntrada(request, opts.limite);
   if (rechazo) return rechazo;
 
@@ -130,11 +149,12 @@ export async function proxySibox<Req, Res>(
       logError(
         `${opts.endpoint}: respuesta con forma inesperada`,
         parsedResponse.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+        requestId,
       );
       return respuesta("SIBOX regreso datos con una forma inesperada.", 502);
     }
     return NextResponse.json({ data: parsedResponse.data });
   } catch (err) {
-    return traducirError(err, opts);
+    return traducirError(err, opts, requestId);
   }
 }

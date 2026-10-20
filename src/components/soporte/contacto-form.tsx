@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { AvisoPrivacidadCorto } from "@/components/ui/aviso-privacidad-corto";
 import { enviarContactoSoporte } from "@/lib/soporte";
 
 export function ContactoForm() {
@@ -116,6 +117,7 @@ export function ContactoForm() {
             {error}
           </p>
         )}
+        {!enviado && <AvisoPrivacidadCorto finalidad="responder tu mensaje" />}
         {enviado ? (
           <p className="text-center text-sm font-medium text-primary">
             ¡Gracias! Recibimos tu mensaje y te contactaremos pronto.

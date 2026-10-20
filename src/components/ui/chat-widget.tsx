@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { AvisoPrivacidadCorto } from "@/components/ui/aviso-privacidad-corto";
 import { rastrearGuia } from "@/lib/rastreo";
 import { enviarContactoChat } from "@/lib/soporte";
 import type { Rastreo } from "@/types/rastreo";
@@ -335,6 +336,7 @@ function ChatTab() {
             No pudimos enviar tu correo. Inténtalo de nuevo.
           </p>
         )}
+        <AvisoPrivacidadCorto finalidad="que un asesor te contacte" />
         <button
           type="button"
           onClick={handleEnviar}

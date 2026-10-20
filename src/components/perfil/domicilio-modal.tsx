@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { AvisoPrivacidadCorto } from "@/components/ui/aviso-privacidad-corto";
 import { ModalShell } from "@/components/ui/modal-shell";
 import { useModalA11y } from "@/components/ui/use-modal-a11y";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
@@ -207,6 +208,7 @@ export function DomicilioModal({
         </p>
       )}
 
+      <AvisoPrivacidadCorto finalidad="programar tus recolecciones" />
       <Button
         onClick={handleGuardar}
         disabled={!canSubmit || guardando}

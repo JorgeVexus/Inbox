@@ -21,7 +21,8 @@
     "qa:ortografia": "cspell lint --no-progress \"src/**/*.{ts,tsx}\" \"docs/*.md\" README.md INDICE_MAESTRO.md",
     "qa:formato": "prettier --check .",
     "qa:peso": "node scripts/peso-por-ruta.mjs",
-    "qa:lighthouse": "node scripts/lighthouse-presupuesto.mjs"
+    "qa:lighthouse": "node scripts/lighthouse-presupuesto.mjs",
+    "qa:simulacro": "node scripts/simulacro-incidentes.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

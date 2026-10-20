@@ -165,3 +165,17 @@ test("las API rechazan peticiones de otro sitio (Origin ajeno) y cuerpos que no 
     expect(texto.status(), `${ruta} con text/plain`).toBe(415);
   }
 });
+
+test("/api/salud responde 200 sin datos internos y las rutas del BFF devuelven X-Request-Id", async ({ request }) => {
+  const salud = await request.get("/api/salud");
+  expect(salud.status()).toBe(200);
+  const cuerpo = (await salud.json()) as Record<string, string>;
+  expect(Object.keys(cuerpo).sort()).toEqual(["estado", "hora", "sibox", "version"]);
+  expect(cuerpo.estado).toBe("ok");
+  expect(JSON.stringify(cuerpo)).not.toMatch(/apitest|api\.inbox|cloudflare|password|token/i);
+  expect(salud.headers()["cache-control"]).toBe("no-store");
+
+  const bff = await request.post("/api/rastreo", { data: { Guia: "mal formato!" } });
+  expect(bff.status()).toBe(400);
+  expect(bff.headers()["x-request-id"]).toMatch(/^[\w:.-]{8,}$/);
+});
