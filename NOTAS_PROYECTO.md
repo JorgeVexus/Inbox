@@ -26,7 +26,7 @@
 
 Rediseño completo de la plataforma web de **Inbox** (paquetería y envíos,
 parte del Grupo Transpaís), construido en Next.js a partir de diseños en
-Figma, reemplazando una implementación previa en Webflow. Integración
+Figma (el plan habla de la implementación "originalmente contemplada" en Webflow; no hay un sitio previo hecho en Webflow). Integración
 progresiva a las APIs de **SIBOX** (el backend real de Inbox).
 
 - **Figma file**: `uET8lmz7lTswi429zz8n8C` ("Inbox")

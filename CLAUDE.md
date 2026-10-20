@@ -22,8 +22,9 @@ el *detalle técnico*; el índice guarda el *mapa y el estado*.
 ## 1. Qué es este proyecto
 
 Rediseño de la plataforma web de **Inbox** (paquetería y envíos, parte del
-Grupo Transpaís) a partir de los diseños en Figma, reemplazando una
-implementación previa en Webflow, con integración progresiva a las APIs de
+Grupo Transpaís) a partir de los diseños en Figma. El plan lo describe como reemplazo de la implementación
+*originalmente contemplada* en Webflow (no es un sitio ya construido en Webflow),
+con integración progresiva a las APIs de
 **SIBOX**. Cliente final: Inbox. Se entregan avances demostrables cada semana
 (ver `plan de desarrollo` resumido en la sección 6).
 

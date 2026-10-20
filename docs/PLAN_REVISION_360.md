@@ -57,7 +57,7 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 | F12 | SEO, analítica y contenido | 🟨 | Dev + Marketing | 3 |
 | F13 | Compatibilidad y condiciones de red | 🟨 | QA | 2 |
 | F14 | Privacidad y cumplimiento legal | ⬜ | Legal + Dev | 3 |
-| F15 | Operación: CI/CD, observabilidad, migración desde Webflow | ⬜ | DevOps + Producto | 5 |
+| F15 | Operación: CI/CD, observabilidad y salida a producción | ⬜ | DevOps + Producto | 5 |
 | F16 | Documentación y mantenibilidad; UAT con usuarios | 🟨 | Todos | 4 |
 | | **Total estimado** | | | **≈ 49 persona-días** (≈ 35 con automatización agresiva) |
 
@@ -176,13 +176,13 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 
 ### F12 — SEO, analítica y contenido
 - **SEO técnico:** metadatos (hecho), canonical, `sitemap`/`robots` con dominio final, datos estructurados válidos (Organization; evaluar LocalBusiness por sucursal, BreadcrumbList, FAQPage con las respuestas reales), enlaces internos, estados 404/410/301, rendimiento.
-- **Migración de SEO desde Webflow:** inventario de URLs actuales, **mapa de redirecciones 301**, conservar títulos/descripciones relevantes, verificar en Search Console antes y después.
+- **Si ya existe un sitio público de Inbox** (por confirmar con el cliente; su plataforma es desconocida): inventario de sus URLs, mapa de redirecciones 301, conservar títulos/descripciones relevantes y verificar en Search Console antes y después. Si no existe o el dominio es nuevo, este punto no aplica.
 - **Analítica y eventos:** plan de medición (rastreo, cotización iniciada/completada, pago, errores), consentimiento de cookies, sin PII en eventos.
 - **Contenido real:** FAQ (4 respuestas hoy genéricas), chat de ayuda, redes sociales, correos oficiales, teléfonos, textos legales; revisión ortográfica y de tono; coherencia de datos entre páginas.
 **Aceptación:** SEO 100 en Lighthouse; redirecciones verificadas; 0 contenido provisional visible.
 
 ### F13 — Compatibilidad y condiciones de red
-- **Navegadores:** Chrome/Edge (últimas 2), Firefox (últimas 2 + ESR), Safari macOS/iOS (últimas 2), Samsung Internet; política para versiones antiguas (soportar ≥ 98 % del tráfico actual del sitio; pedir analítica del Webflow).
+- **Navegadores:** Chrome/Edge (últimas 2), Firefox (últimas 2 + ESR), Safari macOS/iOS (últimas 2), Samsung Internet; política para versiones antiguas (soportar ≥ 98 % del tráfico actual del sitio, si el cliente puede compartir su analítica actual).
 - **Condiciones:** sin JavaScript (hecho en rutas clave), extensiones (bloqueadores de anuncios que bloquean teselas/analítica), cookies/almacenamiento bloqueados (hecho), modo privado, sin red/intermitente, latencia alta, zona horaria distinta (hecho), idioma del navegador.
 - **Robustez de formularios:** autocompletado del navegador, gestores de contraseñas, pegar/arrastrar, doble envío, botón Atrás/Adelante, recargar a mitad de flujo, varias pestañas.
 **Aceptación:** matriz verde en los navegadores soportados.
@@ -201,7 +201,7 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 - **CI (GitHub Actions):** instalar con `npm ci`, `tsc`, ESLint, Prettier, pruebas unitarias con cobertura, build, E2E en Chrome (y noche: 4 navegadores), Lighthouse CI, `npm audit`, escaneo de secretos, CodeQL; bloqueo de *merge* si falla.
 - **Entornos:** desarrollo, preview por PR, producción; paridad de variables; despliegue y **reversión (rollback)** probados.
 - **Observabilidad:** Sentry (errores front/back, sin PII), logs estructurados con correlación, métricas de negocio, *uptime monitor* externo (rastreo, cotización), alertas (error rate, latencia, caída de SIBOX, cooldown de login activo), página de estado.
-- **Migración desde Webflow:** inventario de funciones del sitio actual (formularios, integraciones, scripts), paridad de contenido, plan de **corte de DNS** en ventana controlada, TTL reducido, plan de reversión al Webflow, monitoreo reforzado 72 h.
+- **Salida a producción:** confirmar con el cliente **si existe un sitio actual** que este rediseño reemplace (y en qué plataforma). Si existe: inventario de funciones (formularios, integraciones, scripts), paridad de contenido, plan de **corte de DNS** en ventana controlada, TTL reducido, plan de reversión al sitio anterior y monitoreo reforzado 72 h. Si no existe: alta del dominio, DNS y certificados desde cero.
 - **Continuidad:** respaldo de configuración, runbooks (caída de SIBOX, bloqueo de Cloudflare, rotación de credenciales, incidente de datos), contactos de escalamiento.
 **Aceptación:** simulacro de incidente y de rollback ejecutado; checklist de corte aprobado.
 
@@ -269,7 +269,7 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 | Se encuentran muchos hallazgos tarde | Fases ordenadas por riesgo y correcciones continuas (no acumular) |
 | Cambios de alcance (etiqueta PDF, SAT, historial…) durante la revisión | Congelar alcance de la revisión; lo nuevo entra en un backlog con su propia revisión |
 | Cansancio de revisión / falsos positivos de herramientas | Triage por severidad; excepciones documentadas con fecha de caducidad |
-| Cutover desde Webflow sin plan de reversión | F15 lo exige como criterio de salida |
+| Corte de DNS sin plan de reversión (si hay un sitio actual) | F15 lo exige como criterio de salida |
 
 ---
 
