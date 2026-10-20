@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useModalA11y } from "@/components/ui/use-modal-a11y";
 
 type NombreEnvioModalProps = {
   abierto: boolean;
@@ -31,51 +32,9 @@ function NombreEnvioForm({
   const panelRef = useRef<HTMLDivElement>(null);
   const submittedRef = useRef(false);
   const vioGuardandoRef = useRef(false);
-  const onCerrarRef = useRef(onCerrar);
 
-  useEffect(() => {
-    onCerrarRef.current = onCerrar;
-  }, [onCerrar]);
-
-  useEffect(() => {
-    const elementoAnterior = document.activeElement;
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onCerrarRef.current();
-        return;
-      }
-
-      if (event.key !== "Tab") return;
-
-      const elementos = panelRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
-      );
-      if (!elementos?.length) {
-        event.preventDefault();
-        return;
-      }
-
-      const primero = elementos[0];
-      const ultimo = elementos[elementos.length - 1];
-      if (!panelRef.current?.contains(document.activeElement)) {
-        event.preventDefault();
-        (event.shiftKey ? ultimo : primero).focus();
-      } else if (event.shiftKey && document.activeElement === primero) {
-        event.preventDefault();
-        ultimo.focus();
-      } else if (!event.shiftKey && document.activeElement === ultimo) {
-        event.preventDefault();
-        primero.focus();
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      if (elementoAnterior instanceof HTMLElement) elementoAnterior.focus();
-    };
-  }, []);
+  // Escape, foco atrapado/devuelto y bloqueo de scroll: comportamiento común de los modales.
+  useModalA11y(panelRef, onCerrar);
 
   useEffect(() => {
     if (guardando) {
@@ -102,14 +61,18 @@ function NombreEnvioForm({
   }
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4" onClick={onCerrar}>
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCerrar();
+      }}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="nombre-envio-titulo"
         className="w-full max-w-[504px] rounded-md bg-neutral-bg px-8 py-9 shadow-card sm:px-12"
-        onClick={(event) => event.stopPropagation()}
       >
         <h2 id="nombre-envio-titulo" className="text-center font-display text-2xl font-bold text-black">
           Asigna un nombre a tu envío
@@ -126,7 +89,6 @@ function NombreEnvioForm({
             onChange={(event) => setNombre(event.target.value)}
             placeholder="Ejem. Paquete de ropa"
             maxLength={60}
-            autoFocus
             aria-describedby={error ? "nombre-envio-error nombre-envio-contador" : "nombre-envio-contador"}
             aria-invalid={Boolean(error)}
             className="mt-2 h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-5 text-sm font-medium text-black shadow-card outline-none placeholder:text-black/60 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"

@@ -31,7 +31,7 @@ describe("rastreoDetalleResponseSchema", () => {
   });
 
   it("rechaza un evento sin Estatus", () => {
-    const { Estatus: _e, ...sin } = REAL[0];
+    const { Estatus: _e, ...sin } = REAL[0] as (typeof REAL)[number];
     void _e;
     expect(rastreoDetalleResponseSchema.safeParse([sin]).success).toBe(false);
   });
@@ -66,6 +66,6 @@ describe("versión pública del historial (sin datos de clientes)", () => {
     const json = JSON.stringify(salida);
     expect(json).not.toContain("@");
     expect(json).not.toContain("CECILIO");
-    expect(salida[1].Estatus).toBe("ENTREGADA");
+    expect(salida[1]?.Estatus).toBe("ENTREGADA");
   });
 });

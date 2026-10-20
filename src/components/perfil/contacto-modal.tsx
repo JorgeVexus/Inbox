@@ -30,7 +30,7 @@ export function ContactoModal({
 }: {
   usuario: string;
   /** Pasa un contacto existente para editarlo; omítelo para crear uno. */
-  contacto?: ContactoGuardado;
+  contacto?: ContactoGuardado | undefined;
   onClose: () => void;
   onSuccess: (contacto: ContactoGuardado) => void;
 }) {
@@ -72,14 +72,18 @@ export function ContactoModal({
   const canSubmit = datos.nombre.trim() !== "" && datos.telefono.replace(/\D/g, "").length >= 10;
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8" onClick={onClose}>
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={contacto ? "Editar contacto" : "Agregar contacto"}
         className="relative flex max-h-[90vh] w-full max-w-[560px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-6 pt-10 sm:px-10"
-        onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"

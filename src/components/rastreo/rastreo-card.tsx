@@ -24,7 +24,7 @@ export function RastreoCard({
   guia: string;
   resultado: Rastreo | null;
   /** La consulta fallo (red/servidor) -- distinto de "guia no encontrada". */
-  error?: string;
+  error?: string | undefined;
   onQuitar: () => void;
   /** Solo cuando la consulta falló (no cuando la guía no existe). */
   onReintentar?: () => void;

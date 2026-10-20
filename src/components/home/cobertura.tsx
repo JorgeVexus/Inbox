@@ -445,7 +445,7 @@ export function CoberturaCTA() {
 function FilaCobertura({ sucursal }: { sucursal: Sucursal }) {
   const estado = estadoHorario(sucursal.Observaciones);
   const direccionesHref =
-    sucursal.Latitud != null && sucursal.Longitud != null
+    sucursal.Latitud !== null && sucursal.Longitud !== null
       ? `https://www.google.com/maps/search/?api=1&query=${sucursal.Latitud},${sucursal.Longitud}`
       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
           `${sucursal.Calle}, ${sucursal.D_Ciudad}, ${sucursal.D_Estado}`,

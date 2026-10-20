@@ -33,15 +33,16 @@ function FitBounds({ sucursales }: { sucursales: Sucursal[] }) {
 
   useEffect(() => {
     const points = sucursales
-      .filter((s) => s.Latitud != null && s.Longitud != null)
+      .filter((s) => s.Latitud !== null && s.Longitud !== null)
       .map((s) => [s.Latitud as number, s.Longitud as number] as [number, number]);
 
     if (points.length === 0) {
       map.setView(MEXICO_CENTER, 5);
       return;
     }
-    if (points.length === 1) {
-      map.setView(points[0], 12);
+    const [unico] = points;
+    if (points.length === 1 && unico) {
+      map.setView(unico, 12);
       return;
     }
     map.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 12 });
@@ -81,7 +82,7 @@ export function CoberturaMap({
       />
       <FitBounds sucursales={sucursales} />
       {sucursales
-        .filter((s) => s.Latitud != null && s.Longitud != null)
+        .filter((s) => s.Latitud !== null && s.Longitud !== null)
         .map((s) => (
           <Marker
             key={s.K_Oficina}

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { primero } from "@/lib/test-utils";
 import { rastreoRequestSchema, rastreoResponseSchema } from "./rastreo";
 
 // Respuestas reales capturadas de apitest.inbox.com.mx el 2026-10-02.
@@ -92,7 +93,7 @@ const GUIA_CON_DATOS_PERSONALES = {
 
 describe("versión pública del rastreo (sin datos personales)", () => {
   it("anula nombres, firma y coordenadas pero conserva lo que la UI necesita", () => {
-    const [r] = rastreoResponseSchema.parse([GUIA_CON_DATOS_PERSONALES]);
+    const r = primero(rastreoResponseSchema.parse([GUIA_CON_DATOS_PERSONALES]));
     expect(r.Remitente).toBeNull();
     expect(r.Destinatario).toBeNull();
     expect(r.Recibio).toBeNull();

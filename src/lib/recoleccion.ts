@@ -51,7 +51,7 @@ export function diasDisponibles(horario: HorarioRecoleccion, hoy: Date = new Dat
     const fecha = new Date(hoy);
     fecha.setDate(fecha.getDate() + i);
     const nombreDia = DIAS_SEMANA[fecha.getDay()];
-    if (horario.dias[nombreDia] && ventanasDisponibles(horario, fecha, hoy).length > 0) dias.push(fecha);
+    if (nombreDia && horario.dias[nombreDia] && ventanasDisponibles(horario, fecha, hoy).length > 0) dias.push(fecha);
   }
   return dias;
 }
@@ -62,8 +62,10 @@ export function ventanasDisponibles(
   fecha?: Date,
   ahora: Date = new Date(),
 ): { inicio: string; fin: string }[] {
-  const [hMin] = horario.horaMinima.split(":").map(Number);
-  const [hMax] = horario.horaMaxima.split(":").map(Number);
+  const hMin = Number(horario.horaMinima.split(":")[0]);
+  const hMax = Number(horario.horaMaxima.split(":")[0]);
+  // Horas ilegibles (la API devolvió algo raro): sin ventanas, en vez de un ciclo con NaN.
+  if (!Number.isFinite(hMin) || !Number.isFinite(hMax)) return [];
   const ventanas: { inicio: string; fin: string }[] = [];
   // Si la fecha es HOY: no se puede pasado el límite de captura ni en ventanas que ya empezaron.
   const esHoy = fecha ? mismoDia(fecha, ahora) : false;

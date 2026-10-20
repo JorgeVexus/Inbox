@@ -15,9 +15,15 @@ const DEFINICIONES_ENVIO = [
   { guia: "4157067169", nombre: "Pkt mamá", fechaProgramada: "03/08/2026" },
 ] as const;
 
+function rastreoMock(guia: string) {
+  const rastreo = MOCK_RASTREOS[guia];
+  if (!rastreo) throw new Error(`Falta el rastreo simulado de la guía ${guia}`);
+  return rastreo;
+}
+
 export const MOCK_ENVIOS: EnvioPerfil[] = DEFINICIONES_ENVIO.map(({ guia, nombre, fechaProgramada }) => ({
   guia,
   nombre,
   fechaProgramada,
-  rastreo: { ...MOCK_RASTREOS[guia] },
+  rastreo: { ...rastreoMock(guia) },
 }));

@@ -29,7 +29,7 @@ export function LazyMount({
     }
     const observer = new IntersectionObserver(
       ([entrada]) => {
-        if (entrada.isIntersecting) {
+        if (entrada?.isIntersecting) {
           setVisible(true);
           observer.disconnect();
         }

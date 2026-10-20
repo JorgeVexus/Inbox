@@ -52,14 +52,18 @@ function LoginModalForm() {
   }
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4" onClick={closeLogin}>
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) closeLogin();
+      }}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Iniciar sesión"
         className="relative flex w-full max-w-[460px] flex-col items-center gap-6 rounded-md bg-neutral-bg p-8 shadow-card sm:p-10"
-        onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"

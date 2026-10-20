@@ -46,7 +46,8 @@ export function useModalA11y(panelRef: RefObject<HTMLElement | null>, onClose: (
         return;
       }
       const primero = elementos[0];
-      const ultimo = elementos[elementos.length - 1];
+      const ultimo = elementos.at(-1);
+      if (!primero || !ultimo) return;
       const activo = document.activeElement;
       if (!panelRef.current.contains(activo)) {
         e.preventDefault();

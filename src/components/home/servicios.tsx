@@ -88,8 +88,10 @@ export function Servicios() {
         </div>
       </div>
 
+      {/* Región desplazable: debe ser enfocable para operarse con teclado (WCAG 2.1.1, axe scrollable-region-focusable). */}
       <section
         aria-label="Servicios de Inbox (desplazable)"
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         className="-mx-6 flex gap-6 overflow-x-auto px-6 pb-4 lg:-mx-16 lg:px-16"
       >

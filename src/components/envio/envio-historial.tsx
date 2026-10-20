@@ -34,13 +34,17 @@ export function parsearFechaEvento(valor: string): FechaEvento {
     return { fecha: "Sin fecha", hora: "Sin hora", claveFecha: "sin-fecha" };
   }
 
-  const coincidencia = limpio.match(/^(\d{1,2})-([A-Za-zÁÉÍÓÚÑ]{3})-(\d{4})(?:\s+(\d{1,2}:\d{2}))?$/u);
+  // Se parte en "fecha" y "hora" antes de validar para mantener cada expresión regular simple.
+  const [parteFecha = "", parteHora, ...sobrante] = limpio.split(" ");
+  const coincidencia = /^(\d{1,2})-([A-Za-zÁÉÍÓÚÑ]{3})-(\d{4})$/u.exec(parteFecha);
+  const horaValida = parteHora === undefined || /^\d{1,2}:\d{2}$/.test(parteHora);
 
-  if (!coincidencia) {
+  if (!coincidencia || !horaValida || sobrante.length > 0) {
     return { fecha: limpio, hora: "Sin hora", claveFecha: limpio };
   }
 
-  const [, dia, mesCrudo, anio, hora = "Sin hora"] = coincidencia;
+  const [, dia = "", mesCrudo = "", anio = ""] = coincidencia;
+  const hora = parteHora ?? "Sin hora";
   const mes = MESES[mesCrudo.toUpperCase()] ?? mesCrudo.toLocaleLowerCase("es-MX");
   const diaNormalizado = dia.padStart(2, "0");
   return {
@@ -56,7 +60,7 @@ export function agruparEventosPorFecha(eventos: RastreoEvento[]): GrupoEventos[]
   for (const evento of eventos) {
     const fecha = parsearFechaEvento(evento.F_Estatus);
     const ultimo = grupos.at(-1);
-    const claveUltimaFecha = ultimo ? parsearFechaEvento(ultimo.eventos[0].F_Estatus).claveFecha : null;
+    const claveUltimaFecha = ultimo ? parsearFechaEvento(ultimo.eventos[0]?.F_Estatus ?? "").claveFecha : null;
     if (ultimo && claveUltimaFecha === fecha.claveFecha) {
       ultimo.eventos.push(evento);
     } else {

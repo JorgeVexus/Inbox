@@ -30,7 +30,7 @@ export function getEstados(sucursales: Sucursal[]) {
 export function getCiudades(sucursales: Sucursal[], kEstado?: number) {
   const map = new Map<number, { K_Ciudad: number; D_Ciudad: string }>();
   for (const s of sucursales) {
-    if (kEstado != null && s.K_Estado !== kEstado) continue;
+    if (kEstado !== undefined && s.K_Estado !== kEstado) continue;
     if (!map.has(s.K_Ciudad)) {
       map.set(s.K_Ciudad, { K_Ciudad: s.K_Ciudad, D_Ciudad: s.D_Ciudad });
     }

@@ -131,7 +131,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
   const dias = useMemo(() => (horario ? diasDisponibles(horario) : []), [horario]);
   const ventanas = useMemo(() => {
     if (!horario || !fecha) return [];
-    const [a, m, d] = fecha.split("-").map(Number);
+    const [a = 0, m = 1, d = 1] = fecha.split("-").map(Number);
     return ventanasDisponibles(horario, new Date(a, m - 1, d));
   }, [horario, fecha]);
 
@@ -141,7 +141,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit || enviando) return;
-    const [horaInicio, horaFin] = ventana.split("-");
+    const [horaInicio = "", horaFin = ""] = ventana.split("-");
     setEnviando(true);
     setError(null);
     try {

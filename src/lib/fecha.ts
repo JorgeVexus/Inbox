@@ -26,7 +26,7 @@ const MESES: Record<string, string> = {
 export function formatFechaCorta(fecha: string): string {
   const match = fecha.match(/^(\d{2})-([A-Za-zÁ-Úá-ú]{3})-(\d{4})/);
   if (!match) return fecha;
-  const [, dia, mesTexto, anio] = match;
+  const [, dia, mesTexto = "", anio] = match;
   const mes = MESES[mesTexto.toUpperCase()];
   if (!mes) return fecha;
   return `${dia}/${mes}/${anio}`;

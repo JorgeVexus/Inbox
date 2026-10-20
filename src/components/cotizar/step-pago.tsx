@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { enfocarAlMontar } from "@/components/ui/enfocar-al-montar";
 import { InfoEnvioCard } from "@/components/cotizar/info-envio-card";
 import { FacturacionModal } from "@/components/facturacion/facturacion-modal";
 import { generarGuia, procesarPago } from "@/lib/cotizacion";
@@ -216,7 +217,7 @@ function DatosPrincipales({
             <input
               autoComplete="off"
               type="text"
-              autoFocus
+              ref={enfocarAlMontar}
               value={referencia}
               onChange={(e) => onReferenciaChange(e.target.value)}
               onBlur={onToggleEditarReferencia}
@@ -237,10 +238,11 @@ function DatosPrincipales({
       <div className="flex w-full flex-col items-start gap-6 rounded-md bg-white p-6 shadow-card">
         <div className="flex w-full flex-wrap gap-8">
           <div className="flex w-full max-w-[303px] flex-col gap-2">
-            <label className="text-xs font-medium text-black">Email</label>
+            <label htmlFor="pago-email" className="text-xs font-medium text-black">Email</label>
             <input
               autoComplete="email"
               type="email"
+              id="pago-email"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
               aria-label="Correo electrónico"
@@ -249,10 +251,11 @@ function DatosPrincipales({
             />
           </div>
           <div className="flex w-full max-w-[303px] flex-col gap-2">
-            <label className="text-xs font-medium text-black">Teléfono</label>
+            <label htmlFor="pago-telefono" className="text-xs font-medium text-black">Teléfono</label>
             <input
               autoComplete="tel"
               type="tel"
+              id="pago-telefono"
               value={telefono}
               onChange={(e) => onTelefonoChange(e.target.value)}
               aria-label="Número celular"
@@ -295,12 +298,15 @@ function DatosPrincipales({
   );
 }
 
-const METODOS: { id: MetodoPago; icon: string; label: string; width: string }[] = [
+type MetodoInfo = { id: MetodoPago; icon: string; label: string; width: string };
+
+// Tupla fija (no arreglo): así METODOS[0..3] nunca es `undefined` para TypeScript.
+const METODOS = [
   { id: "tarjeta", icon: "/icons/credit-card.svg", label: "Agregar tarjeta de crédito/débito", width: "w-full" },
   { id: "paypal", icon: "/icons/paypal.svg", label: "Pagar con PayPal", width: "w-[248px]" },
   { id: "efectivo", icon: "/icons/payments.svg", label: "Pagar en efectivo", width: "w-[254px]" },
   { id: "destinatario", icon: "/icons/real-estate-agent.svg", label: "Cobrar al destinatario", width: "w-[254px]" },
-];
+] as const satisfies readonly MetodoInfo[];
 
 function MetodoPagoForm({
   seleccionado,

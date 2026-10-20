@@ -23,7 +23,7 @@ export function FacturacionModal({
    * can display it later. Omitted by the checkout flow (step-pago.tsx),
    * which has no saved-data display to keep in sync. */
   usuario?: string;
-  datosIniciales?: DatosFacturacion;
+  datosIniciales?: DatosFacturacion | undefined;
 }) {
   const [datos, setDatos] = useState<DatosFacturacion>(datosIniciales ?? datosFacturacionVacios());
   const [colonias, setColonias] = useState<string[]>([]);
@@ -126,14 +126,18 @@ export function FacturacionModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8" onClick={onClose}>
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8"
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Datos de facturación"
         className="relative flex max-h-[90vh] w-full max-w-[612px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-5 pt-10 sm:px-10"
-        onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
@@ -151,6 +155,7 @@ export function FacturacionModal({
         <div className="flex flex-col gap-4">
           <p className="text-sm font-medium text-black">Constancia fiscal</p>
           <div
+            role="presentation"
             onDragOver={(e) => {
               e.preventDefault();
               setDragOver(true);

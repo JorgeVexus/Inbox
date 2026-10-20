@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { primero } from "@/lib/test-utils";
 import {
   busquedaCpRequestSchema,
   busquedaCpResponseSchema,
@@ -54,7 +55,7 @@ describe("ListadoOficinas", () => {
   });
 
   it("convierte ids a número, 'SI'/'NO' a booleano y coordenadas a número", () => {
-    const [o] = oficinasResponseSchema.parse([oficinaConCoords]);
+    const o = primero(oficinasResponseSchema.parse([oficinaConCoords]));
     expect(o.K_Oficina).toBe(7);
     expect(o.K_Estado).toBe(28);
     expect(o.B_Ocurre).toBe(true);
@@ -66,7 +67,7 @@ describe("ListadoOficinas", () => {
   });
 
   it("acepta coordenadas nulas, teléfono y observaciones vacíos", () => {
-    const [o] = oficinasResponseSchema.parse([oficinaSinCoords]);
+    const o = primero(oficinasResponseSchema.parse([oficinaSinCoords]));
     expect(o.Latitud).toBeNull();
     expect(o.Longitud).toBeNull();
     expect(o.Telefono).toBeNull();
@@ -76,12 +77,12 @@ describe("ListadoOficinas", () => {
   });
 
   it("un código de estado desconocido no rompe: usa el código como nombre", () => {
-    const [o] = oficinasResponseSchema.parse([{ ...oficinaConCoords, C_Estado: "ZZZ" }]);
+    const o = primero(oficinasResponseSchema.parse([{ ...oficinaConCoords, C_Estado: "ZZZ" }]));
     expect(o.D_Estado).toBe("ZZZ");
   });
 
   it("coordenadas basura no son NaN", () => {
-    const [o] = oficinasResponseSchema.parse([{ ...oficinaConCoords, Latitud: "abc", Longitud: "" }]);
+    const o = primero(oficinasResponseSchema.parse([{ ...oficinaConCoords, Latitud: "abc", Longitud: "" }]));
     expect(o.Latitud).toBeNull();
     expect(o.Longitud).toBeNull();
   });
@@ -125,15 +126,17 @@ describe("BusquedaCP", () => {
   });
 
   it("agrupa las colonias de un CP válido", () => {
-    const [r] = busquedaCpResponseSchema.parse([fila(64060, "OBISPADO"), fila(64060, "CENTRO", 3)]);
+    const r = primero(busquedaCpResponseSchema.parse([fila(64060, "OBISPADO"), fila(64060, "CENTRO", 3)]));
     expect(r).toEqual({ cp: "64060", estado: "NUEVO LEON", ciudad: "MONTERREY", colonias: ["OBISPADO", "CENTRO"] });
   });
 
   it("limpia tabuladores y descarta la fila falsa 'Especifique Otra Colonia'", () => {
-    const [r] = busquedaCpResponseSchema.parse([
-      fila(66655, "\tCOLINAS DE SANTA ENGRACIA", 36149),
-      fila(66655, "Especifique Otra Colonia", -1),
-    ]);
+    const r = primero(
+      busquedaCpResponseSchema.parse([
+        fila(66655, "\tCOLINAS DE SANTA ENGRACIA", 36149),
+        fila(66655, "Especifique Otra Colonia", -1),
+      ]),
+    );
     expect(r.colonias).toEqual(["COLINAS DE SANTA ENGRACIA"]);
   });
 
@@ -146,7 +149,7 @@ describe("BusquedaCP", () => {
   });
 
   it("respeta el CP con cero inicial (CodigoPostal numérico)", () => {
-    const [r] = busquedaCpResponseSchema.parse([fila(1000, "CENTRO")]);
+    const r = primero(busquedaCpResponseSchema.parse([fila(1000, "CENTRO")]));
     expect(r.cp).toBe("01000");
   });
 });
@@ -159,22 +162,24 @@ describe("ObtenerHorariosPorCP", () => {
   });
 
   it("mapea la respuesta real al tipo HorarioRecoleccion", () => {
-    const [h] = horariosResponseSchema.parse([
-      {
-        K_Oficina: 721,
-        D_Oficina: "MONTERREY-5 CONSTITUYENTES",
-        Hora_Minima: "14:00",
-        Hora_Maxima: "19:00",
-        Hora_Limite_Captura: "13:30",
-        B_Lunes: true,
-        B_Martes: true,
-        B_Miercoles: true,
-        B_Jueves: true,
-        B_Viernes: true,
-        B_Sabado: false,
-        B_Domingo: false,
-      },
-    ]);
+    const h = primero(
+      horariosResponseSchema.parse([
+        {
+          K_Oficina: 721,
+          D_Oficina: "MONTERREY-5 CONSTITUYENTES",
+          Hora_Minima: "14:00",
+          Hora_Maxima: "19:00",
+          Hora_Limite_Captura: "13:30",
+          B_Lunes: true,
+          B_Martes: true,
+          B_Miercoles: true,
+          B_Jueves: true,
+          B_Viernes: true,
+          B_Sabado: false,
+          B_Domingo: false,
+        },
+      ]),
+    );
     expect(h).toEqual({
       kOficina: 721,
       oficina: "MONTERREY-5 CONSTITUYENTES",

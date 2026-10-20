@@ -148,6 +148,7 @@ export const busquedaCpResponseSchema = z.array(filaCpSchema).transform((filas):
     ),
   ];
   const [primera] = filas;
+  if (!primera) return [];
   return [
     {
       cp: primera.CodigoPostal,

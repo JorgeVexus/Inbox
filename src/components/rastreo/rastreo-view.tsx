@@ -24,7 +24,9 @@ export function RastreoView() {
   const [busqueda, setBusqueda] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
   const [intento, setIntento] = useState(0);
-  const [resultados, setResultados] = useState<Record<string, { resultado: Rastreo | null; error?: string }>>({});
+  const [resultados, setResultados] = useState<
+    Record<string, { resultado: Rastreo | null; error?: string | undefined }>
+  >({});
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export function RastreoView() {
     setCargando(guias.length > 0);
     rastrearGuias(guias).then((res) => {
       if (cancelado) return;
-      const map: Record<string, { resultado: Rastreo | null; error?: string }> = {};
+      const map: Record<string, { resultado: Rastreo | null; error?: string | undefined }> = {};
       for (const { guia, resultado, error } of res) map[guia] = { resultado, error };
       setResultados(map);
       setCargando(false);

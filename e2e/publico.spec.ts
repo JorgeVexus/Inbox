@@ -41,7 +41,7 @@ test("ningún enlace interno del sitio da 404", async ({ page, request }) => {
   for (const { ruta } of PAGINAS) {
     await page.goto(ruta);
     const hrefs = await page.$$eval("a[href]", (as) => as.map((a) => a.getAttribute("href") ?? ""));
-    for (const h of hrefs) if (h.startsWith("/") && !h.startsWith("//")) vistos.add(h.split("#")[0]);
+    for (const h of hrefs) if (h.startsWith("/") && !h.startsWith("//")) vistos.add(h.split("#")[0] ?? h);
   }
   for (const h of vistos) {
     const r = await request.get(h);

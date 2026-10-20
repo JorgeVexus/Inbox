@@ -54,8 +54,8 @@ describe("siboxPost", () => {
 
     expect(result).toEqual([{ Guia: "1" }]);
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock.mock.calls[0][0]).toBe(`${BASE_URL}/Login`);
-    const secondCallHeaders = fetchMock.mock.calls[1][1]?.headers as Record<string, string>;
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(`${BASE_URL}/Login`);
+    const secondCallHeaders = fetchMock.mock.calls[1]?.[1]?.headers as Record<string, string>;
     expect(secondCallHeaders.Authorization).toBe("Bearer abc123");
   });
 
@@ -73,7 +73,7 @@ describe("siboxPost", () => {
 
     expect(result).toEqual([{ Guia: "1" }]);
     expect(fetchMock).toHaveBeenCalledTimes(4);
-    const lastCallHeaders = fetchMock.mock.calls[3][1]?.headers as Record<string, string>;
+    const lastCallHeaders = fetchMock.mock.calls[3]?.[1]?.headers as Record<string, string>;
     expect(lastCallHeaders.Authorization).toBe("Bearer nuevo");
   });
 

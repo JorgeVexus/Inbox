@@ -18,9 +18,9 @@ describe("rastrearGuia", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(rastrearGuia(" 1 ")).resolves.toMatchObject({ Guia: "1" });
-    const [url, init] = fetchMock.mock.calls[0];
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe("/api/rastreo");
-    expect(JSON.parse(init.body)).toEqual({ Guia: "1" });
+    expect(JSON.parse(init?.body)).toEqual({ Guia: "1" });
   });
 
   it("regresa null (no error) cuando la guía no existe (404)", async () => {
@@ -51,7 +51,7 @@ describe("rastrearGuias", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockImplementation(async (_url: string, init: { body: string }) => {
-        const { Guia } = JSON.parse(init.body);
+        const { Guia } = JSON.parse(init?.body);
         if (Guia === "mala") return respuesta({ error: "x" }, 500);
         if (Guia === "nada") return respuesta({ error: "x" }, 404);
         return respuesta({ data: [{ Guia, Estatus: "EN RUTA" }] });
@@ -60,9 +60,9 @@ describe("rastrearGuias", () => {
 
     const res = await rastrearGuias(["ok", "mala", "nada"]);
     expect(res.map((r) => r.guia)).toEqual(["ok", "mala", "nada"]);
-    expect(res[0].resultado?.Guia).toBe("ok");
-    expect(res[1].resultado).toBeNull();
-    expect(res[1].error).toBeTruthy();
+    expect(res[0]?.resultado?.Guia).toBe("ok");
+    expect(res[1]?.resultado).toBeNull();
+    expect(res[1]?.error).toBeTruthy();
     expect(res[2]).toEqual({ guia: "nada", resultado: null });
   });
 });
@@ -72,7 +72,7 @@ describe("rastrearGuiaDetalle", () => {
     const fetchMock = vi.fn().mockResolvedValue(respuesta({ data: [{ Estatus: "ENTREGADA" }] }));
     vi.stubGlobal("fetch", fetchMock);
     await expect(rastrearGuiaDetalle("1")).resolves.toHaveLength(1);
-    expect(fetchMock.mock.calls[0][0]).toBe("/api/rastreo/detalle");
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/rastreo/detalle");
   });
 });
 

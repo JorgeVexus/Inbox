@@ -183,9 +183,10 @@ export function StepConfirmar({
 
         <div className="flex flex-wrap gap-8">
           <div className="flex w-full max-w-[303px] flex-col gap-2">
-            <label className="text-xs font-medium text-black">Detalle del contenido</label>
+            <label htmlFor="confirmar-contenido" className="text-xs font-medium text-black">Detalle del contenido</label>
             <input
               type="text"
+              id="confirmar-contenido"
               value={contenido}
               onChange={(e) => setContenido(e.target.value)}
               aria-label="Descripción del contenido"
@@ -205,9 +206,10 @@ export function StepConfirmar({
             </Link>
           </div>
           <div className="flex flex-1 flex-col gap-2">
-            <label className="text-xs font-medium text-black">Tipo de contenido</label>
+            <label htmlFor="confirmar-tipo-contenido" className="text-xs font-medium text-black">Tipo de contenido</label>
             <input
               type="text"
+              id="confirmar-tipo-contenido"
               value={tipoContenido}
               onChange={(e) => setTipoContenido(e.target.value)}
               aria-label="Producto SAT"

@@ -33,6 +33,8 @@ type Token = { t: "dia"; dia: number } | { t: "hora"; min: number } | { t: "sep"
 function tokenizar(texto: string): Token[] {
   const tokens: Token[] = [];
   // El sufijo am/pm exige que NO le siga una letra: "13:00 a martes" no es "a.m.".
+  // Lineal: sin cuantificadores anidados sin tope, y el texto es corto (`Observaciones`).
+  // eslint-disable-next-line security/detect-unsafe-regex
   const re = /(\d{1,2}):(\d{2})\s*((?:a\.?\s?m\.?|p\.?\s?m\.?)(?![a-z]))?|([a-z]+)|(-)|(,)/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(texto))) {
@@ -69,7 +71,12 @@ function expandirDias(grupo: { dia: number; rango: boolean }[]): Set<number> {
     if (d.rango && previo) {
       const a = ORDEN_SEMANA.indexOf(previo.dia);
       const b = ORDEN_SEMANA.indexOf(d.dia);
-      if (a >= 0 && b >= a) for (let k = a; k <= b; k++) dias.add(ORDEN_SEMANA[k]);
+      if (a >= 0 && b >= a) {
+        for (let k = a; k <= b; k++) {
+          const dia = ORDEN_SEMANA[k];
+          if (dia !== undefined) dias.add(dia);
+        }
+      }
     }
   });
   return dias;
@@ -94,7 +101,10 @@ export function interpretarHorario(
     if (horas.length >= 2) {
       const dias = grupo.length ? expandirDias(grupo) : new Set([0, 1, 2, 3, 4, 5, 6]);
       for (let i = 0; i + 1 < horas.length; i += 2) {
-        const rango: Rango = [horas[i], horas[i + 1]];
+        const ini = horas[i];
+        const fin = horas[i + 1];
+        if (ini === undefined || fin === undefined) continue;
+        const rango: Rango = [ini, fin];
         for (const d of dias) porDia.set(d, [...(porDia.get(d) ?? []), rango]);
         huboHorarios = true;
       }
