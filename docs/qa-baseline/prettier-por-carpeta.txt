@@ -1,0 +1,10 @@
+     38 src/components
+     25 src/lib
+     13 src/app
+      7 raíz
+      6 e2e/
+      5 src/types
+      4 docs/
+      3 scripts/
+      1 docs/superpowers
+      1 docs/mensajes

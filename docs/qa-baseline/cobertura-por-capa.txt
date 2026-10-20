@@ -1,0 +1,58 @@
+Cobertura de sentencias por capa (menor primero):
+   0%     23 sentencias  app/error.tsx
+   0%     68 sentencias  app/layout.tsx
+   0%     21 sentencias  app/not-found.tsx
+   0%     18 sentencias  app/page.tsx
+   0%     11 sentencias  app/robots.ts
+   0%     13 sentencias  app/sitemap.ts
+   0%     27 sentencias  app/api
+   0%     43 sentencias  app/cobertura
+   0%    117 sentencias  app/cotizar
+   0%     28 sentencias  app/cuenta
+   0%     19 sentencias  app/envio
+   0%     19 sentencias  app/perfil
+   0%     14 sentencias  app/privacidad
+   0%     32 sentencias  app/rastreo
+   0%     19 sentencias  app/recoleccion
+   0%     30 sentencias  app/somos
+   0%     32 sentencias  app/soporte
+   0%     14 sentencias  app/terminos
+   0%     14 sentencias  app/trabaja-en-inbox
+   0%    230 sentencias  components/auth
+   0%     62 sentencias  components/cobertura
+   0%   1891 sentencias  components/cotizar
+   0%     39 sentencias  components/cuenta
+   0%    371 sentencias  components/facturacion
+   0%   1466 sentencias  components/home
+   0%    274 sentencias  components/layout
+   0%    800 sentencias  components/perfil
+   0%    390 sentencias  components/rastreo
+   0%    390 sentencias  components/recoleccion
+   0%    110 sentencias  components/somos
+   0%    222 sentencias  components/soporte
+   0%     10 sentencias  types/auth.ts
+   0%     14 sentencias  types/codigo-postal.ts
+   0%     21 sentencias  types/contacto.ts
+   0%     84 sentencias  types/cotizacion.ts
+   0%     17 sentencias  types/envio.ts
+   0%     27 sentencias  types/facturacion.ts
+   0%     35 sentencias  types/sucursal.ts
+   5%    573 sentencias  components/ui
+  58%   1076 sentencias  lib
+  63%    731 sentencias  components/envio
+  73%     67 sentencias  lib/api/route-helpers.ts
+  94%    147 sentencias  lib/api/sibox-client.ts
+ 100%    214 sentencias  lib/api/schemas
+ 100%     15 sentencias  types/domicilio.ts
+ 100%     16 sentencias  types/rastreo.ts
+ 100%      9 sentencias  types/recoleccion.ts
+
+Archivos de lib/ por debajo del 60 %:
+    0%  lib/auth.ts
+    0%  lib/codigo-postal.ts
+    0%  lib/cotizacion-draft.ts
+    0%  lib/cotizacion.ts
+    0%  lib/facturacion.ts
+    0%  lib/seo.ts
+    0%  lib/soporte.ts
+    0%  lib/sucursales.ts

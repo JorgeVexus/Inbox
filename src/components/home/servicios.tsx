@@ -91,8 +91,7 @@ export function Servicios() {
         </div>
       </div>
 
-      <div
-        role="region"
+      <section
         aria-label="Servicios de Inbox (desplazable)"
         tabIndex={0}
         className="-mx-6 flex gap-6 overflow-x-auto px-6 pb-4 lg:-mx-16 lg:px-16"
@@ -111,7 +110,7 @@ export function Servicios() {
             </div>
           </article>
         ))}
-      </div>
+      </section>
 
       <p className="mx-auto max-w-3xl text-center text-base text-black">
         En inbox® te ofrecemos soluciones confiables y eficientes para cubrir

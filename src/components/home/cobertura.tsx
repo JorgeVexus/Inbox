@@ -170,10 +170,10 @@ export function Cobertura({
               }
               className="flex w-full items-center justify-between"
             >
-              <div className="flex items-center gap-3">
+              <span className="flex items-center gap-3">
                 <span className="h-3 w-3 rounded-full bg-primary" />
                 <span className="text-xs font-semibold text-black">Sucursal</span>
-              </div>
+              </span>
               <CheckSwatch checked={tiposVisibles.sucursal} />
             </button>
             <button
@@ -184,12 +184,12 @@ export function Cobertura({
               }
               className="flex w-full items-center justify-between"
             >
-              <div className="flex items-center gap-3">
+              <span className="flex items-center gap-3">
                 <span className="h-3 w-3 rounded-full bg-gray-800" />
                 <span className="text-xs font-semibold text-black">
                   Centro de distribución
                 </span>
-              </div>
+              </span>
               <CheckSwatch checked={tiposVisibles.distribucion} />
             </button>
           </div>
@@ -465,7 +465,7 @@ export function CoberturaCTA() {
               onChange={(e) =>
                 setKCiudad(e.target.value === "" ? "" : Number(e.target.value))
               }
-              className={`flex h-[53px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none disabled:opacity-50 sm:w-[259px] ${
+              className={`flex h-[53px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium shadow-card outline-none disabled:opacity-50 sm:w-[259px] ${
                 kCiudad !== "" ? "text-primary" : "text-black"
               }`}
             >

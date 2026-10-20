@@ -63,6 +63,23 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 
 ---
 
+## 3.1 Seguimiento por fases (se actualiza al cerrar cada fase)
+
+| Fase | Estado | Documento |
+|---|---|---|
+| 0. Preparación y línea base | ✅ Completada (2026-10-20) | `docs/fases/FASE_0_PREPARACION.md` |
+| 1. Estática y limpieza (F3, F4, F5) | ⬜ Siguiente | — |
+| 2. Seguridad (F1, F2, F14 inventario) | ⬜ | — |
+| 3. Funcional e integración (F6, F7) | ⬜ (depende de B1) | — |
+| 4. Experiencia (F9, F10, F11, F13) | ⬜ (F9 depende de Figma Dev Mode) | — |
+| 5. Rendimiento y SEO (F8, F12) | ⬜ | — |
+| 6. Operación, legal y UAT (F15, F14, F16) | ⬜ | — |
+| 7. Cierre y Go / No-Go | ⬜ | — |
+
+**Supuestos a confirmar:** que existan los roles de DevOps, Seguridad y Legal (si no, esas tareas las asume el equipo disponible o se contratan puntualmente); si existe un sitio público actual de Inbox y en qué plataforma; si hay analítica del sitio actual para definir la matriz de navegadores.
+
+---
+
 ## 4. Detalle por frente
 
 ### F1 — Seguridad de la aplicación

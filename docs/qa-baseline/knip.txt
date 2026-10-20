@@ -1,0 +1,26 @@
+Unused files (1)
+scripts/resumen-cobertura.mjs
+Unused devDependencies (9)
+@cspell/dict-es-es     package.json:27:6
+@next/bundle-analyzer  package.json:28:6
+@vitest/coverage-v8    package.json:37:6
+cspell                 package.json:38:6
+html-validate          package.json:41:6
+jscpd                  package.json:42:6
+madge                  package.json:45:6
+prettier               package.json:46:6
+vite                   package.json:49:6
+Unused exports (8)
+datosFacturacionSchema                  src/lib/almacen-schemas.ts:45:14            
+oficinaSchema                           src/lib/api/schemas/catalogos.ts:64:14      
+rastreoEventoSchema                     src/lib/api/schemas/rastreo-detalle.ts:12:14
+rastreoEventoPublicoSchema              src/lib/api/schemas/rastreo-detalle.ts:32:14
+rastreoRegistroSchema                   src/lib/api/schemas/rastreo.ts:26:14        
+rastreoRegistroPublicoSchema            src/lib/api/schemas/rastreo.ts:64:14        
+MAX_CONSTANCIA_BYTES                    src/lib/facturacion.ts:64:14                
+estaAbiertoAhora              function  src/lib/horario.ts:162:17                   
+Unused exported types (4)
+RastreoRequest     type  src/lib/api/schemas/rastreo.ts:18:13
+RastreoRegistro    type  src/lib/api/schemas/rastreo.ts:50:13
+CostoDetalleLinea  type  src/types/cotizacion.ts:36:13       
+DiaSemana          type  src/types/recoleccion.ts:58:13      

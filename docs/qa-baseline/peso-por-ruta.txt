@@ -1,0 +1,10 @@
+Ruta                  JS       CSS    Imágenes    Fuentes      Total
+/                 206 KB     11 KB       80 KB      42 KB     390 KB
+/cotizar          223 KB     11 KB       32 KB      42 KB     353 KB
+/rastreo          203 KB     11 KB       34 KB      42 KB     333 KB
+/cobertura        250 KB     14 KB      136 KB      42 KB     484 KB
+/somos            207 KB     11 KB       89 KB      42 KB     395 KB
+/soporte          208 KB     11 KB       28 KB      42 KB     331 KB
+/envio            236 KB     11 KB       32 KB      42 KB     381 KB
+/perfil           245 KB     11 KB       32 KB      42 KB     391 KB
+/recoleccion      241 KB     11 KB       32 KB      42 KB     387 KB

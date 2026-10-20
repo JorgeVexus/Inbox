@@ -1,0 +1,26 @@
+
+C:\Users\JORGEC~1\AppData\Local\Temp\html\cobertura.html
+  1:14252  error  <div> element is not permitted as content under <button>  element-permitted-content
+  1:14775  error  <div> element is not permitted as content under <button>  element-permitted-content
+
+C:\Users\JORGEC~1\AppData\Local\Temp\html\home.html
+  1:19947  error  Prefer to use the native <section> element                prefer-native-element
+  1:30343  error  <div> element is not permitted as content under <button>  element-permitted-content
+  1:30866  error  <div> element is not permitted as content under <button>  element-permitted-content
+  1:33122  error  Class "text-black" duplicated                             no-dup-class
+
+C:\Users\JORGEC~1\AppData\Local\Temp\html\somos.html
+  1:17342  error  Prefer to use the native <section> element  prefer-native-element
+  1:26590  error  Class "text-black" duplicated               no-dup-class
+
+C:\Users\JORGEC~1\AppData\Local\Temp\html\soporte.html
+  1:16781  error  Class "text-black" duplicated  no-dup-class
+
+✖ 9 problems (9 errors, 0 warnings)
+  3 errors and 0 warnings potentially fixable with the `--fix` option.
+
+More information:
+  https://html-validate.org/rules/element-permitted-content.html
+  https://html-validate.org/rules/prefer-native-element.html
+  https://html-validate.org/rules/no-dup-class.html
+

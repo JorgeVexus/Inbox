@@ -1,0 +1,14 @@
+ 32 líneas  components/cotizar/step-cotizar.tsx:249  ~  components/home/hero.tsx:408
+ 29 líneas  components/facturacion/facturacion-modal.tsx:248  ~  components/perfil/domicilio-modal.tsx:130
+ 25 líneas  components/perfil/contacto-modal.tsx:127  ~  components/perfil/domicilio-modal.tsx:205
+ 24 líneas  components/cotizar/step-cotizar.tsx:379  ~  components/home/hero.tsx:435
+ 19 líneas  components/cotizar/step-confirmar.tsx:401  ~  components/cotizar/step-pago.tsx:622
+ 19 líneas  components/perfil/perfil-view.tsx:12  ~  components/recoleccion/recoleccion-view.tsx:32
+ 18 líneas  components/envio/envios-view.tsx:242  ~  components/perfil/perfil-view.tsx:37
+ 18 líneas  components/layout/footer.tsx:5  ~  components/layout/footer.tsx:14
+ 17 líneas  components/perfil/contacto-modal.tsx:83  ~  components/perfil/domicilio-modal.tsx:83
+ 15 líneas  components/home/hero.tsx:42  ~  components/somos/somos-hero.tsx:26
+ 14 líneas  components/facturacion/facturacion-modal.tsx:141  ~  components/perfil/contacto-modal.tsx:85
+ 12 líneas  components/home/hero.tsx:28  ~  components/somos/somos-hero.tsx:16
+ 11 líneas  components/cotizar/step-confirmar.tsx:231  ~  components/cotizar/step-costo.tsx:133
+ 10 líneas  components/cotizar/step-confirmar.tsx:232  ~  components/cotizar/step-pago.tsx:159

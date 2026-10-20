@@ -1,0 +1,589 @@
+{
+  "duplicates": [
+    {
+      "firstFile": {
+        "end": 241,
+        "endLoc": {
+          "column": 27,
+          "line": 241,
+          "position": 9094
+        },
+        "name": "components\\cotizar\\step-confirmar.tsx",
+        "start": 231,
+        "startLoc": {
+          "column": 16,
+          "line": 231,
+          "position": 8689
+        }
+      },
+      "format": "tsx",
+      "fragment": "          </div>\n        </div>\n      </div>\n\n      <InfoEnvioCard\n        origenLabel={`${cotizacion.origen.ciudad || \"—\"}, ${cotizacion.origen.cp}`}\n        destinoLabel={`${cotizacion.destino.ciudad || \"—\"}, ${cotizacion.destino.cp}`}\n        numPaquetes={cotizacion.paquetes.length}\n        medidasLabel={medidasLabel}\n        pesoLabel={`${pesoTotalPaquetes(cotizacion.paquetes)} kg`}\n        onEditar={onEditar}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 11,
+      "secondFile": {
+        "end": 143,
+        "endLoc": {
+          "column": 27,
+          "line": 143,
+          "position": 5908
+        },
+        "name": "components\\cotizar\\step-costo.tsx",
+        "start": 133,
+        "startLoc": {
+          "column": 13,
+          "line": 133,
+          "position": 5503
+        }
+      },
+      "tokens": 82
+    },
+    {
+      "firstFile": {
+        "end": 241,
+        "endLoc": {
+          "column": 18,
+          "line": 241,
+          "position": 9085
+        },
+        "name": "components\\cotizar\\step-confirmar.tsx",
+        "start": 232,
+        "startLoc": {
+          "column": 14,
+          "line": 232,
+          "position": 8704
+        }
+      },
+      "format": "tsx",
+      "fragment": "        </div>\n      </div>\n\n      <InfoEnvioCard\n        origenLabel={`${cotizacion.origen.ciudad || \"—\"}, ${cotizacion.origen.cp}`}\n        destinoLabel={`${cotizacion.destino.ciudad || \"—\"}, ${cotizacion.destino.cp}`}\n        numPaquetes={cotizacion.paquetes.length}\n        medidasLabel={medidasLabel}\n        pesoLabel={`${pesoTotalPaquetes(cotizacion.paquetes)} kg`}\n        onEditar={onEditar}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 10,
+      "secondFile": {
+        "end": 168,
+        "endLoc": {
+          "column": 18,
+          "line": 168,
+          "position": 5660
+        },
+        "name": "components\\cotizar\\step-pago.tsx",
+        "start": 159,
+        "startLoc": {
+          "column": 10,
+          "line": 159,
+          "position": 5279
+        }
+      },
+      "tokens": 75
+    },
+    {
+      "firstFile": {
+        "end": 419,
+        "endLoc": {
+          "column": 1,
+          "line": 419,
+          "position": 16555
+        },
+        "name": "components\\cotizar\\step-confirmar.tsx",
+        "start": 401,
+        "startLoc": {
+          "column": 3,
+          "line": 401,
+          "position": 16242
+        }
+      },
+      "format": "tsx",
+      "fragment": "  );\n}\n\nfunction Field({\n  label,\n  className = \"\",\n  children,\n}: {\n  label: string;\n  className?: string;\n  children: React.ReactNode;\n}) {\n  return (\n    <div className={`flex flex-col gap-2 ${className}`}>\n      <label className=\"text-xs font-medium text-black\">{label}</label>\n      {children}\n    </div>\n  );\n}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 19,
+      "secondFile": {
+        "end": 640,
+        "endLoc": {
+          "column": 1,
+          "line": 640,
+          "position": 22557
+        },
+        "name": "components\\cotizar\\step-pago.tsx",
+        "start": 622,
+        "startLoc": {
+          "column": 13,
+          "line": 622,
+          "position": 22244
+        }
+      },
+      "tokens": 73
+    },
+    {
+      "firstFile": {
+        "end": 280,
+        "endLoc": {
+          "column": 8,
+          "line": 280,
+          "position": 9414
+        },
+        "name": "components\\cotizar\\step-cotizar.tsx",
+        "start": 249,
+        "startLoc": {
+          "column": 20,
+          "line": 249,
+          "position": 8704
+        }
+      },
+      "format": "tsx",
+      "fragment": "function OpcionRadio({\n  label,\n  checked,\n  onClick,\n}: {\n  label: string;\n  checked: boolean;\n  onClick: () => void;\n}) {\n  return (\n    <button\n      type=\"button\"\n      onClick={onClick}\n      className=\"flex items-center gap-2 text-sm font-medium text-black\"\n    >\n      <span\n        className={`flex h-[25px] w-[25px] items-center justify-center rounded-[3px] border-2 bg-white ${\n          checked ? \"border-primary\" : \"border-secondary\"\n        }`}\n      >\n        {checked && (\n          <svg viewBox=\"0 0 24 24\" className=\"h-4 w-4 fill-primary\" aria-hidden>\n            <path d=\"M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z\" />\n          </svg>\n        )}\n      </span>\n      {label}\n    </button>\n  );\n}\n\nfunction PaqueteCard({",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 32,
+      "secondFile": {
+        "end": 439,
+        "endLoc": {
+          "column": 8,
+          "line": 439,
+          "position": 15496
+        },
+        "name": "components\\home\\hero.tsx",
+        "start": 408,
+        "startLoc": {
+          "column": 20,
+          "line": 408,
+          "position": 14786
+        }
+      },
+      "tokens": 108
+    },
+    {
+      "firstFile": {
+        "end": 402,
+        "endLoc": {
+          "column": 18,
+          "line": 402,
+          "position": 13830
+        },
+        "name": "components\\cotizar\\step-cotizar.tsx",
+        "start": 379,
+        "startLoc": {
+          "column": 9,
+          "line": 379,
+          "position": 13299
+        }
+      },
+      "format": "tsx",
+      "fragment": "    </div>\n  );\n}\n\nfunction MedidaInput({\n  label,\n  unit,\n  value,\n  onChange,\n}: {\n  label: string;\n  unit: string;\n  value: string;\n  onChange: (v: string) => void;\n}) {\n  return (\n    <div className=\"flex h-[53px] min-w-0 flex-1 items-center justify-end gap-1 sm:w-[82px] sm:flex-none rounded-md border border-[#707372]/70 bg-white px-3 shadow-card\">\n      <input\n        type=\"number\"\n        min={0}\n        value={value}\n        onChange={(e) => onChange(e.target.value)}\n        aria-label={label} placeholder=\"0\"\n        className=\"h-full w-full min-w-0 text-right text-xs font-medium text-black outline-none\"",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 24,
+      "secondFile": {
+        "end": 458,
+        "endLoc": {
+          "column": 18,
+          "line": 458,
+          "position": 16009
+        },
+        "name": "components\\home\\hero.tsx",
+        "start": 435,
+        "startLoc": {
+          "column": 12,
+          "line": 435,
+          "position": 15478
+        }
+      },
+      "tokens": 94
+    },
+    {
+      "firstFile": {
+        "end": 259,
+        "endLoc": {
+          "column": 69,
+          "line": 259,
+          "position": 8578
+        },
+        "name": "components\\envio\\envios-view.tsx",
+        "start": 242,
+        "startLoc": {
+          "column": 10,
+          "line": 242,
+          "position": 7917
+        }
+      },
+      "format": "tsx",
+      "fragment": "          </p>\n          {!isLoginOpen && (\n            <Button type=\"button\" onClick={openLogin} className=\"mt-7\">\n              Iniciar sesión\n            </Button>\n          )}\n        </section>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"bg-neutral-bg pb-20\">\n      <div className=\"mx-auto w-full max-w-[1200px] px-5 pt-8 sm:px-8 lg:px-10\">\n        <nav aria-label=\"Migas de pan\" className=\"text-sm text-black/70\">\n          <Link href=\"/\" className=\"inline-block py-2 transition-colors hover:text-primary\">Inicio</Link>\n          <span aria-hidden=\"true\" className=\"mx-2\">›</span>\n          <span aria-current=\"page\" className=\"font-bold text-black\">Mis envíos</span>",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 18,
+      "secondFile": {
+        "end": 54,
+        "endLoc": {
+          "column": 69,
+          "line": 54,
+          "position": 2248
+        },
+        "name": "components\\perfil\\perfil-view.tsx",
+        "start": 37,
+        "startLoc": {
+          "column": 10,
+          "line": 37,
+          "position": 1587
+        }
+      },
+      "tokens": 109
+    },
+    {
+      "firstFile": {
+        "end": 154,
+        "endLoc": {
+          "column": 78,
+          "line": 154,
+          "position": 5755
+        },
+        "name": "components\\facturacion\\facturacion-modal.tsx",
+        "start": 141,
+        "startLoc": {
+          "column": 8,
+          "line": 141,
+          "position": 5123
+        }
+      },
+      "format": "tsx",
+      "fragment": "        onClick={(e) => e.stopPropagation()}\n      >\n        <button\n          type=\"button\"\n          onClick={onClose}\n          aria-label=\"Cerrar\"\n          className=\"absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-black/50 hover:bg-black/5 hover:text-black\"\n        >\n          <svg viewBox=\"0 0 24 24\" className=\"h-5 w-5 fill-current\" aria-hidden>\n            <path d=\"M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.29 1.41 1.41 6.3-6.29 6.3 6.29 1.41-1.41-6.3-6.29 6.3-6.3z\" />\n          </svg>\n        </button>\n\n        <p className=\"text-center font-display text-2xl font-bold text-black\">",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 14,
+      "secondFile": {
+        "end": 98,
+        "endLoc": {
+          "column": 78,
+          "line": 98,
+          "position": 3283
+        },
+        "name": "components\\perfil\\contacto-modal.tsx",
+        "start": 85,
+        "startLoc": {
+          "column": 8,
+          "line": 85,
+          "position": 2651
+        }
+      },
+      "tokens": 68
+    },
+    {
+      "firstFile": {
+        "end": 276,
+        "endLoc": {
+          "column": 11,
+          "line": 276,
+          "position": 10757
+        },
+        "name": "components\\facturacion\\facturacion-modal.tsx",
+        "start": 248,
+        "startLoc": {
+          "column": 20,
+          "line": 248,
+          "position": 9473
+        }
+      },
+      "format": "tsx",
+      "fragment": "            </select>\n          </Row>\n\n          <Row label=\"C.P\">\n            <input autoComplete=\"postal-code\"\n              type=\"text\"\n              inputMode=\"numeric\"\n              maxLength={5}\n              value={datos.cp}\n              onChange={(e) => set(\"cp\", e.target.value.replace(/\\D/g, \"\").slice(0, 5))}\n              onBlur={handleCpBlur}\n              aria-label=\"Código postal\" placeholder=\"Ingrese código postal\"\n              className=\"h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none\"\n            />\n          </Row>\n\n          <Row label=\"Estado\">\n            <div className=\"flex h-[53px] w-full items-center rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card\">\n              {buscandoCP ? \"Buscando…\" : datos.estado || \"Se completa con el C.P\"}\n            </div>\n          </Row>\n\n          <Row label=\"Ciudad\">\n            <div className=\"flex h-[53px] w-full items-center rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card\">\n              {buscandoCP ? \"Buscando…\" : datos.ciudad || \"Se completa con el C.P\"}\n            </div>\n          </Row>\n\n          <div className=\"flex flex-col gap-2\">",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 29,
+      "secondFile": {
+        "end": 158,
+        "endLoc": {
+          "column": 11,
+          "line": 158,
+          "position": 6188
+        },
+        "name": "components\\perfil\\domicilio-modal.tsx",
+        "start": 130,
+        "startLoc": {
+          "column": 13,
+          "line": 130,
+          "position": 4904
+        }
+      },
+      "tokens": 164
+    },
+    {
+      "firstFile": {
+        "end": 39,
+        "endLoc": {
+          "column": 6,
+          "line": 39,
+          "position": 1104
+        },
+        "name": "components\\home\\hero.tsx",
+        "start": 28,
+        "startLoc": {
+          "column": 2,
+          "line": 28,
+          "position": 716
+        }
+      },
+      "format": "tsx",
+      "fragment": "  useEffect(() => {\n    // Respeta \"reducir movimiento\" del sistema (WCAG 2.2.2): sin cambio automático de fotos.\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = setInterval(() => {\n      setSlide((s) => (s + 1) % SLIDES.length);\n    }, 5000);\n    return () => clearInterval(id);\n  }, []);\n\n  return (\n    <section className=\"relative\">\n      {/* Banner: sliding photos + dark overlay + rastreo search. Clipped to a",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 12,
+      "secondFile": {
+        "end": 27,
+        "endLoc": {
+          "column": 6,
+          "line": 27,
+          "position": 676
+        },
+        "name": "components\\somos\\somos-hero.tsx",
+        "start": 16,
+        "startLoc": {
+          "column": 2,
+          "line": 16,
+          "position": 288
+        }
+      },
+      "tokens": 74
+    },
+    {
+      "firstFile": {
+        "end": 56,
+        "endLoc": {
+          "column": 78,
+          "line": 56,
+          "position": 1882
+        },
+        "name": "components\\home\\hero.tsx",
+        "start": 42,
+        "startLoc": {
+          "column": 78,
+          "line": 42,
+          "position": 1405
+        }
+      },
+      "format": "tsx",
+      "fragment": "          the quote card straddles the banner and the white section below. */}\n      <div className=\"relative h-[577px] w-full overflow-hidden\">\n        {SLIDES.map((src, i) => (\n          <Image\n            key={src}\n            src={src}\n            alt=\"\"\n            fill\n            priority={i === 0}\n            className={`object-cover transition-opacity duration-1000 ${\n              i === slide ? \"opacity-100\" : \"opacity-0\"\n            }`}\n          />\n        ))}\n        <div className=\"absolute inset-0 bg-black/30 backdrop-blur-[1.5px]\" />",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 15,
+      "secondFile": {
+        "end": 40,
+        "endLoc": {
+          "column": 78,
+          "line": 40,
+          "position": 1146
+        },
+        "name": "components\\somos\\somos-hero.tsx",
+        "start": 26,
+        "startLoc": {
+          "column": 34,
+          "line": 26,
+          "position": 669
+        }
+      },
+      "tokens": 69
+    },
+    {
+      "firstFile": {
+        "end": 22,
+        "endLoc": {
+          "column": 4,
+          "line": 22,
+          "position": 602
+        },
+        "name": "components\\layout\\footer.tsx",
+        "start": 5,
+        "startLoc": {
+          "column": 2,
+          "line": 5,
+          "position": 83
+        }
+      },
+      "format": "tsx",
+      "fragment": "  {\n    title: \"Servicio al cliente\",\n    links: [\n      { label: \"Obtener cotización\", href: \"/cotizar\" },\n      { label: \"Rastrear\", href: \"/rastreo\" },\n      { label: \"Enviar\", href: \"/envio\" },\n      { label: \"Cobertura\", href: \"/cobertura\" },\n    ],\n  },\n  {\n    title: \"Servicio al cliente\",\n    links: [\n      { label: \"Obtener cotización\", href: \"/cotizar\" },\n      { label: \"Rastrear\", href: \"/rastreo\" },\n      { label: \"Enviar\", href: \"/envio\" },\n      { label: \"Cobertura\", href: \"/cobertura\" },\n    ],\n  },",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 18,
+      "secondFile": {
+        "end": 31,
+        "endLoc": {
+          "column": 4,
+          "line": 31,
+          "position": 863
+        },
+        "name": "components\\layout\\footer.tsx",
+        "start": 14,
+        "startLoc": {
+          "column": 2,
+          "line": 14,
+          "position": 344
+        }
+      },
+      "tokens": 104
+    },
+    {
+      "firstFile": {
+        "end": 99,
+        "endLoc": {
+          "column": 11,
+          "line": 99,
+          "position": 3295
+        },
+        "name": "components\\perfil\\contacto-modal.tsx",
+        "start": 83,
+        "startLoc": {
+          "column": 69,
+          "line": 83,
+          "position": 2492
+        }
+      },
+      "format": "tsx",
+      "fragment": "        aria-label={contacto ? \"Editar contacto\" : \"Agregar contacto\"}\n        className=\"relative flex max-h-[90vh] w-full max-w-[560px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-6 pt-10 sm:px-10\"\n        onClick={(e) => e.stopPropagation()}\n      >\n        <button\n          type=\"button\"\n          onClick={onClose}\n          aria-label=\"Cerrar\"\n          className=\"absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-black/50 hover:bg-black/5 hover:text-black\"\n        >\n          <svg viewBox=\"0 0 24 24\" className=\"h-5 w-5 fill-current\" aria-hidden>\n            <path d=\"M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.29 1.41 1.41 6.3-6.29 6.3 6.29 1.41-1.41-6.3-6.29 6.3-6.3z\" />\n          </svg>\n        </button>\n\n        <p className=\"text-center font-display text-2xl font-bold text-black\">\n          {contacto ? \"Editar contacto\" : \"Agregar contacto\"}",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 17,
+      "secondFile": {
+        "end": 99,
+        "endLoc": {
+          "column": 11,
+          "line": 99,
+          "position": 3306
+        },
+        "name": "components\\perfil\\domicilio-modal.tsx",
+        "start": 83,
+        "startLoc": {
+          "column": 74,
+          "line": 83,
+          "position": 2503
+        }
+      },
+      "tokens": 74
+    },
+    {
+      "firstFile": {
+        "end": 151,
+        "endLoc": {
+          "column": 22,
+          "line": 151,
+          "position": 6332
+        },
+        "name": "components\\perfil\\contacto-modal.tsx",
+        "start": 127,
+        "startLoc": {
+          "column": 15,
+          "line": 127,
+          "position": 5685
+        }
+      },
+      "format": "tsx",
+      "fragment": "          </Row>\n        </div>\n\n        {error && (\n          <p role=\"alert\" className=\"text-center text-sm font-medium text-red-600\">\n            {error}\n          </p>\n        )}\n\n        <Button\n          onClick={handleGuardar}\n          disabled={!canSubmit || guardando}\n          className=\"mx-auto disabled:cursor-not-allowed disabled:opacity-50\"\n        >\n          {guardando ? \"Guardando…\" : \"Guardar\"}\n        </Button>\n      </div>\n    </div>\n  );\n}\n\nfunction Row({ label, children }: { label: string; children: React.ReactNode }) {\n  return (\n    <div className=\"flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4\">\n      <span className=\"w-full shrink-0 text-xs font-medium text-[#707372] sm:w-[90px]\">{label}</span>",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 25,
+      "secondFile": {
+        "end": 229,
+        "endLoc": {
+          "column": 22,
+          "line": 229,
+          "position": 9190
+        },
+        "name": "components\\perfil\\domicilio-modal.tsx",
+        "start": 205,
+        "startLoc": {
+          "column": 17,
+          "line": 205,
+          "position": 8543
+        }
+      },
+      "tokens": 112
+    },
+    {
+      "firstFile": {
+        "end": 30,
+        "endLoc": {
+          "column": 69,
+          "line": 30,
+          "position": 1189
+        },
+        "name": "components\\perfil\\perfil-view.tsx",
+        "start": 12,
+        "startLoc": {
+          "column": 50,
+          "line": 12,
+          "position": 518
+        }
+      },
+      "format": "tsx",
+      "fragment": "  const { session, isLoginOpen, openLogin, logout } = useAuth();\n  const aperturaSolicitadaRef = useRef(false);\n\n  useEffect(() => {\n    if (session) {\n      aperturaSolicitadaRef.current = false;\n      return;\n    }\n    if (!aperturaSolicitadaRef.current && !isLoginOpen) {\n      aperturaSolicitadaRef.current = true;\n      openLogin();\n    }\n  }, [isLoginOpen, openLogin, session]);\n\n  if (!session) {\n    return (\n      <div className=\"flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20\">\n        <section className=\"w-full max-w-xl rounded-md border border-neutral-line bg-white px-6 py-12 text-center shadow-card-sm sm:px-12\">\n          <p className=\"font-display text-sm font-bold text-primary\">MI PERFIL</p>",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 19,
+      "secondFile": {
+        "end": 50,
+        "endLoc": {
+          "column": 69,
+          "line": 50,
+          "position": 1737
+        },
+        "name": "components\\recoleccion\\recoleccion-view.tsx",
+        "start": 32,
+        "startLoc": {
+          "column": 42,
+          "line": 32,
+          "position": 1066
+        }
+      },
+      "tokens": 95
+    }
+  ],
+  "statistics": {
+    "detectionDate": "2026-10-20T15:55:32.526Z",
+    "formats": {
+      "css": {
+        "clones": 0,
+        "duplicatedLines": 0,
+        "duplicatedTokens": 0,
+        "lines": 68,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 0.0,
+        "percentageTokens": 0.0,
+        "sources": 1,
+        "tokens": 1171
+      },
+      "tsx": {
+        "clones": 14,
+        "duplicatedLines": 263,
+        "duplicatedTokens": 1301,
+        "lines": 8195,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 3.209273947528981,
+        "percentageTokens": 2.8810594149301325,
+        "sources": 62,
+        "tokens": 45157
+      },
+      "typescript": {
+        "clones": 0,
+        "duplicatedLines": 0,
+        "duplicatedTokens": 0,
+        "lines": 2417,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 0.0,
+        "percentageTokens": 0.0,
+        "sources": 33,
+        "tokens": 12343
+      }
+    },
+    "total": {
+      "clones": 14,
+      "duplicatedLines": 263,
+      "duplicatedTokens": 1301,
+      "lines": 10680,
+      "newClones": 0,
+      "newDuplicatedLines": 0,
+      "percentage": 2.4625468164794007,
+      "percentageTokens": 2.2174498474544495,
+      "sources": 96,
+      "tokens": 58671
+    }
+  }
+}
