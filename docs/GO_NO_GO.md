@@ -37,9 +37,9 @@ Semáforo: 🟢 cumple · 🟡 cumple en parte / aceptable con plan · 🔴 no c
 | Área | Umbral del plan | Estado | Evidencia y brecha |
 |---|---|---|---|
 | **Hallazgos** | 0 Críticos y 0 Altos abiertos; Medios con plan y fecha | 🔴 | **0 críticos.** **3 altos abiertos**: B1 Cloudflare (R-02), formularios que no envían (R-03/B8) y límite de peticiones solo en memoria (R-01/B12, mitigado, no cerrado). Medios abiertos con plan: contraste de marca, contenido provisional, teselas del mapa (§7) |
-| **Seguridad** | 0 vulnerabilidades altas en dependencias; 0 secretos; límite activo y probado; autorización por objeto verificada; ZAP sin altos | 🟡 | Dependencias de **producción: 0** vulnerabilidades. Desarrollo: 5 altas en la cadena del linter (sin ruta al sitio; aceptadas, Fase 2 §3.9). Secretos: **0** en código e historial (semgrep 0 hallazgos). Límite activo y probado (30/min, 429) pero **por instancia** (B12). **Autorización por objeto: no aplica aún** (no hay rutas con cuenta; B2). **ZAP no se ejecutó** |
-| **Código** | `tsc`/ESLint/Prettier en 0; sin código muerto ni ciclos; cobertura lib ≥ 85 % | 🟡 | `tsc` 0, ESLint **0 errores** (quedan **12 avisos** de complejidad/tamaño, deuda visible), Prettier 0, `knip` 0, ciclos 0, duplicación 1.84 %, cobertura `src/lib` > 93 % |
-| **Pruebas** | Suite completa verde 3 corridas seguidas sin reintentos | @@PRUEBAS_ESTADO@@ | @@PRUEBAS_EVIDENCIA@@ |
+| **Seguridad** | 0 vulnerabilidades altas en dependencias; 0 secretos; límite activo y probado; autorización por objeto verificada; ZAP sin altos | 🟡 | Dependencias de **producción: 0** vulnerabilidades. Desarrollo: 5 altas en la cadena del linter (sin ruta al sitio; aceptadas, Fase 2 §3.9). Secretos: **0** en código e historial (semgrep 0 hallazgos en 178 archivos, repetido hoy; historial de git sin contraseña ni claves). Límite activo y probado (30/min, 429) pero **por instancia** (B12). **Autorización por objeto: no aplica aún** (no hay rutas con cuenta; B2). **ZAP no se ejecutó** |
+| **Código** | `tsc`/ESLint/Prettier en 0; sin código muerto ni ciclos; cobertura lib ≥ 85 % | 🟡 | `tsc` 0, ESLint **0 errores** (quedan **12 avisos** de complejidad/tamaño, deuda visible), Prettier 0, `knip` 0, ciclos 0, duplicación 1.60 %, cobertura `src/lib` > 93 % |
+| **Pruebas** | Suite completa verde 3 corridas seguidas sin reintentos | 🟢 | **3 corridas seguidas de la suite completa (121 pruebas × 4 navegadores = 484 casos), sin reintentos: 481 pasan, 3 omitidas a propósito, 0 fallan en cada una** (≈ 11 min cada una). La primera serie tuvo 1 fallo intermitente en WebKit (la prueba de Home → `/cotizar` escribía antes de que React hidratara); se corrigió la prueba y se repitió la serie completa. 208 pruebas unitarias en verde |
 | **Rendimiento** | Lighthouse móvil ≥ 90 en rutas públicas; LCP ≤ 2.5 s, CLS ≤ 0.1; carga objetivo sin errores | 🟡 | Lighthouse **93–96** en las 6 rutas, CLS **0**, TBT < 110 ms, carga local 900–1 200 peticiones/s sin errores. **LCP:** 1.8–2.6 s con red y CPU limitadas de verdad (4 de 6 rutas ≤ 2.5 s); 2.9–3.1 s en el laboratorio simulado. Datos de campo pendientes. Carga contra Vercel/SIBOX real: pendiente |
 | **Accesibilidad** | axe 0; teclado y lector de pantalla aprobados; contraste resuelto o excepción aprobada | 🟡 | axe: **0 violaciones** en páginas, modales y flujos (salvo el contraste de marca, informado aparte); teclado y foco automatizados (Escape, foco atrapado, 4 navegadores). **Lector de pantalla humano: no hecho.** **Contraste:** blanco sobre `#ff6015` = 3.02:1 (AA exige 4.5) pendiente de decisión de marca (`#CC4D11` cumpliría) |
 | **Diseño / responsividad** | 0 desviaciones Altas contra Figma; 0 desbordes en la matriz | 🟡 | **0 desbordes** de 320 a 1920 px en 4 motores. **Fidelidad contra Figma: no verificada** (requiere activar Dev Mode) |
@@ -47,7 +47,7 @@ Semáforo: 🟢 cumple · 🟡 cumple en parte / aceptable con plan · 🔴 no c
 | **Operación** | CI obligatorio, monitoreo y alertas activos, rollback ensayado, plan de corte aprobado | 🔴 | CI, flujo nocturno, seguridad, Dependabot y CODEOWNERS **escritos, sin activar** en GitHub (protección de rama pendiente). Monitores y Sentry **sin configurar**. Rollback **no ensayado** (nada desplegado). Plan de corte escrito, **no aprobado**. Simulacro local de incidentes: 3/3 |
 | **Negocio** | UAT firmado; bloqueos B1–B11 resueltos o aceptados por escrito | 🔴 | **UAT sin hacer** (kit listo). Ningún bloqueo resuelto ni aceptado por escrito |
 
-**Resumen:** 🟢 0 · 🟡 5 (seguridad, código, rendimiento, accesibilidad, diseño) · 🔴 4 (hallazgos, contenido/legal, operación, negocio) · pruebas: ver arriba.
+**Resumen:** 🟢 1 (pruebas) · 🟡 5 (seguridad, código, rendimiento, accesibilidad, diseño) · 🔴 4 (hallazgos, contenido/legal, operación, negocio).
 
 ---
 
@@ -184,4 +184,4 @@ npm run qa:todo -- --e2e --lighthouse --simulacro     # todo lo automático (≈
 ```
 No sustituye lo que requiere personas (UAT, Legal, lector de pantalla, Figma). Resultado de la última ejecución: ver `docs/fases/REVISION_360_FASES.md`, Fase 7.
 
-**Versión evaluada:** @@COMMIT@@
+**Versión evaluada:** commit `6ab2f0b` de `main` (GitHub `JorgeVexus/Inbox`), 20 de octubre de 2026.

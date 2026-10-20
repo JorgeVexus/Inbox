@@ -35,6 +35,7 @@ Sin ellas el sitio corre con datos de demostración, marcados como tales en pant
 | [`docs/RUNBOOKS.md`](./docs/RUNBOOKS.md) | Qué hacer cuando algo falla (SIBOX, Cloudflare, rollback, datos) |
 | [`docs/legal/`](./docs/legal) | Borradores para Legal: aviso de privacidad, términos, ARCO, retención |
 | [`docs/uat/`](./docs/uat) | Kit de pruebas con usuarios reales |
+| [`docs/GO_NO_GO.md`](./docs/GO_NO_GO.md) | **Decisión Go / No-Go** y camino a producción |
 | [`docs/fases/REVISION_360_FASES.md`](./docs/fases/REVISION_360_FASES.md) | Bitácora de la revisión 360° (calidad, seguridad, rendimiento, operación) |
 | [`docs/PLAN_REVISION_360.md`](./docs/PLAN_REVISION_360.md) | Plan de esa revisión |
 | [`docs/mensajes/`](./docs/mensajes) | Mensajes ya redactados para el cliente |

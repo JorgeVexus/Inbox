@@ -8,7 +8,7 @@
 
 | | |
 |---|---|
-| **Última actualización** | 2026-10-20 (revisión 360°, Fase 6 preparada) |
+| **Última actualización** | 2026-10-20 (revisión 360°, cierre: acta Go / No-Go) |
 | **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 208 tests unitarios + suite E2E Playwright (484 casos en Chrome/Firefox/WebKit/móvil); revisión 360° en `docs/PLAN_REVISION_360.md` y `docs/fases/REVISION_360_FASES.md` (fases 0, 1, 2, 5 hechas; 6 preparada; 3 y 4 esperan a terceros); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
@@ -273,7 +273,8 @@ npx tsc --noEmit && npm run lint && npm test
 | `NOTAS_PROYECTO.md` | Síntesis autocontenida para cualquier agente/persona, notas de proceso (Figma→código, trucos del navegador) | Onboarding profundo |
 | `AGENTS.md` | Aviso de Next.js 16 (lo regenera `next dev`; no borrar) | Agentes |
 | `docs/mensajes/` | Mensajes ya redactados para el cliente | Al contactar al cliente |
-| `docs/fases/REVISION_360_FASES.md` | Bitácora de la revisión 360° (fases 0–6) | Para saber qué se midió, corrigió y qué falta |
+| **`docs/GO_NO_GO.md`** | **Decisión Go / No-Go, tablero de criterios, camino a producción, firmas** | **Antes de cualquier lanzamiento** |
+| `docs/fases/REVISION_360_FASES.md` | Bitácora de la revisión 360° (fases 0–7) | Para saber qué se midió, corrigió y qué falta |
 | `docs/DESPLIEGUE.md` · `docs/RUNBOOKS.md` | Variables, publicación, corte, y qué hacer cuando algo falla | Al desplegar y en incidentes |
 | `docs/adr/` · `docs/DICCIONARIO_SEAMS.md` · `docs/PRUEBAS.md` | Decisiones de arquitectura, qué dato viene de dónde, cómo probar | Al tocar o conectar código |
 | `docs/legal/` · `docs/uat/` | Borradores para Legal; kit de pruebas con usuarios | Antes de lanzar |
@@ -286,6 +287,8 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-20 — Revisión 360°, Fase 7 (cierre): decisión recomendada GO para demostración protegida / NO-GO para producción** (`docs/GO_NO_GO.md`): re-ejecución completa con el nuevo `npm run qa:todo` (tipos, ESLint 0 errores, 208 pruebas, 0 código muerto, duplicación 1.60 %, 0 vulnerabilidades de producción, semgrep 0, Lighthouse en presupuesto, simulacro 3/3) y **3 corridas seguidas de 484 casos E2E sin reintentos (481 pasan, 0 fallan)**. Tablero: 1 verde, 5 amarillos, 4 rojos (hallazgos altos abiertos B1/B8/B12, contenido y legal, operación sin ensayar, UAT). Fases 3 y 4 **no ejecutadas** (esperan Cloudflare y Figma Dev Mode): la decisión se repite al hacerlas. Camino de 14 pasos a producción en el acta §4. Siguiente: enviar el mensaje al cliente (B1 + textos legales + contenido).
 
 - **2026-10-20 — Revisión 360°, Fase 6 (operación, legal y UAT) preparada** (`docs/fases/REVISION_360_FASES.md`, Fase 6): `/api/salud`, `X-Request-Id` y registros JSON; SIBOX inalcanzable ahora responde 503 (el simulacro local `npm run qa:simulacro` lo encontró); aviso de privacidad corto en los 7 formularios con datos personales; `docs/RUNBOOKS.md`, `docs/DESPLIEGUE.md` (variables y checklist de corte), 9 ADR, diccionario de seams, guía de pruebas, `CONTRIBUTING.md`, borradores legales (`docs/legal/`) y kit de UAT con SUS (`docs/uat/`). Onboarding mecánico ≈ 3 min. **Sin ejecutar** (requieren personas o Vercel): UAT, revisión legal, rollback real, monitores. Nuevo B14. Siguiente: 7 (corte intermedio) o 3/4 cuando se destraben.
 

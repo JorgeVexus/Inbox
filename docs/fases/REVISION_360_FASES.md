@@ -15,7 +15,7 @@ El plan tiene **8 fases en total (de la 0 a la 7)**.
 | 4 | Experiencia | F9, F10, F11, F13 | ⬜ (F9 depende de Figma Dev Mode) |
 | 5 | Rendimiento y SEO | F8, F12 | ✅ Completada (2026-10-20); 8 pendientes con dueño en su §7 |
 | 6 | Operación, legal y UAT | F15, F14, F16 | 🟡 Preparada (2026-10-20); 11 pendientes con dueño en su §6 (UAT y legal requieren personas) |
-| 7 | Cierre y Go / No-Go | todos | ⬜ |
+| 7 | Cierre y Go / No-Go | todos | ✅ Completada como corte intermedio (2026-10-20): **GO demo protegida / NO-GO producción** — ver `docs/GO_NO_GO.md`; se repite al ejecutar 3 y 4 |
 
 Convenciones: las referencias "§N" dentro de una fase apuntan a las secciones de esa misma fase.
 
@@ -749,3 +749,81 @@ Clon limpio desde GitHub siguiendo **solo** el `README.md`, sin `.env.local`:
 ### 7. Siguiente
 
 Quedan **3** (funcional e integración; depende de B1) y **4** (experiencia; depende de Figma Dev Mode), y **7** (cierre y Go / No-Go). La 7 puede hacerse como **corte intermedio**: consolidar el informe de la revisión, con cada criterio de aceptación en verde/amarillo/rojo y la lista de bloqueos que decide el Go / No-Go. Hoy el veredicto sería **No-Go para producción real** por B1–B4, B8–B13 y los pendientes de §6, y **Go para una demo/preview protegida**.
+
+---
+
+## Fase 7 — Cierre y decisión Go / No-Go
+
+**Plan:** `docs/PLAN_REVISION_360.md` · **Fecha:** 20 de octubre de 2026 · **Estado:** ✅ **Completada como corte intermedio**: re-ejecución completa de todo lo automático, tablero contra los criterios del plan y acta lista para firma. **Las fases 3 y 4 no se ejecutaron**, por lo que la decisión es provisional y se repite cuando se hagan (ver §6).
+
+**Entregable principal: [`docs/GO_NO_GO.md`](../GO_NO_GO.md)** — decisión, condiciones, tablero de criterios, camino a producción, riesgos aceptados, registro de hallazgos, trazabilidad de requisitos y bloque de firmas.
+
+### 1. Decisión recomendada
+
+| Destino | Veredicto |
+|---|---|
+| **Demostración / preview protegida** para el cliente y pruebas con usuarios | ✅ **GO** (6 condiciones en el acta §2: previews protegidos, modo demo, sin dominio de producción, aviso por escrito, credencial de pruebas, comprobar `/api/salud`) |
+| **Producción real** | ⛔ **NO-GO**: 3 hallazgos altos abiertos (Cloudflare, formularios que no envían, límite de peticiones por instancia) y 4 criterios del plan en rojo, casi todos por dependencias externas |
+
+### 2. Re-ejecución completa (con `npm run qa:todo`)
+
+Un solo comando repite todo lo automático y pinta un tablero (`scripts/verificacion-completa.mjs`). **Resultado de hoy:**
+
+| Comprobación | Resultado |
+|---|---|
+| Tipos (`tsc`, 8 banderas estrictas) | ✅ 0 errores |
+| ESLint | ✅ 0 errores · 12 avisos de complejidad/tamaño (deuda visible) |
+| Formato (Prettier) | ✅ *(el propio `qa:todo` detectó que su script nuevo no estaba formateado: corregido)* |
+| Pruebas unitarias + umbrales de cobertura | ✅ **208** pasan; `src/lib` por encima de su piso (88 %) |
+| Código muerto (`knip`) · ciclos (`madge`) | ✅ 0 · ✅ ninguno |
+| Duplicación (`jscpd`) | ✅ **1.60 %** (línea base 2.46 %; meta ≤ 3 %) |
+| Dependencias de producción (`npm audit`) | ✅ **0** vulnerabilidades |
+| Construcción (`next build`) | ✅ |
+| Simulacro de incidentes (SIBOX apagado / colgado / Cloudflare real) | ✅ 3/3 |
+| Lighthouse móvil con presupuestos, 6 rutas | ✅ dentro de presupuesto (Rendimiento 93–96, SEO 100, CLS 0) |
+| **E2E completa, 4 navegadores, 0 reintentos, 3 corridas seguidas** | ✅ **481 pasan, 3 omitidas, 0 fallan** en cada corrida |
+| SAST (`semgrep`, reglas TypeScript/React/Next/OWASP/secretos) | ✅ 0 hallazgos en 178 archivos |
+| Secretos en todo el historial de git | ✅ la contraseña de servicio no aparece; sin claves ni tokens reales. Una coincidencia de "token JWT" es un **ejemplo ficticio de prueba** (`log.test.ts`, el JWT de muestra público de jwt.io) |
+
+**Sobre las corridas de E2E:** la primera serie de tres dio limpio / **1 fallo** / limpio. El fallo fue intermitente, en WebKit, en la prueba "tarjeta de cotización del Home pasa los datos a `/cotizar`": escribía en los campos antes de que React terminara de hidratar la página y el texto se perdía (ya había aparecido como intermitente en las fases 2, 5 y 6). Se corrigió la **prueba** (esperar a la hidratación, como ya hacían otras) y se repitió la serie completa: 3 de 3 limpias. **Efecto real para personas, sin resolver y de baja gravedad:** quien escriba en un campo de la tarjeta de cotización del Home en la fracción de segundo previa a la hidratación (dispositivo muy lento) puede perder lo escrito; es una característica conocida de los formularios con renderizado en servidor y no se corrige hoy.
+
+### 3. Tablero contra los criterios del plan (resumen; detalle y evidencia en el acta §3)
+
+| Área | Estado |
+|---|---|
+| Hallazgos | 🔴 3 altos abiertos (B1, B8, B12 parcial) |
+| Seguridad | 🟡 dependencias de producción 0, secretos 0, SAST 0; límite por instancia, ZAP no ejecutado, autorización por objeto aún no aplica |
+| Código | 🟡 `tsc` 0, ESLint 0 errores (12 avisos), sin código muerto ni ciclos |
+| Pruebas | 🟢 3 corridas seguidas, 0 reintentos |
+| Rendimiento | 🟡 Lighthouse ≥ 93, CLS 0; LCP sobre 2.5 s en 2 de 6 rutas con limitación real y en las 6 en laboratorio simulado |
+| Accesibilidad | 🟡 axe 0; faltan lector de pantalla humano y decisión del contraste de marca |
+| Diseño / responsividad | 🟡 0 desbordes 320–1920 px; fidelidad contra Figma no verificada |
+| Contenido y legal | 🔴 provisional; aviso y términos en borrador |
+| Operación | 🔴 escrita y simulada en local; sin monitores, rollback ni protección de rama |
+| Negocio | 🔴 UAT sin hacer; ningún bloqueo resuelto ni aceptado por escrito |
+
+### 4. Balance de la revisión 360° (fases 0–7)
+
+| Fase | Resultado en una línea |
+|---|---|
+| 0 Preparación | Herramientas, CI y línea base medible |
+| 1 Estática y limpieza | TypeScript estricto, ESLint endurecido (53 → 0 errores), código muerto 0, duplicación 2.46 → 1.60 %, componentes partidos, +26 pruebas con piso de cobertura |
+| 2 Seguridad | Límite de peticiones, CSP, defensa entre sitios, bitácora enmascarada, solo HTTPS, 0 hallazgos de SAST, historial sin secretos |
+| 3 Funcional e integración | **No ejecutada** (depende de B1) |
+| 4 Experiencia | **No ejecutada** (depende de Figma Dev Mode y personas) |
+| 5 Rendimiento y SEO | CLS de `/rastreo` 0.646 → 0; JS de Home 205 → 177 KB; Rendimiento 93–96; SEO técnico con 23 pruebas |
+| 6 Operación, legal y UAT | `/api/salud`, trazabilidad por `X-Request-Id`, 503 correcto con SIBOX caído (encontrado en el simulacro), runbooks, guía de despliegue, borradores legales, kit de UAT |
+| 7 Cierre | `qa:todo`, acta Go / No-Go, tablero, trazabilidad y registro de hallazgos |
+
+**Cifras de la revisión:** pruebas unitarias 155 → **208**; casos E2E 360 → **484** (4 navegadores); cobertura de `src/lib` ~94 % → > 93 % con piso exigido; hallazgos encontrados y corregidos en la revisión: más de **110**, entre ellos 1 defecto de 500-en-lugar-de-503 y 1 salto de diseño de 0.65 detectados solo por las mediciones nuevas.
+
+### 5. Lo que esta revisión NO garantiza
+1. **Nada se probó contra el servidor real de SIBOX desde Node** (B1): el contrato se verificó con `curl`, respuestas reales grabadas y un puente local.
+2. **Nada se probó en Vercel** (no hay despliegue): funciones en frío, regiones, rollback, cabeceras de la plataforma.
+3. **Sin ojos humanos**: diseño contra Figma, lector de pantalla, dispositivos físicos y usuarios reales (UAT) quedan fuera.
+4. **No es una auditoría de seguridad externa** ni un análisis dinámico (ZAP): se recomienda una revisión independiente antes del lanzamiento.
+5. Las cifras de laboratorio de rendimiento son simuladas; los datos de campo llegan después del lanzamiento.
+
+### 6. Siguiente
+
+Para cambiar el veredicto a Go de producción, seguir el **camino de 14 pasos del acta §4** (primero, hoy: enviar el mensaje al cliente por Cloudflare y pedirle textos legales y contenido, que son lo que más tarda). Cuando se destraben B1 y Figma Dev Mode, **ejecutar las fases 3 y 4** y repetir `npm run qa:todo -- --e2e --lighthouse --simulacro`; si aparecen hallazgos nuevos, actualizar el tablero y firmar una nueva acta.

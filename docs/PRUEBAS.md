@@ -49,7 +49,15 @@ El laboratorio tiene ruido (±5 puntos entre corridas): el script usa la mediana
 - **Un fallo nuevo = una prueba nueva** que lo reproduzca antes de arreglarlo (como las de fuga de datos del rastreo y de las fechas).
 - **Qué NO hacer:** esperas fijas (`waitForTimeout`) salvo para animaciones; pruebas que dependan de SIBOX real (usan el modo demo o respuestas grabadas).
 
-## 5. Antes de cada commit
+## 5. Verificación completa en un comando
+
+```bash
+npm run qa:todo                                       # rápidas (≈ 3 min)
+npm run qa:todo -- --e2e --lighthouse --simulacro     # todo lo automático (≈ 20 min)
+```
+Imprime un tablero verde/rojo (`scripts/verificacion-completa.mjs`) y sale con error si algo falla. Se usa para repetir el Go / No-Go (`docs/GO_NO_GO.md`).
+
+## 6. Antes de cada commit
 
 ```bash
 npx tsc --noEmit && npm run lint && npm test

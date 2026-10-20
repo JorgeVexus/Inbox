@@ -74,7 +74,7 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 | 4. Experiencia (F9, F10, F11, F13) | ⬜ (F9 depende de Figma Dev Mode) | — |
 | 5. Rendimiento y SEO (F8, F12) | ✅ Completada (2026-10-20; datos de campo y contenido real pendientes) | `docs/fases/REVISION_360_FASES.md` (Fase 5) |
 | 6. Operación, legal y UAT (F15, F14, F16) | 🟡 Preparada (2026-10-20; legal, UAT y simulacro en Vercel requieren personas/despliegue) | `docs/fases/REVISION_360_FASES.md` (Fase 6) |
-| 7. Cierre y Go / No-Go | ⬜ | — |
+| 7. Cierre y Go / No-Go | ✅ Corte intermedio (2026-10-20): GO demo protegida / NO-GO producción | `docs/GO_NO_GO.md` · `docs/fases/REVISION_360_FASES.md` (Fase 7) |
 
 **Supuestos a confirmar:** que existan los roles de DevOps, Seguridad y Legal (si no, esas tareas las asume el equipo disponible o se contratan puntualmente); si existe un sitio público actual de Inbox y en qué plataforma; si hay analítica del sitio actual para definir la matriz de navegadores.
 
