@@ -26,6 +26,7 @@ export default function CotizarPage() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const draft = readAndClearCotizacionDraft();
+    // sessionStorage solo existe en el cliente, así que la lectura va después del montaje (ver arriba).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (draft) setCotizacion(draft);
     setReady(true);

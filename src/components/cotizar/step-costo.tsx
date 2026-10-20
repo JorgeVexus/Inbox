@@ -31,6 +31,7 @@ export function StepCosto({
     return () => {
       cancelado = true;
     };
+    // Solo al montar: el paso recibe la cotización ya cerrada y no debe volver a pedirla si el padre re-renderiza.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
