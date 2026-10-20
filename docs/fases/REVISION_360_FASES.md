@@ -14,7 +14,7 @@ El plan tiene **8 fases en total (de la 0 a la 7)**.
 | 3 | Funcional e integración | F6, F7 | ⬜ (depende de B1: Cloudflare) |
 | 4 | Experiencia | F9, F10, F11, F13 | ⬜ (F9 depende de Figma Dev Mode) |
 | 5 | Rendimiento y SEO | F8, F12 | ✅ Completada (2026-10-20); 8 pendientes con dueño en su §7 |
-| 6 | Operación, legal y UAT | F15, F14, F16 | ⬜ |
+| 6 | Operación, legal y UAT | F15, F14, F16 | 🟡 Preparada (2026-10-20); 11 pendientes con dueño en su §6 (UAT y legal requieren personas) |
 | 7 | Cierre y Go / No-Go | todos | ⬜ |
 
 Convenciones: las referencias "§N" dentro de una fase apuntan a las secciones de esa misma fase.
@@ -637,3 +637,115 @@ Accesibilidad 96–100 (el 96 es el contraste del naranja de marca con texto bla
 ### 8. Siguiente
 
 Las fases **3** (funcional e integración; depende de B1) y **4** (experiencia; depende de Figma Dev Mode) siguen esperando a terceros. La **6** (operación, legal y UAT) puede empezar con lo que ya se sabe: aviso de privacidad (insumo: inventario de la Fase 2 y plan de analítica de esta fase), CI/CD, observabilidad y plan de migración; la **7** cierra con el Go / No-Go.
+
+---
+
+## Fase 6 — Operación, legal y UAT (F15 operación, F14 privacidad, F16 documentación y pruebas con usuarios)
+
+**Plan:** `docs/PLAN_REVISION_360.md` · **Fecha:** 20 de octubre de 2026 · **Estado:** 🟡 **Preparada**. Todo lo que se podía construir y verificar desde el código está hecho; **lo que requiere personas o un despliegue real queda listo para ejecutarse pero no ejecutado** (ver §6). Los criterios de aceptación del plan **no se dan por cumplidos** (§5).
+
+### 1. Objetivo
+
+Dejar el sitio operable (saber si está sano, qué hacer si falla, cómo publicarlo y revertirlo), con el tratamiento de datos personales documentado y la información legal lista para revisión, y con el material para probarlo con personas reales. Una advertencia de honestidad: esta fase es la que **más depende de terceros** (Legal, el cliente, Vercel, usuarios), así que su resultado es sobre todo *material listo + verificaciones locales*, no un "hecho".
+
+### 2. Qué se hizo
+
+#### 2.1 Observabilidad (F15)
+| Pieza | Qué es | Dónde |
+|---|---|---|
+| **`GET /api/salud`** | Comprobación para monitores de disponibilidad: `{estado, sibox, version, hora}`. No llama a SIBOX (un monitor cada minuto no debe gastar su cupo ni disparar su Login) y no revela nada interno. `sibox` es el último estado conocido: `ok` / `degradado` (Login fallido, en enfriamiento de 30 s) / `desconocido` (arranque en frío). Límite de 60/min por IP | `src/app/api/salud/route.ts` |
+| **`X-Request-Id`** | Todas las respuestas del BFF llevan un identificador (el de Vercel o uno propio) que aparece también en las líneas de registro de esa petición: un reporte "me falló a las 4:10" se convierte en una búsqueda exacta | `route-helpers.ts` |
+| **Registros en JSON** | `{"nivel":"error","evento":"…","detalle":"…","requestId":"…","t":"…"}`, buscables en Vercel, con datos personales enmascarados | `src/lib/api/log.ts` |
+| **Errores no controlados** | `onRequestError` registra cualquier error de servidor (render, rutas) con el mismo formato; es el punto donde se enchufaría Sentry | `src/instrumentation.ts` |
+| **Monitores y alertas** | Matriz recomendada (disponibilidad, páginas, rastreo extremo a extremo, certificado, tasa de errores) y opciones de servicio | `docs/RUNBOOKS.md` §2 (**sin configurar**: requiere cuenta) |
+| **Sentry** | Decisión documentada, **no instalado**: costaría 30–50 KB de JavaScript (afecta el presupuesto de la Fase 5) y exige configurar el envío sin datos personales. Recomendado para producción | `docs/RUNBOOKS.md` §2 |
+
+#### 2.2 CI y despliegue (F15)
+- CI ahora también exige **formato** (`qa:formato`); nuevo flujo **nocturno** (`nocturno.yml`) con la suite completa en los 4 navegadores a las 02:00 (hora de Ciudad de México).
+- `RATE_LIMIT_DISABLED` **se ignora en Vercel**: un descuido de configuración no puede dejar producción sin límite (con prueba).
+- `.env.example` documenta las variables de pruebas y las que pone Vercel.
+- **`docs/DESPLIEGUE.md`**: los 3 ambientes, **tabla de variables por ambiente** (qué es secreto, qué se publica al navegador), primera publicación en 10 pasos, flujo diario, y **checklist de salida a producción** con dos ramas según exista o no un sitio actual (inventario, paridad, redirecciones 301, TTL del DNS, ventana de corte, vuelta atrás, monitoreo 72 h; o dominio, DNS, certificados, SPF/DKIM/DMARC).
+- **`docs/RUNBOOKS.md`**: 8 procedimientos (SIBOX caído, Cloudflare bloquea, rotación de credencial, incidente de datos, **rollback**, tráfico anómalo, enfriamiento del Login, sitio caído), tabla de contactos de escalamiento (**vacía: hay que llenarla**) y respaldos.
+
+#### 2.3 Privacidad y legal (F14)
+- **Aviso de privacidad corto** (`AvisoPrivacidadCorto`) junto a los **7 formularios que piden datos personales**: contacto de soporte, correo del chat, datos del envío (Confirmar), facturación, contactos guardados, direcciones guardadas y agendado de recolección. Dice la finalidad, enlaza a `/privacidad` y se abre en otra pestaña para no perder lo escrito. Prueba E2E incluida.
+- **`docs/legal/`** (borradores para Legal, **no publicables**): `AVISO_PRIVACIDAD_BORRADOR.md` (estructura completa del aviso integral con lo que el sitio realmente hace; lo que solo el cliente sabe va entre corchetes), `TERMINOS_BORRADOR.md` (estructura + **10 preguntas que el cliente debe responder**), `PROCEDIMIENTO_ARCO.md` (cómo atender acceso, rectificación, cancelación y oposición, y dónde buscar los datos de una persona) e `INVENTARIO_DATOS_RETENCION.md` (mapa de datos, retención propuesta y terceros que reciben datos).
+- Las páginas `/privacidad` y `/terminos` **siguen "Próximamente"** a propósito: publicar texto legal inventado sería peor que no publicarlo. La normativa mexicana se reformó en 2025 (incluida la autoridad); todos los borradores dejan esa verificación a Legal.
+
+#### 2.4 Documentación y pruebas con usuarios (F16)
+- `CONTRIBUTING.md` (flujo, reglas innegociables, estilo), `README.md` renovado con el mapa de documentos, `docs/PRUEBAS.md` (capas, cómo correr cada una, trampas conocidas), `docs/DICCIONARIO_SEAMS.md` (**cada dato: de dónde viene hoy, qué endpoint, qué lo bloquea, y receta de 7 pasos para conectar uno**), y **9 ADR** (`docs/adr/`) con las decisiones de arquitectura y su porqué.
+- **Kit de UAT** (`docs/uat/`): plan con criterios, perfiles de participantes, 10 tareas con tiempos meta y criterio de éxito, hoja de observación, consentimiento, guion de cierre, hipótesis a verificar y formato de aceptación firmada; cuestionario **SUS** con la fórmula de cálculo.
+
+### 3. Verificación realizada
+
+#### 3.1 Simulacro local de incidentes (`npm run qa:simulacro`)
+Levanta el sitio compilado con un fallo distinto cada vez y comprueba lo que ve el visitante, lo que queda en los registros y lo que dice `/api/salud`:
+
+| Escenario | Resultado |
+|---|---|
+| **R1a** SIBOX apagado (conexión rechazada) | **Encontró un defecto:** respondía **500** "Error al consultar el rastreo" (como si fuera culpa nuestra). Corregido: ahora **503** "El servicio no está disponible…", con la línea de registro y el `X-Request-Id`; `/api/salud` pasa a `degradado`. Con prueba unitaria |
+| **R1b** SIBOX no contesta (se cuelga) | **504** a los 20 s exactos (tope del BFF), mensaje genérico ✅ |
+| **R2/R7** Cloudflare bloquea al servidor — **incidente real**, con la API de pruebas | **503** en ~230 ms; la 2.ª petición, dentro del enfriamiento de 30 s, responde **503 en 8 ms sin volver a llamar a SIBOX** ✅. Confirma además que **B1 sigue abierto hoy** (20-oct-2026) |
+
+Los tres cuerpos de respuesta se comprobaron sin rutas, nombres de servidor ni mensajes internos.
+
+#### 3.2 Prueba de onboarding (mecánica)
+Clon limpio desde GitHub siguiendo **solo** el `README.md`, sin `.env.local`:
+
+| Paso | Tiempo | Resultado |
+|---|---|---|
+| `git clone` | segundos | ✅ (el repositorio contiene el proyecto en su raíz) |
+| `npm install` | **118 s** | ✅ 789 paquetes |
+| `npm run dev` sin credenciales | ~1 s | ✅ `/` y `/rastreo` 200; `/api/salud` ok (modo demo) |
+| `tsc` / `lint` | 8 s / 13 s | ✅ 0 errores |
+| `npm test` | — | ✅ 208 pruebas |
+| `npm run build` | compila en ~6 s | ✅ |
+| **Total** | **≈ 3 minutos** (meta: < 30) | Sin tropiezos |
+
+**Limitaciones:** la hizo quien escribió la documentación, en la misma máquina y con Node 24 (el README exige "20.9 o superior"; CI usa 22; **Node 20 no se probó**). La prueba del plan es con **una persona nueva** que no pida ayuda: sigue pendiente y es la única válida.
+
+#### 3.3 Resto
+| Comprobación | Resultado |
+|---|---|
+| `tsc`, ESLint (0 errores, 12 avisos heredados), `knip`, Prettier | ✅ |
+| Pruebas unitarias | **208** (+4: `/api/salud` ×2, `X-Request-Id`, 503 con SIBOX inalcanzable; además se reescribieron las de `logError` y se amplió la de `RATE_LIMIT_DISABLED` en Vercel) |
+| E2E completa, 4 navegadores (**121 pruebas × 4 = 484 casos**; +2 nuevas: `/api/salud`+`X-Request-Id` y aviso de privacidad) | **481 pasan, 3 omitidas a propósito, 0 fallan** (13.5 min) |
+
+### 4. Hallazgos de esta fase
+| # | Hallazgo | Estado |
+|---|---|---|
+| O-01 | SIBOX inalcanzable devolvía 500 en vez de 503 | ✅ corregido |
+| O-02 | Sin identificador para seguir un error de punta a punta | ✅ `X-Request-Id` + registros JSON |
+| O-03 | Ningún punto para un monitor de disponibilidad | ✅ `/api/salud` |
+| O-04 | Los formularios no informaban la finalidad ni enlazaban el aviso de privacidad | ✅ aviso corto (el integral depende de Legal) |
+| O-05 | Contactos de escalamiento, monitores, Sentry, simulacro de rollback y UAT inexistentes | ⏳ preparados, ver §6 |
+| O-06 | `/privacidad` y `/terminos` no publicables hasta que Legal apruebe | ⏳ B10/B13 |
+
+### 5. Criterios de aceptación del plan: dónde estamos
+
+| Criterio (plan) | Estado |
+|---|---|
+| F15: simulacro de incidente y de rollback ejecutado; checklist de corte aprobado | 🟡 simulacro de incidente **hecho en local** (3 escenarios); **rollback no ensayado** (no hay despliegue); checklist **escrito, no aprobado** |
+| F14: documentos legales publicados y revisados por Legal; mapa de datos firmado | 🔴 borradores y mapa listos; **nada publicado ni firmado** |
+| F16: onboarding < 30 min sin ayuda | 🟡 mecánico ≈ 3 min; falta la prueba con una persona nueva |
+| F16: SUS ≥ 80; UAT aprobado | 🔴 kit listo; **ninguna sesión realizada** |
+
+### 6. Pendientes (con dueño)
+
+| # | Pendiente | Dueño | Cuándo |
+|---|---|---|---|
+| 1 | **Legal** redacta y aprueba aviso de privacidad y términos; el cliente responde las 10 preguntas de `TERMINOS_BORRADOR.md` y da razón social, domicilio y contacto de privacidad | Cliente + Legal | Antes de lanzar |
+| 2 | Llenar la tabla de contactos de escalamiento (`RUNBOOKS.md` §3) | Tú + cliente | Antes de lanzar |
+| 3 | Elegir y configurar monitores (UptimeRobot/Better Stack/Vercel Checks) con la matriz de `RUNBOOKS.md` §2; probar que llega el aviso | Tú | Al crear el proyecto en Vercel |
+| 4 | Decidir Sentry (costo en rendimiento vs. visibilidad de errores del navegador) | Tú + desarrollo | Antes de lanzar |
+| 5 | **Ensayar el rollback** en Vercel (publicar dos versiones y revertir) y el ejercicio de mesa de incidente de datos (1 h con Legal y Dirección) | Tú | En el primer despliegue |
+| 6 | **UAT**: reclutar 5–8 personas (cliente final, mostrador, soporte) y ejecutar `docs/uat/PLAN_UAT.md`; corregir lo grave y volver a probar | Cliente + tú | Cuando haya preview estable (idealmente con B1 resuelto) |
+| 7 | **Prueba de onboarding** con una persona nueva sin ayuda (y con Node 20) | Tú | Cuando se sume alguien |
+| 8 | Crear la **copia privada compartida** de `../Documentacion/` y `../originales-imagenes/` | Tú | Ya |
+| 9 | Confirmar si existe un **sitio público actual** (decide migración vs alta desde cero) | Cliente | Ya |
+| 10 | Revisar y aceptar el acuerdo de procesamiento de datos de Vercel; definir figura legal de SIBOX/Grupo Transpaís (encargado o transferencia) | Legal | Antes de lanzar |
+| 11 | Repetir `qa:simulacro` y las pruebas de carga contra la preview | Desarrollo | Cuando B1 se resuelva |
+
+### 7. Siguiente
+
+Quedan **3** (funcional e integración; depende de B1) y **4** (experiencia; depende de Figma Dev Mode), y **7** (cierre y Go / No-Go). La 7 puede hacerse como **corte intermedio**: consolidar el informe de la revisión, con cada criterio de aceptación en verde/amarillo/rojo y la lista de bloqueos que decide el Go / No-Go. Hoy el veredicto sería **No-Go para producción real** por B1–B4, B8–B13 y los pendientes de §6, y **Go para una demo/preview protegida**.

@@ -885,6 +885,11 @@ npm run qa:lighthouse   # presupuestos de Lighthouse móvil en las 6 rutas públ
 npm run qa:peso         # KB de JS/CSS/imágenes/fuentes por ruta
 ```
 
+Observabilidad (Fase 6): `GET /api/salud` para monitores; toda respuesta de `proxySibox()` lleva
+`X-Request-Id` y los errores se registran como una línea JSON con ese `requestId` (`logError`);
+`src/instrumentation.ts` registra errores no controlados. Los formularios con datos personales
+llevan `AvisoPrivacidadCorto`. Procedimientos en `docs/RUNBOOKS.md`; simulacro: `npm run qa:simulacro`.
+
 Reglas de rendimiento (Fase 5 de la revisión 360°): no importes `zod` (ni `almacen-schemas`)
 desde código que cargue Home o el layout; las fotos del banner van por
 `components/ui/fotos-hero.tsx`; un marcador de `Suspense` debe medir lo mismo que el

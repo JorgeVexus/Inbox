@@ -8,8 +8,8 @@
 
 | | |
 |---|---|
-| **Última actualización** | 2026-10-20 (revisión 360°, Fase 1 completada) |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 181 tests unitarios + suite E2E Playwright (360 casos en Chrome/Firefox/WebKit/móvil); plan de revisión 360° en `docs/PLAN_REVISION_360.md` (fases 0 y 1 hechas); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
+| **Última actualización** | 2026-10-20 (revisión 360°, Fase 6 preparada) |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 208 tests unitarios + suite E2E Playwright (484 casos en Chrome/Firefox/WebKit/móvil); revisión 360° en `docs/PLAN_REVISION_360.md` y `docs/fases/REVISION_360_FASES.md` (fases 0, 1, 2, 5 hechas; 6 preparada; 3 y 4 esperan a terceros); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
 ---
@@ -150,6 +150,7 @@ bloqueado, B1).
 | **B11** | **Mapa**: el sitio usa teselas públicas de OpenStreetMap, cuya política no permite tráfico comercial intenso. Decidir proveedor de teselas (MapTiler, Stadia, propio) antes de producción. Además solo 32 de 71 oficinas reales traen coordenadas. | Jefe / presupuesto | Producción | Pendiente de decidir. |
 | **B12** | **Límite de peticiones compartido**: el actual vive en la memoria de cada instancia (en Vercel cada instancia tiene el suyo), así que solo es una primera barrera. Hace falta un almacén compartido (Upstash Redis u otro) y límites para login/cotización/CP cuando existan sus rutas. | Desarrollo + costo | Producción | Pendiente (`src/lib/api/rate-limit.ts` ya está preparado: se cambia `AlmacenLimite`). |
 | **B13** | **Contenido provisional visible** (detalle en la Fase 5, §5): las 4 respuestas del FAQ son idénticas; las 3 columnas del pie son idénticas; redes sociales apuntan a las portadas genéricas; hay dos correos de soporte distintos (`soporte@` e `info@`); teléfonos por confirmar; el enlace "Enviar" del pie exige iniciar sesión. Se suma a B10. | Cliente | No lanzar con textos de relleno | Pendiente de enviar al cliente. |
+| **B14** | **Operación sin ensayar**: sin monitores ni alertas configurados, sin Sentry (decisión pendiente), contactos de escalamiento vacíos, rollback y rotación de credenciales no ensayados en Vercel, **UAT sin hacer** (kit listo en `docs/uat/`), documentos legales solo en borrador (`docs/legal/`), copia privada de `../Documentacion/` pendiente. Detalle y dueños en la Fase 6, §6. | Tú + cliente + Legal | No lanzar a producción | Material listo; falta ejecutarlo. |
 | **B7** | Más guías de prueba: las 3 entregadas son todas `ENTREGADA`. Faltan guías en tránsito / "LISTO PARA ENTREGAR" para validar el timeline y la fecha prometida. | Cliente | Validación del timeline | En el mensaje. |
 
 ---
@@ -272,6 +273,11 @@ npx tsc --noEmit && npm run lint && npm test
 | `NOTAS_PROYECTO.md` | Síntesis autocontenida para cualquier agente/persona, notas de proceso (Figma→código, trucos del navegador) | Onboarding profundo |
 | `AGENTS.md` | Aviso de Next.js 16 (lo regenera `next dev`; no borrar) | Agentes |
 | `docs/mensajes/` | Mensajes ya redactados para el cliente | Al contactar al cliente |
+| `docs/fases/REVISION_360_FASES.md` | Bitácora de la revisión 360° (fases 0–6) | Para saber qué se midió, corrigió y qué falta |
+| `docs/DESPLIEGUE.md` · `docs/RUNBOOKS.md` | Variables, publicación, corte, y qué hacer cuando algo falla | Al desplegar y en incidentes |
+| `docs/adr/` · `docs/DICCIONARIO_SEAMS.md` · `docs/PRUEBAS.md` | Decisiones de arquitectura, qué dato viene de dónde, cómo probar | Al tocar o conectar código |
+| `docs/legal/` · `docs/uat/` | Borradores para Legal; kit de pruebas con usuarios | Antes de lanzar |
+| `CONTRIBUTING.md` | Cómo trabajar en el repo | Al incorporarse |
 | `docs/superpowers/` | Spec y plan de `/envio` (histórico) | Contexto de esa feature |
 | `GUIA_PRUEBAS.md` (local, ignorado) | Datos y pasos para probar la demo | Probar manualmente |
 | `../Documentacion/*` (fuera del repo) | PDF de la API, plan de 8 semanas, doc de pantallas | Contrato de la API y alcance |
@@ -280,6 +286,8 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-20 — Revisión 360°, Fase 6 (operación, legal y UAT) preparada** (`docs/fases/REVISION_360_FASES.md`, Fase 6): `/api/salud`, `X-Request-Id` y registros JSON; SIBOX inalcanzable ahora responde 503 (el simulacro local `npm run qa:simulacro` lo encontró); aviso de privacidad corto en los 7 formularios con datos personales; `docs/RUNBOOKS.md`, `docs/DESPLIEGUE.md` (variables y checklist de corte), 9 ADR, diccionario de seams, guía de pruebas, `CONTRIBUTING.md`, borradores legales (`docs/legal/`) y kit de UAT con SUS (`docs/uat/`). Onboarding mecánico ≈ 3 min. **Sin ejecutar** (requieren personas o Vercel): UAT, revisión legal, rollback real, monitores. Nuevo B14. Siguiente: 7 (corte intermedio) o 3/4 cuando se destraben.
 
 - **2026-10-20 — Revisión 360°, Fase 5 (rendimiento y SEO) completada** (`docs/fases/REVISION_360_FASES.md`, Fase 5; se hizo antes que la 3 y la 4, que dependen de Cloudflare y de Figma): Lighthouse móvil con presupuestos (`npm run qa:lighthouse`, también en CI sin bloquear): las 6 rutas públicas ≥ 93 en Rendimiento y SEO 100; `/rastreo` pasó de 71 a 95 (CLS 0.646 → 0). JS de Home 205 → 177 KB (Zod ya no se descarga en todo el sitio), fotos del banner bajo demanda, logos de 626/517 KB a 12/9 KB, caché de estáticos, `vercel.json` (región `dfw1`), migas de pan JSON-LD, `lang=es-MX`, 23 pruebas E2E de SEO, prueba de carga (900–1 200 peticiones/s sin errores). LCP con limitación real 1.8–2.6 s (objetivo 2.5 s: 4 de 6 rutas; confirmar con datos de campo). Plan de analítica e inventario de contenido provisional (nuevo B13). Siguiente: 6 (legal/operación), o 3 y 4 cuando se destraben.
 
