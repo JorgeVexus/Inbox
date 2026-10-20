@@ -1,0 +1,6 @@
+# Quién debe revisar cada área (se exige al activar la protección de rama de `main`).
+# Sustituir por los equipos reales cuando existan.
+*                              @JorgeVexus
+/src/lib/api/                  @JorgeVexus
+/next.config.ts                @JorgeVexus
+/.github/                      @JorgeVexus

@@ -1,0 +1,18 @@
+# Actualizaciones automáticas de dependencias (revisión 360°, Fase 2 / F2).
+# Agrupa las menores y parches en un solo PR por semana para no inundar el repositorio;
+# las versiones mayores llegan por separado porque pueden romper cosas.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      menores-y-parches:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

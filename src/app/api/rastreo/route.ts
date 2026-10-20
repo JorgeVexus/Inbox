@@ -1,3 +1,4 @@
+import { LIMITES } from "@/lib/api/rate-limit";
 import { proxySibox } from "@/lib/api/route-helpers";
 import { rastreoRequestSchema, rastreoResponseSchema } from "@/lib/api/schemas/rastreo";
 
@@ -8,5 +9,6 @@ export async function POST(request: Request) {
     responseSchema: rastreoResponseSchema,
     notFoundMessage: "No encontramos esa guía.",
     genericErrorMessage: "Error al consultar el rastreo.",
+    limite: LIMITES.rastreo,
   });
 }

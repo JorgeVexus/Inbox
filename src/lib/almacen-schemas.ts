@@ -4,6 +4,10 @@ import type { ContactoGuardado } from "@/types/contacto";
 import type { DatosFacturacion } from "@/types/facturacion";
 import type { Domicilio } from "@/types/domicilio";
 
+// En el navegador no usamos el modo JIT de Zod: sondea `new Function`, y la CSP del sitio (sin
+// `unsafe-eval`) lo reporta como violación aunque el error se capture. Sin JIT es igual de correcto.
+z.config({ jitless: true });
+
 /**
  * Validación de TODO lo que se lee de localStorage/sessionStorage. Esos datos
  * los puede editar cualquiera desde las herramientas del navegador, otra

@@ -45,13 +45,17 @@ const oficinaSinCoords = {
 
 describe("ListadoOficinas", () => {
   it("el request siempre es el payload fijo del servidor (el navegador no manda nada)", () => {
-    expect(oficinasRequestSchema.parse({ K_Estado: "1", cualquier: "cosa" })).toMatchObject({
+    expect(oficinasRequestSchema.parse({})).toMatchObject({
       K_Oficina: "",
       K_Estado: "",
       CP: "",
       NombreDispositivo: "web",
       B_Operadores: false,
     });
+  });
+
+  it("rechaza cualquier campo que mande el navegador (no se ignora en silencio)", () => {
+    expect(oficinasRequestSchema.safeParse({ K_Estado: "1", cualquier: "cosa" }).success).toBe(false);
   });
 
   it("convierte ids a número, 'SI'/'NO' a booleano y coordenadas a número", () => {
@@ -99,8 +103,14 @@ describe("código postal de entrada", () => {
 
 describe("BusquedaCP", () => {
   it("el navegador solo manda el CP; el resto del payload lo fija el servidor", () => {
-    const r = busquedaCpRequestSchema.parse({ CP: "64060", K_UsuarioApp: 999, B_Operadores: true });
+    const r = busquedaCpRequestSchema.parse({ CP: "64060" });
     expect(r).toMatchObject({ CP: "64060", K_UsuarioApp: 0, B_Operadores: false, Session: "web" });
+  });
+
+  it("rechaza campos extra: el navegador no puede colar K_UsuarioApp ni otros parámetros", () => {
+    expect(busquedaCpRequestSchema.safeParse({ CP: "64060", K_UsuarioApp: 999, B_Operadores: true }).success).toBe(
+      false,
+    );
   });
 
   const fila = (cp: number, colonia: string, k = 1776, ciudad = "MONTERREY") => ({

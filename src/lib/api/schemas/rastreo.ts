@@ -13,7 +13,7 @@ const guiaSchema = z
   .regex(/^[A-Za-z0-9-]{1,40}$/, "Formato de guía inválido");
 
 /** Request de wsRastreo -- ver PDF de API seccion 5. */
-export const rastreoRequestSchema = z.object({ Guia: guiaSchema });
+export const rastreoRequestSchema = z.object({ Guia: guiaSchema }).strict();
 
 /**
  * Un registro de la respuesta de wsRastreo, ajustado contra la API real

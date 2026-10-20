@@ -60,8 +60,8 @@ async function readJson(res: Response, endpoint: string): Promise<unknown> {
 }
 
 class SiboxConfigError extends Error {
-  constructor(missingVar: string) {
-    super(`Falta configurar ${missingVar} -- ver .env.example. El BFF no puede autenticar contra SIBOX sin esto.`);
+  constructor(missingVar: string, motivo = "Falta configurar") {
+    super(`${motivo} ${missingVar} -- ver .env.example. El BFF no puede autenticar contra SIBOX sin esto.`);
     this.name = "SiboxConfigError";
   }
 }
@@ -69,7 +69,18 @@ class SiboxConfigError extends Error {
 function getBaseUrl(): string {
   const url = process.env.SIBOX_API_BASE_URL;
   if (!url) throw new SiboxConfigError("SIBOX_API_BASE_URL");
-  return url;
+  // La credencial de servicio viaja en cada Login: solo por HTTPS (HTTP únicamente hacia localhost, para pruebas).
+  let destino: URL;
+  try {
+    destino = new URL(url);
+  } catch {
+    throw new SiboxConfigError("SIBOX_API_BASE_URL", "No es una URL válida:");
+  }
+  const local = destino.hostname === "localhost" || destino.hostname === "127.0.0.1";
+  if (destino.protocol !== "https:" && !(local && destino.protocol === "http:")) {
+    throw new SiboxConfigError("SIBOX_API_BASE_URL", "Debe usar https://");
+  }
+  return url.replace(/\/+$/, "");
 }
 
 function getServiceCredentials(): { usuario: string; password: string } {

@@ -47,6 +47,9 @@ async function postBff<T>(url: string, guia: string): Promise<T | null> {
   // 404 = no existe; 400 = el formato no es el de una guia (el BFF lo valida).
   // Para el visitante ambos son "no encontramos esa guia".
   if (res.status === 404 || res.status === 400) return null;
+  if (res.status === 429) {
+    throw new RastreoError("Hiciste muchas consultas seguidas. Espera un momento e intenta de nuevo.");
+  }
   if (!res.ok) {
     throw new RastreoError("No pudimos consultar tu envío en este momento. Intenta de nuevo.");
   }

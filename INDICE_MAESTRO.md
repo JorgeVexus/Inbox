@@ -8,8 +8,8 @@
 
 | | |
 |---|---|
-| **Última actualización** | 2026-10-12 (sesión 3, auditoría QA) |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 152 tests unitarios + suite E2E Playwright (248 pasan en Chrome/Firefox/WebKit/móvil); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
+| **Última actualización** | 2026-10-20 (revisión 360°, Fase 1 completada) |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 181 tests unitarios + suite E2E Playwright (360 casos en Chrome/Firefox/WebKit/móvil); plan de revisión 360° en `docs/PLAN_REVISION_360.md` (fases 0 y 1 hechas); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
 | **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
 
 ---
@@ -148,6 +148,7 @@ bloqueado, B1).
 | **B9** | **Modo demo en producción**: login mock (`INBOX`/`Prueba`), `/envio`, `/perfil`, `/recoleccion`, cotizador y pago son mock y muestran datos de ejemplo. Antes de lanzar: o se conectan (B2/B3/B4) o se ocultan los links del Navbar y se marcan claramente. | Depende de B2–B4 | Producción | Pendiente. |
 | **B10** | **Contenido provisional que hay que pedir al cliente**: respuestas reales del FAQ (las 4 muestran el mismo texto) y del chat; URLs reales de Facebook/Instagram/LinkedIn; correo oficial de soporte (el sitio mezcla `soporte@` e `info@`); **aviso de privacidad y términos y condiciones** (obligatorios en México; hoy `/privacidad` y `/terminos` son páginas "Próximamente"); bolsa de trabajo; aclarar el interruptor US/MX del Hero. | Cliente | No lanzar con textos de relleno | Pendiente (agregar al próximo mensaje). |
 | **B11** | **Mapa**: el sitio usa teselas públicas de OpenStreetMap, cuya política no permite tráfico comercial intenso. Decidir proveedor de teselas (MapTiler, Stadia, propio) antes de producción. Además solo 32 de 71 oficinas reales traen coordenadas. | Jefe / presupuesto | Producción | Pendiente de decidir. |
+| **B12** | **Límite de peticiones compartido**: el actual vive en la memoria de cada instancia (en Vercel cada instancia tiene el suyo), así que solo es una primera barrera. Hace falta un almacén compartido (Upstash Redis u otro) y límites para login/cotización/CP cuando existan sus rutas. | Desarrollo + costo | Producción | Pendiente (`src/lib/api/rate-limit.ts` ya está preparado: se cambia `AlmacenLimite`). |
 | **B7** | Más guías de prueba: las 3 entregadas son todas `ENTREGADA`. Faltan guías en tránsito / "LISTO PARA ENTREGAR" para validar el timeline y la fecha prometida. | Cliente | Validación del timeline | En el mensaje. |
 
 ---
@@ -201,6 +202,8 @@ las pruebas de conectividad contra `api.inbox.com.mx`.
 | 2026-10-12 | Al elegir un contacto en *Confirmar* se **conserva el C.P. cotizado** y se avisa si difiere | El precio ya se calculó con ese C.P.; no cambiarlo en silencio |
 | 2026-10-12 | El BFF **anula** nombres, quién recibió, firma, coordenadas y `Observaciones` del rastreo público | Reglas de seguridad 3 y 7: la API los devuelve con solo conocer la guía |
 | 2026-10-12 | Errores internos de SIBOX **nunca** llegan al navegador (502/503/504 genéricos) | Se vio un error de SQL con nombre de stored procedure |
+| 2026-10-20 | CSP estática con `script-src 'self' 'unsafe-inline'` en lugar de nonce | El HTML de Next trae scripts en línea; el nonce obliga a generar todas las páginas en cada visita (sin CDN). Se reevalúa en la Fase 5 |
+| 2026-10-20 | El BFF rechaza (403/415) peticiones con `Origin` ajeno o que no sean JSON, y campos extra (400) | Defensa entre sitios y contra colar `K_Cliente`; barato y sin efectos para el sitio |
 | siempre | `procesarPago()` **nunca** se conecta a una pasarela sin decisión explícita | Pagos bloqueados por backend |
 
 ---
@@ -276,7 +279,11 @@ npx tsc --noEmit && npm run lint && npm test
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
 
-- **2026-10-20 — Revisión 360°, Fase 0 completada** (`docs/fases/FASE_0_PREPARACION.md`, plan en `docs/PLAN_REVISION_360.md`): herramientas de calidad instaladas (knip, jscpd, madge, cspell, html-validate, prettier, cobertura), CI de GitHub Actions definida, línea base en `docs/qa-baseline/` (cobertura global 15.8 %, BFF 94 %; duplicación 2.46 %; 0 ciclos; JS 200–250 KB por ruta). Se corrigieron 3 defectos de HTML (div en button, region→section, clase de color duplicada que impedía el naranja del selector de ciudad). Corregida la referencia errónea a Webflow. Siguiente: Fase 1.
+- **2026-10-20 — Revisión 360°, Fase 2 (seguridad) completada** (`docs/fases/REVISION_360_FASES.md`, Fase 2): semgrep 0 hallazgos, historial de git sin secretos, `npm audit` de producción 0. Corregido: límite de peticiones en el BFF (429 + `Retry-After`, 30/min en rastreo; **solo en memoria, ver B12**), CSP completa, defensa entre sitios (`Origin` + `application/json`), esquemas estrictos, bitácora con datos personales enmascarados, solo HTTPS hacia SIBOX, vitest 5 (sin críticas). Archivos listos para activar en GitHub: gitleaks, CodeQL, Dependabot, CODEOWNERS. 204 pruebas unitarias. Siguiente: Fase 3.
+
+- **2026-10-20 — Revisión 360°, Fase 1 completada** (`docs/fases/REVISION_360_FASES.md` (Fase 1)): TypeScript con 8 banderas estrictas y ESLint con a11y estricta + seguridad + calidad (53 hallazgos → 0 errores, 12 avisos de complejidad/tamaño como deuda visible); knip limpio; duplicación 2.46 % → 1.84 %; `ModalShell` (5 modales), `PantallaSinSesion` (3 páginas), `step-pago` 759 → 385 líneas (+ `lib/tarjeta.ts`), `cobertura`, `hero` divididos; 181 pruebas unitarias (+26) con piso de cobertura (`src/lib` ≥ 88 %) exigido en CI. Siguiente: Fase 2 (seguridad).
+
+- **2026-10-20 — Revisión 360°, Fase 0 completada** (`docs/fases/REVISION_360_FASES.md` (Fase 0), plan en `docs/PLAN_REVISION_360.md`): herramientas de calidad instaladas (knip, jscpd, madge, cspell, html-validate, prettier, cobertura), CI de GitHub Actions definida, línea base en `docs/qa-baseline/` (cobertura global 15.8 %, BFF 94 %; duplicación 2.46 %; 0 ciclos; JS 200–250 KB por ruta). Se corrigieron 3 defectos de HTML (div en button, region→section, clase de color duplicada que impedía el naranja del selector de ciudad). Corregida la referencia errónea a Webflow. Siguiente: Fase 1.
 
 - **2026-10-20 — B1 reverificado: SIGUE BLOQUEADO.** Cliente avisó que hicieron un cambio en Cloudflare. Desde la IP `187.189.155.14` (confirmada vigente): `curl` pasa (HTTP 200, Ray `a4d8f1c9dcfab476-DFW`), Node `fetch` y `https.request` reciben 403 `cf-mitigated: challenge` (Ray `a4d8f1e4ba24e93e-DFW`), 4 de 4 intentos; `api.inbox.com.mx` (producción) igual. La regla no aplica al cliente Node o no está en la zona/host correcto. Mensaje de seguimiento al cliente redactado en la conversación.
 

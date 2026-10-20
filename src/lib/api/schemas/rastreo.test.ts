@@ -131,3 +131,10 @@ describe("rastreoRequestSchema: solo formato de guía (defensa contra inyección
     expect(rastreoRequestSchema.safeParse({ Guia: guia }).success).toBe(true);
   });
 });
+
+describe("rastreoRequestSchema es estricto", () => {
+  it("rechaza campos extra en lugar de ignorarlos", () => {
+    expect(rastreoRequestSchema.safeParse({ Guia: "4003229791", K_Cliente: 1 }).success).toBe(false);
+    expect(rastreoRequestSchema.safeParse({ Guia: "4003229791" }).success).toBe(true);
+  });
+});

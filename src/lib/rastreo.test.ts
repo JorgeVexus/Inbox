@@ -33,6 +33,11 @@ describe("rastrearGuia", () => {
     await expect(rastrearGuia("1")).rejects.toBeInstanceOf(RastreoError);
   });
 
+  it("explica el límite de consultas cuando el BFF responde 429", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(respuesta({ error: "x" }, 429)));
+    await expect(rastrearGuia("1")).rejects.toThrow("muchas consultas");
+  });
+
   it("lanza RastreoError si no hay red", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
     await expect(rastrearGuia("1")).rejects.toBeInstanceOf(RastreoError);

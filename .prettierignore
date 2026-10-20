@@ -5,3 +5,4 @@ playwright-report
 docs/qa-baseline
 package-lock.json
 public
+*.md

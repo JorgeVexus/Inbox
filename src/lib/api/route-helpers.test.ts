@@ -13,7 +13,11 @@ async function llamar(respuestaSibox: Response) {
   vi.resetModules();
   vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValueOnce(login()).mockResolvedValueOnce(respuestaSibox));
   const { proxySibox } = await import("@/lib/api/route-helpers");
-  const request = new Request("http://localhost/api/x", { method: "POST", body: JSON.stringify({ Guia: "1" }) });
+  const request = new Request("http://localhost/api/x", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ Guia: "1" }),
+  });
   return proxySibox(request, {
     endpoint: "/wsX",
     requestSchema: z.object({ Guia: z.string() }),
@@ -70,7 +74,11 @@ describe("proxySibox", () => {
         .mockRejectedValueOnce(new DOMException("timeout", "TimeoutError")),
     );
     const { proxySibox } = await import("@/lib/api/route-helpers");
-    const request = new Request("http://localhost/api/x", { method: "POST", body: JSON.stringify({ Guia: "1" }) });
+    const request = new Request("http://localhost/api/x", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ Guia: "1" }),
+    });
     const res = await proxySibox(request, {
       endpoint: "/wsX",
       requestSchema: z.object({ Guia: z.string() }),
@@ -99,14 +107,65 @@ describe("proxySibox: límites de entrada", () => {
     vi.stubGlobal("fetch", fetchMock);
     const { proxySibox } = await import("@/lib/api/route-helpers");
     const grande = JSON.stringify({ Guia: "1", relleno: "a".repeat(20_000) });
-    const res = await proxySibox(new Request("http://localhost/api/x", { method: "POST", body: grande }), {
-      endpoint: "/wsX",
-      requestSchema: z.object({ Guia: z.string() }),
-      responseSchema: z.array(z.object({ Guia: z.string() })),
-      notFoundMessage: "x",
-      genericErrorMessage: "x",
-    });
+    const res = await proxySibox(
+      new Request("http://localhost/api/x", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: grande,
+      }),
+      {
+        endpoint: "/wsX",
+        requestSchema: z.object({ Guia: z.string() }),
+        responseSchema: z.array(z.object({ Guia: z.string() })),
+        notFoundMessage: "x",
+        genericErrorMessage: "x",
+      },
+    );
     expect(res.status).toBe(413);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("proxySibox: defensa entre sitios", () => {
+  async function llamar(headers: Record<string, string>) {
+    vi.resetModules();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const { proxySibox } = await import("@/lib/api/route-helpers");
+    const res = await proxySibox(
+      new Request("http://localhost/api/x", { method: "POST", headers, body: JSON.stringify({ Guia: "1" }) }),
+      {
+        endpoint: "/wsX",
+        requestSchema: z.object({ Guia: z.string() }),
+        responseSchema: z.array(z.object({ Guia: z.string() })),
+        notFoundMessage: "x",
+        genericErrorMessage: "x",
+      },
+    );
+    return { res, fetchMock };
+  }
+
+  it("rechaza con 403 un Origin de otro sitio sin llamar a SIBOX", async () => {
+    const { res, fetchMock } = await llamar({
+      "content-type": "application/json",
+      origin: "https://sitio-malicioso.example",
+      host: "localhost",
+    });
+    expect(res.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rechaza con 403 un Origin que no es una URL", async () => {
+    const { res } = await llamar({ "content-type": "application/json", origin: "no-es-url", host: "localhost" });
+    expect(res.status).toBe(403);
+  });
+
+  it("rechaza con 415 un cuerpo que no es application/json (formularios de otros sitios)", async () => {
+    for (const tipo of ["text/plain", "application/x-www-form-urlencoded", "multipart/form-data"]) {
+      const { res, fetchMock } = await llamar({ "content-type": tipo });
+      expect(res.status, tipo).toBe(415);
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+    expect((await llamar({})).res.status).toBe(415);
   });
 });

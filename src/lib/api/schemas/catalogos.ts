@@ -29,7 +29,7 @@ export const codigoPostalSchema = z
 // ---------------------------------------------------------------- Oficinas
 
 /** Request de ListadoOficinas: sin filtros = todas las oficinas (public, sin datos personales). */
-export const oficinasRequestSchema = z.object({}).transform(() => ({
+export const oficinasRequestSchema = z.strictObject({}).transform(() => ({
   K_Oficina: "",
   D_Oficina: "",
   K_Estado: "",
@@ -103,7 +103,7 @@ export const oficinasResponseSchema = z.array(oficinaSchema);
 // ------------------------------------------------------------- BusquedaCP
 
 /** Lo unico que acepta el navegador: un CP. El resto del payload lo fija el servidor. */
-export const busquedaCpRequestSchema = z.object({ CP: codigoPostalSchema }).transform(({ CP }) => ({
+export const busquedaCpRequestSchema = z.strictObject({ CP: codigoPostalSchema }).transform(({ CP }) => ({
   CP,
   Colonia: "",
   Estado: "",
@@ -162,7 +162,7 @@ export const busquedaCpResponseSchema = z.array(filaCpSchema).transform((filas):
 // ---------------------------------------------------- ObtenerHorariosPorCP
 
 /** OJO: el parametro se llama `Codigo_Postal` (no `CP`). */
-export const horariosRequestSchema = z.object({ Codigo_Postal: codigoPostalSchema });
+export const horariosRequestSchema = z.strictObject({ Codigo_Postal: codigoPostalSchema });
 
 const horaSchema = z.string().regex(/^\d{1,2}:\d{2}/);
 

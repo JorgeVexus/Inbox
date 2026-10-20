@@ -428,7 +428,16 @@ API:
 5. Rate limiting propio en el BFF además del de SIBOX (valores sugeridos en
    la sección 6.2 del plan: rastreo 30/min, cotización 10/min y 50/hora,
    login 5 fallos/15min, generar guía 5/10min, etc.). Responder 429 +
-   Retry-After.
+   Retry-After. **Implementado (2026-10-20)** en `src/lib/api/rate-limit.ts`
+   y activado con la opción `limite` de `proxySibox()` (rastreo y detalle:
+   30/min por IP). Ojo: el almacén actual es en memoria (por instancia) y
+   hay que cambiarlo por uno compartido antes de producción (INDICE B12).
+   Toda ruta nueva del BFF debe declarar su `limite`. `proxySibox()` también
+   exige `Origin` propio (403) y `Content-Type: application/json` (415), y los
+   esquemas de entrada son `strict` (campos extra = 400): úsalo en rutas
+   nuevas. Los errores se registran con `logError()` (`src/lib/api/log.ts`),
+   que enmascara correos, teléfonos, RFC y tokens: no uses `console.error`
+   directo con respuestas de SIBOX.
 6. Sesión en cookies `Secure` + `HttpOnly` + `SameSite`. CSRF en mutaciones.
    CORS restringido a orígenes explícitos.
 7. No loguear contraseñas, tokens, PII completa (RFC, teléfono, correo,

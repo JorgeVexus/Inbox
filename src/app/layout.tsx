@@ -59,8 +59,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-full flex flex-col bg-white">
         <script
           type="application/ld+json"
-          // JSON estático escrito por nosotros (sin datos del usuario): seguro de inyectar.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(DATOS_ESTRUCTURADOS) }}
+          // JSON estático escrito por nosotros (sin datos del usuario). Aun así se escapa `<` para que ningún valor pueda cerrar la etiqueta <script>.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(DATOS_ESTRUCTURADOS).replace(/</g, "\\u003c") }}
         />
         <AuthProvider>
           <Navbar />

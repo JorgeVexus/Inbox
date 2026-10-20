@@ -45,6 +45,7 @@ test.describe("API /api/rastreo y /api/rastreo/detalle: entradas hostiles", () =
         ["traversal", { Guia: "../../Login" }, 400],
         ["41 caracteres", { Guia: "A".repeat(41) }, 400],
         ["sin campo", {}, 400],
+        ["campo extra (K_Cliente ajeno)", { Guia: "4003229791", K_Cliente: 1 }, 400],
         ["arreglo", [], 400],
         ["null", null, 400],
       ];
@@ -111,5 +112,56 @@ test("rutas privadas no se indexan (meta robots noindex)", async ({ page }) => {
   for (const ruta of ["/perfil", "/envio", "/recoleccion"]) {
     await page.goto(ruta);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  }
+});
+
+test("la política de seguridad de contenido se cumple en todo el sitio (sin violaciones)", async ({ page }) => {
+  const violaciones: string[] = [];
+  await page.addInitScript(() => {
+    document.addEventListener("securitypolicyviolation", (e) => {
+      (window as unknown as { __csp: string[] }).__csp ??= [];
+      (window as unknown as { __csp: string[] }).__csp.push(`${e.violatedDirective} ${e.blockedURI}`);
+    });
+  });
+  for (const ruta of ["/", "/cotizar", "/rastreo", "/cobertura", "/somos", "/soporte"]) {
+    const r = await page.goto(ruta);
+    expect(r?.headers()["content-security-policy"], ruta).toMatch(/default-src 'self'.*frame-ancestors 'none'/);
+    await page.waitForLoadState("networkidle");
+    await page.mouse.wheel(0, 4000); // llega al mapa (carga perezosa de Leaflet y teselas)
+    await page.waitForTimeout(600);
+    violaciones.push(...(await page.evaluate(() => (window as unknown as { __csp?: string[] }).__csp ?? [])));
+  }
+  expect(violaciones).toEqual([]);
+});
+
+test("la CSP impide scripts de otros orígenes, eval y conexiones externas", async ({ request }) => {
+  const csp = (await request.get("/")).headers()["content-security-policy"] ?? "";
+  expect(csp).toContain("script-src 'self'");
+  expect(csp).not.toMatch(/script-src[^;]*(\*|https?:)/);
+  expect(csp).not.toContain("unsafe-eval");
+  expect(csp).toContain("connect-src 'self'");
+  expect(csp).toContain("object-src 'none'");
+  expect(csp).toContain("base-uri 'self'");
+});
+
+test("las API rechazan peticiones de otro sitio (Origin ajeno) y cuerpos que no son JSON", async ({ request }) => {
+  for (const ruta of ["/api/rastreo", "/api/rastreo/detalle"]) {
+    const ajeno = await request.post(ruta, {
+      data: { Guia: "4003229791" },
+      headers: { origin: "https://sitio-malicioso.example" },
+    });
+    expect(ajeno.status(), `${ruta} con Origin ajeno`).toBe(403);
+
+    const mismoSitio = await request.post(ruta, {
+      data: { Guia: "mal formato!" },
+      headers: { origin: "http://localhost:3400" },
+    });
+    expect(mismoSitio.status(), `${ruta} con Origin propio`).toBe(400);
+
+    const texto = await request.post(ruta, {
+      data: '{"Guia":"4003229791"}',
+      headers: { "content-type": "text/plain" },
+    });
+    expect(texto.status(), `${ruta} con text/plain`).toBe(415);
   }
 });

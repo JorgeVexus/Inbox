@@ -220,3 +220,41 @@ describe("protecciones del Login (anti-martilleo hacia SIBOX)", () => {
     await expect(siboxPost("/wsRastreo", { Guia: "1" })).resolves.toEqual([]);
   });
 });
+
+describe("URL base de SIBOX", () => {
+  beforeEach(() => {
+    process.env.SIBOX_SERVICE_USER = "servicio";
+    process.env.SIBOX_SERVICE_PASSWORD = "clave";
+    vi.resetModules();
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    delete process.env.SIBOX_API_BASE_URL;
+    delete process.env.SIBOX_SERVICE_USER;
+    delete process.env.SIBOX_SERVICE_PASSWORD;
+  });
+
+  it.each(["http://apitest.inbox.com.mx", "ftp://x.mx", "no es una url"])(
+    "rechaza %s antes de enviar la credencial",
+    async (url) => {
+      process.env.SIBOX_API_BASE_URL = url;
+      const fetchMock = vi.fn();
+      vi.stubGlobal("fetch", fetchMock);
+      const { siboxPost } = await import("@/lib/api/sibox-client");
+      await expect(siboxPost("/wsX", {})).rejects.toThrow(/SIBOX_API_BASE_URL/);
+      expect(fetchMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it("acepta http solo hacia localhost y quita la diagonal final", async () => {
+    process.env.SIBOX_API_BASE_URL = "http://localhost:4010/";
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(loginOk("t"))
+      .mockResolvedValueOnce(jsonResponse({ resp: { result: 0, data: [] } }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { siboxPost } = await import("@/lib/api/sibox-client");
+    await siboxPost("/wsX", {});
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("http://localhost:4010/Login");
+  });
+});

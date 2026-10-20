@@ -67,9 +67,9 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 
 | Fase | Estado | Documento |
 |---|---|---|
-| 0. Preparación y línea base | ✅ Completada (2026-10-20) | `docs/fases/FASE_0_PREPARACION.md` |
-| 1. Estática y limpieza (F3, F4, F5) | ⬜ Siguiente | — |
-| 2. Seguridad (F1, F2, F14 inventario) | ⬜ | — |
+| 0. Preparación y línea base | ✅ Completada (2026-10-20) | `docs/fases/REVISION_360_FASES.md` (Fase 0) |
+| 1. Estática y limpieza (F3, F4, F5) | ✅ Completada (2026-10-20; remanente: 12 avisos de tamaño/complejidad) | `docs/fases/REVISION_360_FASES.md` (Fase 1) |
+| 2. Seguridad (F1, F2, F14 inventario) | 🔄 En curso | `docs/fases/REVISION_360_FASES.md` (Fase 2) |
 | 3. Funcional e integración (F6, F7) | ⬜ (depende de B1) | — |
 | 4. Experiencia (F9, F10, F11, F13) | ⬜ (F9 depende de Figma Dev Mode) | — |
 | 5. Rendimiento y SEO (F8, F12) | ⬜ | — |
