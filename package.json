@@ -20,7 +20,8 @@
     "qa:ciclos": "madge --circular --extensions ts,tsx --ts-config tsconfig.json src",
     "qa:ortografia": "cspell lint --no-progress \"src/**/*.{ts,tsx}\" \"docs/*.md\" README.md INDICE_MAESTRO.md",
     "qa:formato": "prettier --check .",
-    "qa:peso": "node scripts/peso-por-ruta.mjs"
+    "qa:peso": "node scripts/peso-por-ruta.mjs",
+    "qa:lighthouse": "node scripts/lighthouse-presupuesto.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
@@ -42,6 +43,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^5.0.5",
+    "chrome-launcher": "^1.2.2",
     "cspell": "^10.4.0",
     "eslint": "^9",
     "eslint-config-next": "^16.4.0",
@@ -51,6 +53,7 @@
     "jscpd": "^5.4.1",
     "jsdom": "^26.1.0",
     "knip": "^6.42.1",
+    "lighthouse": "^13.5.0",
     "madge": "^8.0.0",
     "prettier": "^3.9.10",
     "tailwindcss": "^4",

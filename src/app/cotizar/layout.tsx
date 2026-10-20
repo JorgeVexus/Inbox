@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { MigasJsonLd } from "@/components/seo/json-ld";
 import { paginaMeta } from "@/lib/seo";
 
 export const metadata: Metadata = paginaMeta({
@@ -10,5 +11,10 @@ export const metadata: Metadata = paginaMeta({
 });
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <>
+      <MigasJsonLd nombre="Cotizar envío" ruta="/cotizar" />
+      {children}
+    </>
+  );
 }

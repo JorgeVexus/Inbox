@@ -1,4 +1,3 @@
-import { leerBorradorCotizacion } from "@/lib/almacen-schemas";
 import type { CotizacionInput } from "@/types/cotizacion";
 
 /**
@@ -10,27 +9,18 @@ import type { CotizacionInput } from "@/types/cotizacion";
  * Read once and cleared immediately — if the visitor reloads /cotizar or
  * navigates back to it later, it should behave like a fresh quote, not
  * silently resurrect stale data.
+ *
+ * La lectura vive en `cotizacion-draft-lectura.ts` a propósito: valida con Zod (~30 KB comprimidos) y
+ * Home solo necesita guardar. Importarla aquí hacía que todo el sitio descargara Zod.
  */
-const KEY = "inbox:cotizacion-draft";
+export const CLAVE_BORRADOR = "inbox:cotizacion-draft";
 
 export function saveCotizacionDraft(input: CotizacionInput) {
   if (typeof window === "undefined") return;
   try {
-    window.sessionStorage.setItem(KEY, JSON.stringify(input));
+    window.sessionStorage.setItem(CLAVE_BORRADOR, JSON.stringify(input));
   } catch {
     // Almacenamiento bloqueado (modo privado / datos del sitio bloqueados): el
     // traspaso Home -> /cotizar es una comodidad, no debe romper el flujo.
-  }
-}
-
-export function readAndClearCotizacionDraft(): CotizacionInput | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.sessionStorage.getItem(KEY);
-    if (!raw) return null;
-    window.sessionStorage.removeItem(KEY);
-    return leerBorradorCotizacion(JSON.parse(raw));
-  } catch {
-    return null;
   }
 }

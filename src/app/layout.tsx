@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DESCRIPCION_BASE, NOMBRE_SITIO, SITE_URL } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import type { ReactNode } from "react";
 import { Poppins } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
@@ -55,13 +56,9 @@ const DATOS_ESTRUCTURADOS = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es" className={`${poppins.variable} h-full antialiased`}>
+    <html lang="es-MX" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white">
-        <script
-          type="application/ld+json"
-          // JSON estático escrito por nosotros (sin datos del usuario). Aun así se escapa `<` para que ningún valor pueda cerrar la etiqueta <script>.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(DATOS_ESTRUCTURADOS).replace(/</g, "\\u003c") }}
-        />
+        <JsonLd datos={DATOS_ESTRUCTURADOS} />
         <AuthProvider>
           <Navbar />
           <main className="flex-1">{children}</main>

@@ -149,6 +149,7 @@ bloqueado, B1).
 | **B10** | **Contenido provisional que hay que pedir al cliente**: respuestas reales del FAQ (las 4 muestran el mismo texto) y del chat; URLs reales de Facebook/Instagram/LinkedIn; correo oficial de soporte (el sitio mezcla `soporte@` e `info@`); **aviso de privacidad y términos y condiciones** (obligatorios en México; hoy `/privacidad` y `/terminos` son páginas "Próximamente"); bolsa de trabajo; aclarar el interruptor US/MX del Hero. | Cliente | No lanzar con textos de relleno | Pendiente (agregar al próximo mensaje). |
 | **B11** | **Mapa**: el sitio usa teselas públicas de OpenStreetMap, cuya política no permite tráfico comercial intenso. Decidir proveedor de teselas (MapTiler, Stadia, propio) antes de producción. Además solo 32 de 71 oficinas reales traen coordenadas. | Jefe / presupuesto | Producción | Pendiente de decidir. |
 | **B12** | **Límite de peticiones compartido**: el actual vive en la memoria de cada instancia (en Vercel cada instancia tiene el suyo), así que solo es una primera barrera. Hace falta un almacén compartido (Upstash Redis u otro) y límites para login/cotización/CP cuando existan sus rutas. | Desarrollo + costo | Producción | Pendiente (`src/lib/api/rate-limit.ts` ya está preparado: se cambia `AlmacenLimite`). |
+| **B13** | **Contenido provisional visible** (detalle en la Fase 5, §5): las 4 respuestas del FAQ son idénticas; las 3 columnas del pie son idénticas; redes sociales apuntan a las portadas genéricas; hay dos correos de soporte distintos (`soporte@` e `info@`); teléfonos por confirmar; el enlace "Enviar" del pie exige iniciar sesión. Se suma a B10. | Cliente | No lanzar con textos de relleno | Pendiente de enviar al cliente. |
 | **B7** | Más guías de prueba: las 3 entregadas son todas `ENTREGADA`. Faltan guías en tránsito / "LISTO PARA ENTREGAR" para validar el timeline y la fecha prometida. | Cliente | Validación del timeline | En el mensaje. |
 
 ---
@@ -204,6 +205,7 @@ las pruebas de conectividad contra `api.inbox.com.mx`.
 | 2026-10-12 | Errores internos de SIBOX **nunca** llegan al navegador (502/503/504 genéricos) | Se vio un error de SQL con nombre de stored procedure |
 | 2026-10-20 | CSP estática con `script-src 'self' 'unsafe-inline'` en lugar de nonce | El HTML de Next trae scripts en línea; el nonce obliga a generar todas las páginas en cada visita (sin CDN). Se reevalúa en la Fase 5 |
 | 2026-10-20 | El BFF rechaza (403/415) peticiones con `Origin` ajeno o que no sean JSON, y campos extra (400) | Defensa entre sitios y contra colar `K_Cliente`; barato y sin efectos para el sitio |
+| 2026-10-20 | Región de Vercel `dfw1` (Dallas) y presupuestos de Lighthouse bloqueantes en CI solo tras unas semanas de estabilidad | El borde de Cloudflare de SIBOX está en Dallas; el laboratorio compartido de CI tiene ruido |
 | siempre | `procesarPago()` **nunca** se conecta a una pasarela sin decisión explícita | Pagos bloqueados por backend |
 
 ---
@@ -278,6 +280,8 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-20 — Revisión 360°, Fase 5 (rendimiento y SEO) completada** (`docs/fases/REVISION_360_FASES.md`, Fase 5; se hizo antes que la 3 y la 4, que dependen de Cloudflare y de Figma): Lighthouse móvil con presupuestos (`npm run qa:lighthouse`, también en CI sin bloquear): las 6 rutas públicas ≥ 93 en Rendimiento y SEO 100; `/rastreo` pasó de 71 a 95 (CLS 0.646 → 0). JS de Home 205 → 177 KB (Zod ya no se descarga en todo el sitio), fotos del banner bajo demanda, logos de 626/517 KB a 12/9 KB, caché de estáticos, `vercel.json` (región `dfw1`), migas de pan JSON-LD, `lang=es-MX`, 23 pruebas E2E de SEO, prueba de carga (900–1 200 peticiones/s sin errores). LCP con limitación real 1.8–2.6 s (objetivo 2.5 s: 4 de 6 rutas; confirmar con datos de campo). Plan de analítica e inventario de contenido provisional (nuevo B13). Siguiente: 6 (legal/operación), o 3 y 4 cuando se destraben.
 
 - **2026-10-20 — Revisión 360°, Fase 2 (seguridad) completada** (`docs/fases/REVISION_360_FASES.md`, Fase 2): semgrep 0 hallazgos, historial de git sin secretos, `npm audit` de producción 0. Corregido: límite de peticiones en el BFF (429 + `Retry-After`, 30/min en rastreo; **solo en memoria, ver B12**), CSP completa, defensa entre sitios (`Origin` + `application/json`), esquemas estrictos, bitácora con datos personales enmascarados, solo HTTPS hacia SIBOX, vitest 5 (sin críticas). Archivos listos para activar en GitHub: gitleaks, CodeQL, Dependabot, CODEOWNERS. 204 pruebas unitarias. Siguiente: Fase 3.
 

@@ -37,7 +37,7 @@ export function Navbar() {
             fill
             sizes="220px"
             className="object-contain object-left"
-            priority
+            preload
           />
         </Link>
 

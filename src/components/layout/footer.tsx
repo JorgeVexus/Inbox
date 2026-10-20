@@ -44,7 +44,7 @@ export function Footer() {
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-10 px-6 py-14 lg:px-16">
         <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative h-[90px] w-[140px] shrink-0">
-            <Image src="/images/logo-blanco.png" alt="Inbox" fill className="object-contain" />
+            <Image src="/images/logo-blanco.png" alt="Inbox" fill sizes="140px" className="object-contain" />
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-16">

@@ -6,7 +6,7 @@ import { StepCotizar, defaultCotizacionInput } from "@/components/cotizar/step-c
 import { StepCosto } from "@/components/cotizar/step-costo";
 import { StepConfirmar } from "@/components/cotizar/step-confirmar";
 import { StepPago } from "@/components/cotizar/step-pago";
-import { readAndClearCotizacionDraft } from "@/lib/cotizacion-draft";
+import { readAndClearCotizacionDraft } from "@/lib/cotizacion-draft-lectura";
 import type { ConfirmarInput, CostoOpcion, CotizacionInput } from "@/types/cotizacion";
 
 export default function CotizarPage() {

@@ -52,13 +52,32 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
+/**
+ * Caché de archivos estáticos (revisión 360°, Fase 5). Los de `/_next/static` ya llevan hash en el
+ * nombre y Next los marca como inmutables; los de `public/` no (Next los sirve con `max-age=0`,
+ * es decir, el navegador los revalida en cada visita). Sus nombres no llevan hash, así que se
+ * cachean un día y se sirven viejos hasta una semana mientras se revalidan: un cambio de logo
+ * tarda como máximo un día en verse, y las visitas repetidas no vuelven a pedir los iconos.
+ */
+const cacheEstaticos = "public, max-age=86400, stale-while-revalidate=604800";
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  images: {
+    // El optimizador de imágenes cachea 7 días (por defecto 4 horas): los originales casi no cambian.
+    minimumCacheTTL: 60 * 60 * 24 * 7,
+  },
   // Un package-lock.json suelto fuera del repo hacia que Turbopack infiriera
   // mal la raiz del workspace.
   turbopack: { root: path.resolve(import.meta.dirname) },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/icons/:path*", headers: [{ key: "Cache-Control", value: cacheEstaticos }] },
+      { source: "/images/:path*", headers: [{ key: "Cache-Control", value: cacheEstaticos }] },
+      // Las respuestas del BFF dependen de quién pregunta y del momento: nunca se cachean.
+      { source: "/api/:path*", headers: [{ key: "Cache-Control", value: "no-store" }] },
+    ];
   },
 };
 

@@ -880,7 +880,15 @@ npm run dev     # http://localhost:3000
 npm run lint
 npx tsc --noEmit
 npm run build
+# Rendimiento (con el sitio compilado y servido: npx next start -p 3500):
+npm run qa:lighthouse   # presupuestos de Lighthouse móvil en las 6 rutas públicas
+npm run qa:peso         # KB de JS/CSS/imágenes/fuentes por ruta
 ```
+
+Reglas de rendimiento (Fase 5 de la revisión 360°): no importes `zod` (ni `almacen-schemas`)
+desde código que cargue Home o el layout; las fotos del banner van por
+`components/ui/fotos-hero.tsx`; un marcador de `Suspense` debe medir lo mismo que el
+contenido real (si no, salta el diseño); usa `preload` (no `priority`) en el `Image` del LCP.
 
 Un `.claude/launch.json` en la raíz de `Inbox/` (un nivel arriba de `repo/`)
 ya está configurado para levantar el dev server vía la herramienta de

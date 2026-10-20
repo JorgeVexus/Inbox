@@ -60,7 +60,8 @@ test("guía en la URL con script no se ejecuta ni se refleja como HTML", async (
   await page.waitForLoadState("networkidle");
   expect(dialogo).toBe(false);
   await expect(page.locator("main img[src='x']")).toHaveCount(0);
-  await expect(page.locator("main script")).toHaveCount(0);
+  // Los datos estructurados (JSON-LD) son legítimos; lo que no debe existir es un script inyectado.
+  await expect(page.locator('main script:not([type="application/ld+json"])')).toHaveCount(0);
 });
 
 test("chat: rastreo y formulario de correo con validación", async ({ page }) => {

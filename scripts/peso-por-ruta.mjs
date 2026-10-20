@@ -1,9 +1,9 @@
 // Mide cuánto JavaScript/CSS/imágenes/fuentes descarga cada ruta (bytes transferidos, comprimidos).
-// Requiere un servidor de producción: npx next start -p 3700
+// Requiere un servidor de producción: npx next start -p 3500
 // Uso: node scripts/peso-por-ruta.mjs [urlBase]
 import { chromium } from "@playwright/test";
 
-const base = process.argv[2] ?? "http://localhost:3700";
+const base = process.argv[2] ?? process.env.LH_URL ?? "http://localhost:3500";
 const rutas = ["/", "/cotizar", "/rastreo", "/cobertura", "/somos", "/soporte", "/envio", "/perfil", "/recoleccion"];
 const navegador = await chromium.launch({ channel: "chrome" });
 const filas = [];

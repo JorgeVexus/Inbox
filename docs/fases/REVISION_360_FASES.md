@@ -11,9 +11,9 @@ El plan tiene **8 fases en total (de la 0 a la 7)**.
 | 0 | Preparación y línea base | — | ✅ Completada (2026-10-20) |
 | 1 | Estática y limpieza | F3, F4, F5 | ✅ Completada (2026-10-20) |
 | 2 | Seguridad | F1, F2, F14 (inventario) | ✅ Completada (2026-10-20); 12 pendientes con dueño en su §6 |
-| 3 | Funcional e integración | F6, F7 | ⬜ Siguiente (depende de B1: Cloudflare) |
+| 3 | Funcional e integración | F6, F7 | ⬜ (depende de B1: Cloudflare) |
 | 4 | Experiencia | F9, F10, F11, F13 | ⬜ (F9 depende de Figma Dev Mode) |
-| 5 | Rendimiento y SEO | F8, F12 | ⬜ |
+| 5 | Rendimiento y SEO | F8, F12 | ✅ Completada (2026-10-20); 8 pendientes con dueño en su §7 |
 | 6 | Operación, legal y UAT | F15, F14, F16 | ⬜ |
 | 7 | Cierre y Go / No-Go | todos | ⬜ |
 
@@ -490,3 +490,150 @@ Sin cookies, sin analítica, sin Sentry todavía: cuando se agreguen, este inven
 ### 8. Siguiente: Fase 3 — Funcional e integración
 
 Probar cada flujo de punta a punta contra la API real (depende de B1: Cloudflare), conectar al BFF los endpoints de lectura ya verificados (`ListadoOficinas`, `BusquedaCP`, `TipoEnvio`/`TipoEntrega`, `ObtenerHorariosPorCP`) con límite de peticiones, pruebas de contrato con respuestas reales grabadas y las pruebas de autorización por objeto. **Si B1 sigue bloqueado, se avanza con el puente local de `curl` y las respuestas grabadas, y se deja la validación contra el servidor real como condición de salida.**
+
+---
+
+## Fase 5 — Rendimiento y SEO (F8 rendimiento, F12 SEO, analítica y contenido)
+
+**Plan:** `docs/PLAN_REVISION_360.md` · **Fecha:** 20 de octubre de 2026 · **Estado:** ✅ **Completada** en lo medible desde esta computadora; los datos de campo y varias decisiones dependen del lanzamiento y del cliente (ver §7)
+
+> Las fases 3 y 4 se saltaron a propósito porque dependen de terceros (Cloudflare/SIBOX y Figma Dev Mode). El orden de las fases no es rígido; el documento conserva su numeración.
+
+### 1. Objetivo
+
+Que el sitio cargue rápido en un teléfono con red lenta, que los buscadores lo entiendan, y dejar **medido y vigilado** (con presupuestos que fallan en CI) para que no se degrade sin que nadie lo note.
+
+### 2. Cómo se midió
+
+- **Lighthouse 13 móvil** (4G lento y CPU 4× más lenta, simulado) sobre las 6 rutas públicas: mediana de 3 corridas y hasta 2 intentos, para absorber el ruido del laboratorio. Script propio `npm run qa:lighthouse` con **presupuestos que hacen fallar el proceso**: Rendimiento ≥ 90, Accesibilidad ≥ 95, Buenas prácticas ≥ 95, SEO = 100, LCP ≤ 3.3 s (límite de laboratorio; el objetivo de 2.5 s se vigila como aviso), CLS ≤ 0.1, TBT ≤ 200 ms. `scripts/lighthouse-diagnostico.mjs` explica una ruta (elemento LCP, desplazamientos, recursos pesados).
+- **Medición con limitación real** (Lighthouse "devtools": la red y la CPU se limitan de verdad en el navegador, sin simulación) para contrastar el LCP simulado, que es conservador.
+- **Peso por ruta** (`npm run qa:peso`), **prueba de carga** con `autocannon` y **pruebas E2E de SEO** (nuevas).
+
+### 3. Resultados
+
+#### 3.1 Lighthouse móvil: antes y después
+
+| Ruta | Rendimiento antes → después | LCP simulado antes → después | CLS antes → después | TBT después |
+|---|---|---|---|---|
+| `/` | 90 → **94** | 3 515 → 2 998 ms | 0 → 0 | 71 ms |
+| `/cotizar` | 98 → 93* | 2 129 → 3 060 ms* | 0 → 0 | 91 ms |
+| `/rastreo` | **71 → 95** | 3 011 → 2 888 ms | **0.646 → 0** | 61 ms |
+| `/cobertura` | 94 → 94 | 3 080 → 3 038 ms | 0 → 0 | 68 ms |
+| `/somos` | 94 → 95 | 2 989 → 2 882 ms | 0 → 0 | 48 ms |
+| `/soporte` | 95 → 95 | 2 888 → 2 870 ms | 0 → 0 | 57 ms |
+
+Accesibilidad 96–100 (el 96 es el contraste del naranja de marca con texto blanco, 3.02:1, ya conocido; ver F11), Buenas prácticas 96–100, **SEO 100 en las 6**.
+
+*`/cotizar`: el laboratorio simulado varió entre 2.1 y 3.1 s en corridas sucesivas **sin cambios en esa página** (ruido de la máquina, no regresión); en la medición con limitación real dio 2.49 s.
+
+**LCP con la red y la CPU limitadas de verdad** (mediana de 3): `/` 2 589 ms · `/cotizar` 2 486 · `/rastreo` 1 799 · `/cobertura` 2 442 · `/somos` 2 587 · `/soporte` 1 776. **Dicho con franqueza:** el objetivo de Core Web Vitals (LCP ≤ 2.5 s) se cumple en 4 de 6 rutas y en las otras 2 queda a ~0.1 s; en laboratorio simulado las 6 quedan entre 2.9 y 3.1 s. La acreditación definitiva es con **datos de campo** (usuarios reales) tras el lanzamiento (§7).
+
+#### 3.2 Qué se corrigió y por qué
+
+| # | Hallazgo | Corrección | Efecto |
+|---|---|---|---|
+| P-01 | **`/rastreo` saltaba al cargar** (CLS 0.646, 6 veces el límite "bueno"): el marcador de carga era solo un título y el contenido real aparecía después, empujando el pie de página | `rastreo-esqueleto.tsx`: el marcador mide lo mismo que la vista real | CLS 0.646 → **0**, Rendimiento 71 → 95 |
+| P-02 | Las **4 fotos del banner se pedían a la vez**; las 3 ocultas competían por el ancho de banda con la foto que define el LCP | `ui/fotos-hero.tsx` (también elimina código duplicado entre Home y Somos): se descarga la visible y, a mitad del primer intervalo, la siguiente; la primera con `preload` + `fetchPriority="high"` | Imágenes de Home 80 → 38 KB; LCP de Home −500 ms |
+| P-03 | **Zod (30 KB comprimidos) se descargaba en TODAS las páginas** porque Home importaba el guardado del borrador de cotización, que arrastraba el validador | Se separó la lectura (`cotizacion-draft-lectura.ts`, solo `/cotizar`) | JS de Home 205 → **177 KB**; `/rastreo` 203 → 175; `/somos` 204 → 176; `/soporte` 205 → 177 |
+| P-04 | Logos de **4096×2483 px** (626 y 517 KB) para mostrarse a 140–220 px; 2 imágenes, 10 iconos y 5 archivos de plantilla de Next sin uso | Logos a 880 px (12 y 9 KB; diferencia visual máxima 21/255 en un píxel, media 0.15; los originales quedaron fuera del repo en `../originales-imagenes`); se borró lo no usado (≈ 880 KB de fuentes) | Menos peso de repositorio y de optimización de imágenes; `sizes` en el logo del pie |
+| P-05 | Los archivos de `public/` se revalidaban en cada visita (`max-age=0`) | Caché de 1 día con *stale-while-revalidate* de 7 para `/icons` y `/images`; el optimizador de imágenes cachea 7 días (antes 4 h); `/api/*` con `no-store` | Visitas repetidas sin pedir iconos |
+| P-06 | `priority` de `next/image` está obsoleto en Next 16 | Reemplazado por `preload` | Sin avisos de obsolescencia |
+| P-07 | La función del BFF no declaraba cuánto puede tardar, y SIBOX puede tardar hasta 20 s | `maxDuration = 25` en las dos rutas | El 504 limpio llega antes de que Vercel corte la función |
+| P-08 | Región del servidor sin definir | `vercel.json` → `dfw1` (Dallas): los identificadores de Cloudflare del API de SIBOX terminan en "-DFW", así que su borde está en Dallas | Menos latencia en cada llamada del BFF; **decisión reversible** (ver §7) |
+
+**Probado y descartado:** `experimental.inlineCss` (incrustar el CSS en el HTML) empeoró el rendimiento (Home 93 → 89, TBT 61 → 198 ms), se revirtió.
+
+#### 3.3 Peso por ruta (KB, sin caché)
+
+| Ruta | JS antes → después | Imágenes antes → después |
+|---|---|---|
+| `/` | 205 → 177 | 80 → 38 |
+| `/rastreo` | 203 → 175 | 34 → 16 |
+| `/somos` | 204 → 176 | 89 → 46 |
+| `/soporte` | 205 → 177 | 28 → 29 |
+| `/cobertura` | 250 → 222 | 136 → 137 |
+| `/cotizar` | 222 → 226 | 32 → 33 |
+| `/envio`, `/perfil`, `/recoleccion` | 235–244 → 239–248 | sin cambio |
+
+(Las rutas que sí usan Zod suben ~4 KB por el tercer fragmento; es el precio de quitárselo a las demás.) Todas bajo el presupuesto de 250 KB de JS.
+
+#### 3.4 Renderizado y servidor
+**Todas las páginas son estáticas** (precompiladas, servibles desde CDN); solo las 2 rutas del BFF son dinámicas. Por eso no hay coste de render por visita. Esto es justo lo que se perdería con una CSP con *nonce* (decisión de la Fase 2: se mantiene la CSP estática).
+
+#### 3.5 Carga (localhost, producción, `autocannon`)
+
+| Escenario | Resultado |
+|---|---|
+| Home, 50 conexiones simultáneas, 15 s | **1 029 peticiones/s**, p50 46 ms, p99 84 ms, 0 errores |
+| **Pico**: Home, 500 conexiones, 10 s | 900 peticiones/s, p50 533 ms, p99 775 ms, **0 errores, 0 caídas** |
+| `/cotizar`, 100 conexiones, 10 s | 1 191 peticiones/s, p99 127 ms, 0 errores |
+| BFF sin límite, 50 conexiones, 10 s (cuerpo inválido, rechazado antes de SIBOX) | 1 001 peticiones/s, p99 98 ms |
+| BFF **con** límite, 50 conexiones, 10 s | 1 125 peticiones/s, p99 165 ms, 0 errores; tras las 30 primeras el límite responde 429 (comportamiento comprobado en `e2e/limite.spec.ts`) y no añade costo apreciable |
+
+**Limitaciones:** es una sola máquina (también corre el generador de carga), no el despliegue real; y **no se pudo medir el BFF hablando con SIBOX** (bloqueo de Cloudflare, B1) ni las funciones en frío de Vercel. Antes del lanzamiento hay que repetirlo contra la preview con `k6` o `autocannon` (§7).
+
+#### 3.6 SEO técnico
+- **`e2e/seo.spec.ts` (nuevo, 23 pruebas por navegador)**: en las 6 páginas públicas verifica `lang="es-MX"`, un solo `h1`, título y descripción **únicos**, de longitud útil (título ≤ 65, descripción 50–170), canonical absoluto y sin parámetros, Open Graph coherente con el canonical y con imagen que existe, datos estructurados válidos; en las 7 rutas privadas o provisionales, `noindex`; el sitemap lista exactamente las 6 públicas y todas responden 200; `robots.txt` apunta al sitemap y bloquea API/zonas privadas sin bloquear todo; las rutas inexistentes dan 404 real (no "404 blando").
+- **Migas de pan (BreadcrumbList)** en las 5 páginas internas, además de `Organization` en todas (`src/components/seo/json-ld.tsx`).
+- `lang` pasó de `es` a `es-MX`.
+- **Evaluado y no hecho:** `LocalBusiness` por sucursal (requiere los datos reales de las 71 oficinas, hoy son un ejemplo), `FAQPage` (las respuestas reales no existen aún, ver §5) y `sameAs` con redes sociales (las direcciones reales no existen aún).
+
+### 4. Analítica: plan de medición (propuesta; no se instaló nada)
+
+**Principio:** medir qué pasa sin guardar datos personales. Ningún evento lleva número de guía, nombre, correo, teléfono, RFC, dirección completa ni C.P. completo (como máximo los 2 primeros dígitos).
+
+| Evento | Cuándo | Propiedades permitidas |
+|---|---|---|
+| `rastreo_consultado` | Se consulta una guía | origen (hero / página / chat), resultado (encontrada / no encontrada / error / límite) |
+| `cotizacion_iniciada` / `cotizacion_calculada` | Paso 1 enviado / costo mostrado | tipo de envío, tipo de entrega, rango de peso |
+| `checkout_confirmar` / `pago_iniciado` / `pago_exitoso` / `pago_fallido` | Pasos 3 y 4 | método de pago, motivo del fallo (sin datos de tarjeta) |
+| `recoleccion_programada` | Se agenda | estado (no la dirección) |
+| `login_exitoso` / `login_fallido` | Modal de acceso | — |
+| `cobertura_busqueda` | Se busca sucursal | estado |
+| `contacto_enviado` | Formularios de soporte/chat | formulario |
+| `error_bff` | El BFF responde 4xx/5xx | ruta, código |
+
+**Herramientas recomendadas (decisión del cliente):** *Vercel Web Analytics + Speed Insights* (sin cookies, mide Core Web Vitals reales y páginas vistas; los eventos personalizados requieren plan Pro) frente a *GA4* (más completo, pero usa cookies y exige banner de consentimiento y aviso). Con la primera no hace falta banner; sí hay que mencionarla en el aviso de privacidad (Fase 6). El embudo (cotización → pago) solo es completo cuando B2–B4 estén conectados.
+
+### 5. Contenido provisional que sigue visible (para pedir al cliente)
+
+| Dónde | Qué hay hoy | Qué se necesita |
+|---|---|---|
+| Home, Somos, Rastreo y Soporte (`Faq`) | **Las 4 respuestas son el mismo texto genérico** ("Escríbenos a soporte@…") | Respuestas reales a las 4 preguntas (y ampliar la lista) |
+| Chat flotante → pestaña Ayuda | Temas y preguntas de relleno | Contenido de ayuda real o decidir si se mantiene |
+| Pie de página | **Las 3 columnas son idénticas** ("Servicio al cliente" ×3 con los mismos 4 enlaces); "Enviar" lleva a `/envio` (exige iniciar sesión, pero **comprar una guía no debe exigir registro**) | Estructura real de columnas y a dónde debe llevar "Enviar" |
+| Pie de página | Redes sociales con las portadas genéricas `facebook.com`, `instagram.com`, `linkedin.com` | Direcciones reales de los perfiles |
+| FAQ y página de soporte | Dos correos distintos: `soporte@inbox.com.mx` e `info@inbox.com.mx` | Cuál es el oficial |
+| Servicios y soporte | `01 800 713 1000` y `834 171 3030` ("línea directa") | Confirmar ambos números |
+| `/privacidad`, `/terminos`, `/trabaja-en-inbox` | "Próximamente" (ya con `noindex`) | **Aviso de privacidad y términos: obligatorios en México antes de lanzar** |
+| `/cuenta/crear`, `/cuenta/recuperar` | "Próximamente" | Depende de B2 |
+| Rastreo, mapa y sucursales | Datos de demostración / ejemplo (el mapa muestra una muestra de oficinas, no las 71) | Conectar a la API (Fase 3) |
+
+**Sitio actual y redirecciones 301:** sigue **sin confirmarse** si existe un sitio público de Inbox. Si existe, hay que inventariar sus URLs y armar el mapa de redirecciones **antes** de cambiar el dominio; si no, este punto no aplica. Es la pregunta pendiente de más valor para SEO.
+
+### 6. Verificación
+
+| Comprobación | Resultado |
+|---|---|
+| `tsc`, ESLint (0 errores, 12 avisos heredados), `knip`, Prettier, ciclos | ✅ |
+| Pruebas unitarias | 204 pasan |
+| E2E completa, 4 navegadores (**119 pruebas × 4 = 476 casos**; +23 nuevas de SEO) | 467 pasan, 3 omitidas a propósito, **4 fallaron y 2 fueron intermitentes**. Los 4 fallos eran una sola prueba de rastreo que contaba cualquier `<script>` dentro de `<main>` y ahora encuentra legítimamente los datos estructurados; se corrigió para excluirlos y las 116 pruebas de rastreo y SEO volvieron a pasar en los 4 navegadores. Las 2 intermitentes fueron tiempos de espera de WebKit bajo carga (2 servidores + 2 procesos), que pasan solas |
+| Lighthouse con presupuestos | ✅ las 6 rutas dentro de presupuesto (con 6 avisos de LCP sobre el objetivo de laboratorio) |
+| CI | Nuevo trabajo `rendimiento` (Lighthouse con presupuestos). **No bloquea** las primeras semanas (`continue-on-error`): los ejecutores compartidos de GitHub son más ruidosos; quitar la línea cuando salga estable |
+
+### 7. Pendientes (con dueño)
+
+| # | Pendiente | Dueño | Cuándo |
+|---|---|---|---|
+| 1 | **Datos de campo**: activar Speed Insights/Analytics y revisar LCP/INP/CLS en p75 móvil durante 2 semanas | Tú (Vercel) | Tras el lanzamiento |
+| 2 | Repetir la prueba de carga contra la **preview de Vercel** (con SIBOX alcanzable) y probar funciones en frío | Desarrollo | Fase 7 / cuando B1 se resuelva |
+| 3 | Confirmar la región `dfw1` con el proveedor de SIBOX (dónde está su servidor) y con el plan de Vercel (varias regiones requieren Pro) | Tú / cliente | Al crear el proyecto |
+| 4 | Pendientes de contenido de §5 (**incluye aviso de privacidad y términos**) y la pregunta del **sitio actual / redirecciones 301** | Cliente | Antes de lanzar |
+| 5 | Elegir herramienta de analítica (§4) | Cliente / jefe | Antes de lanzar |
+| 6 | Si se quiere bajar más el LCP: 4 pesos de Poppins en lugar de 5 (−8 KB; cambia 10 textos de 600 a 700), cargar el chat solo al abrirlo (−10 KB), AVIF para fotos. Son mejoras pequeñas; se dejaron por no cambiar el diseño sin que lo decidas | Desarrollo | Opcional |
+| 7 | Dominio final en `SITE_URL` (Vercel) para que sitemap, canonical y Open Graph apunten al correcto; si se omite, hay respaldos con las variables de Vercel | Tú | Al crear el proyecto |
+| 8 | Quitar `continue-on-error` del trabajo de rendimiento del CI cuando sea estable | Desarrollo | Tras ~2 semanas |
+
+### 8. Siguiente
+
+Las fases **3** (funcional e integración; depende de B1) y **4** (experiencia; depende de Figma Dev Mode) siguen esperando a terceros. La **6** (operación, legal y UAT) puede empezar con lo que ya se sabe: aviso de privacidad (insumo: inventario de la Fase 2 y plan de analítica de esta fase), CI/CD, observabilidad y plan de migración; la **7** cierra con el Go / No-Go.

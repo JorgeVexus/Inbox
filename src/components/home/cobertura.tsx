@@ -61,7 +61,7 @@ export function Cobertura({
               src={headlineImage}
               alt=""
               fill
-              priority
+              preload
               sizes="(min-width: 1024px) 480px, 100vw"
               className="object-contain"
             />

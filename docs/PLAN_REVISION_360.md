@@ -72,7 +72,7 @@ Estado: ✅ cubierto con evidencia · 🟨 parcial · ⬜ pendiente. “Hoy” =
 | 2. Seguridad (F1, F2, F14 inventario) | 🔄 En curso | `docs/fases/REVISION_360_FASES.md` (Fase 2) |
 | 3. Funcional e integración (F6, F7) | ⬜ (depende de B1) | — |
 | 4. Experiencia (F9, F10, F11, F13) | ⬜ (F9 depende de Figma Dev Mode) | — |
-| 5. Rendimiento y SEO (F8, F12) | ⬜ | — |
+| 5. Rendimiento y SEO (F8, F12) | ✅ Completada (2026-10-20; datos de campo y contenido real pendientes) | `docs/fases/REVISION_360_FASES.md` (Fase 5) |
 | 6. Operación, legal y UAT (F15, F14, F16) | ⬜ | — |
 | 7. Cierre y Go / No-Go | ⬜ | — |
 

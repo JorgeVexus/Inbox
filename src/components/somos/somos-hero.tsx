@@ -1,36 +1,10 @@
-"use client";
-
-import Image from "next/image";
-import { useEffect, useState } from "react";
-
-const SLIDES = ["/images/hero-1.webp", "/images/hero-2.webp", "/images/hero-3.webp", "/images/hero-4.webp"];
+import { FotosHero } from "@/components/ui/fotos-hero";
 
 export function SomosHero() {
-  const [slide, setSlide] = useState(0);
-
-  useEffect(() => {
-    // Respeta "reducir movimiento" del sistema (WCAG 2.2.2): sin cambio automático de fotos.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => {
-      setSlide((s) => (s + 1) % SLIDES.length);
-    }, 5000);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <section className="relative">
       <div className="relative h-[577px] w-full overflow-hidden">
-        {SLIDES.map((src, i) => (
-          <Image
-            key={src}
-            src={src}
-            alt=""
-            fill
-            priority={i === 0}
-            className={`object-cover transition-opacity duration-1000 ${i === slide ? "opacity-100" : "opacity-0"}`}
-          />
-        ))}
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-[1.5px]" />
+        <FotosHero />
       </div>
 
       {/* Headline card — overlaps the bottom of the banner, same pattern as
