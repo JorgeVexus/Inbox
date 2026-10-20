@@ -136,6 +136,8 @@ test("recargar a mitad del flujo no rompe nada y vuelve al paso 1", async ({ pag
 
 test("tarjeta de cotización del Home pasa los datos a /cotizar", async ({ page }) => {
   await page.goto("/");
+  // Esperar a que React hidrate: escribir antes pierde el texto en los campos controlados (WebKit, bajo carga).
+  await page.waitForLoadState("networkidle");
   await page.getByLabel("Código postal de origen").fill("64060");
   await page.getByLabel("Ciudad de origen").fill("Monterrey");
   await page.getByLabel("Código postal de destino").fill("0100");
