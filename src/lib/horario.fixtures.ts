@@ -41,5 +41,5 @@ export const HORARIOS_REALES: string[] = [
   "Lunes - Viernes de 8:00 a 13:00 hrs  y de 14:30 a 19:00 hrs",
   "Lunes - Viernes 08:00 - 19:30 hrs.\r\nSábado 08:00 - 14:00 hrs.",
   "Lunes - Viernes 07:00 - 21:00 hrs\r\nSábado 08:00 -  16:00 hrs",
-  "Lun-Vie 10:00 - 16:00 hrs."
+  "Lun-Vie 10:00 - 16:00 hrs.",
 ];

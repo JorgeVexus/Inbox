@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  agruparEventosPorFecha,
-  parsearFechaEvento,
-} from "./envio-historial";
+import { agruparEventosPorFecha, parsearFechaEvento } from "./envio-historial";
 import type { RastreoEvento } from "../../types/rastreo";
 
 function evento(id: string, fecha: string): RastreoEvento {
@@ -24,11 +21,7 @@ describe("agruparEventosPorFecha", () => {
       evento("A2", "01-AGO-2026 10:00"),
     ]);
 
-    expect(grupos.map((grupo) => grupo.eventos.map((item) => item.K_Historia_Guia))).toEqual([
-      ["A1"],
-      ["B1"],
-      ["A2"],
-    ]);
+    expect(grupos.map((grupo) => grupo.eventos.map((item) => item.K_Historia_Guia))).toEqual([["A1"], ["B1"], ["A2"]]);
   });
 });
 

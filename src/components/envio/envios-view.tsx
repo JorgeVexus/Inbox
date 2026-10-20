@@ -8,12 +8,7 @@ import { EnvioResumen } from "@/components/envio/envio-resumen";
 import { EnviosLista } from "@/components/envio/envios-lista";
 import { NombreEnvioModal } from "@/components/envio/nombre-envio-modal";
 import { Button } from "@/components/ui/button";
-import {
-  asignarNombreEnvio,
-  filtrarEnvios,
-  listarEnvios,
-  obtenerDetalleEnvio,
-} from "@/lib/envios";
+import { asignarNombreEnvio, filtrarEnvios, listarEnvios, obtenerDetalleEnvio } from "@/lib/envios";
 import type { EnvioDetalle, EnvioPerfil } from "@/types/envio";
 
 type ListaState = {
@@ -122,16 +117,12 @@ export function EnviosView() {
   }, [reintentoLista, usuario]);
 
   const listaVisible = lista.usuario === usuario ? lista : LISTA_INICIAL;
-  const enviosFiltrados = useMemo(
-    () => filtrarEnvios(listaVisible.envios, busqueda),
-    [busqueda, listaVisible.envios],
-  );
+  const enviosFiltrados = useMemo(() => filtrarEnvios(listaVisible.envios, busqueda), [busqueda, listaVisible.envios]);
   const guiaVisible =
     seleccionado && enviosFiltrados.some((envio) => envio.guia === seleccionado)
       ? seleccionado
       : (enviosFiltrados[0]?.guia ?? null);
-  const envioSeleccionado =
-    listaVisible.envios.find((envio) => envio.guia === guiaVisible) ?? null;
+  const envioSeleccionado = listaVisible.envios.find((envio) => envio.guia === guiaVisible) ?? null;
   const detalleActual = guiaVisible ? detalles[guiaVisible] : undefined;
 
   function cargarDetalle(guia: string) {
@@ -146,10 +137,7 @@ export function EnviosView() {
 
     obtenerDetalleEnvio(guia)
       .then((detalle) => {
-        if (
-          detalleRequestRef.current[guia] !== requestId ||
-          usuarioSolicitud !== usuarioActivoRef.current
-        ) return;
+        if (detalleRequestRef.current[guia] !== requestId || usuarioSolicitud !== usuarioActivoRef.current) return;
         setDetalles((actual) => ({
           ...actual,
           [guia]: detalle
@@ -162,10 +150,7 @@ export function EnviosView() {
         }));
       })
       .catch(() => {
-        if (
-          detalleRequestRef.current[guia] !== requestId ||
-          usuarioSolicitud !== usuarioActivoRef.current
-        ) return;
+        if (detalleRequestRef.current[guia] !== requestId || usuarioSolicitud !== usuarioActivoRef.current) return;
         setDetalles((actual) => ({
           ...actual,
           [guia]: {
@@ -200,19 +185,13 @@ export function EnviosView() {
     try {
       resultado = await asignarNombreEnvio(usuario, guia, nombre);
     } catch {
-      if (
-        guardadoRequestRef.current === requestId &&
-        usuarioSolicitud === usuarioActivoRef.current
-      ) {
+      if (guardadoRequestRef.current === requestId && usuarioSolicitud === usuarioActivoRef.current) {
         setGuardandoAlias(false);
         setErrorAlias("No pudimos guardar el nombre del envío. Intenta de nuevo.");
       }
       return;
     }
-    if (
-      guardadoRequestRef.current !== requestId ||
-      usuarioSolicitud !== usuarioActivoRef.current
-    ) return;
+    if (guardadoRequestRef.current !== requestId || usuarioSolicitud !== usuarioActivoRef.current) return;
 
     setGuardandoAlias(false);
     if (!resultado.ok) {
@@ -222,9 +201,7 @@ export function EnviosView() {
 
     setLista((actual) => ({
       ...actual,
-      envios: actual.envios.map((envio) =>
-        envio.guia === guia ? { ...envio, nombre: resultado.nombre } : envio,
-      ),
+      envios: actual.envios.map((envio) => (envio.guia === guia ? { ...envio, nombre: resultado.nombre } : envio)),
     }));
     setAliasAbierto(false);
   }
@@ -254,9 +231,15 @@ export function EnviosView() {
     <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[1200px] px-5 pt-8 sm:px-8 lg:px-10">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
-          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">Inicio</Link>
-          <span aria-hidden="true" className="mx-2">›</span>
-          <span aria-current="page" className="font-bold text-black">Mis envíos</span>
+          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">
+            Inicio
+          </Link>
+          <span aria-hidden="true" className="mx-2">
+            ›
+          </span>
+          <span aria-current="page" className="font-bold text-black">
+            Mis envíos
+          </span>
         </nav>
 
         <div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -270,25 +253,39 @@ export function EnviosView() {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button href="/cotizar" variant="outline" className="w-full sm:w-auto">Cotizar nuevo envío</Button>
-            <Button href="/cotizar" className="w-full sm:w-auto">Hacer un nuevo envío</Button>
+            <Button href="/cotizar" variant="outline" className="w-full sm:w-auto">
+              Cotizar nuevo envío
+            </Button>
+            <Button href="/cotizar" className="w-full sm:w-auto">
+              Hacer un nuevo envío
+            </Button>
           </div>
         </div>
 
         {listaVisible.cargando ? (
-          <section aria-live="polite" aria-busy="true" className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
+          <section
+            aria-live="polite"
+            aria-busy="true"
+            className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm"
+          >
             <p className="text-sm text-black/70">Cargando tus envíos…</p>
           </section>
         ) : listaVisible.error ? (
           <section className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
-            <p role="alert" className="text-sm text-black">{listaVisible.error}</p>
-            <Button type="button" onClick={() => setReintentoLista((valor) => valor + 1)} className="mt-5">Reintentar</Button>
+            <p role="alert" className="text-sm text-black">
+              {listaVisible.error}
+            </p>
+            <Button type="button" onClick={() => setReintentoLista((valor) => valor + 1)} className="mt-5">
+              Reintentar
+            </Button>
           </section>
         ) : listaVisible.envios.length === 0 ? (
           <section className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
             <h2 className="font-display text-2xl font-bold text-black">Aún no tienes envíos</h2>
             <p className="mt-3 text-sm text-black/70">Cotiza tu primer envío para comenzar.</p>
-            <Button href="/cotizar" className="mt-5">Cotizar nuevo envío</Button>
+            <Button href="/cotizar" className="mt-5">
+              Cotizar nuevo envío
+            </Button>
           </section>
         ) : (
           <div className="mt-10 grid items-start gap-6 lg:grid-cols-[310px_minmax(0,1fr)]">

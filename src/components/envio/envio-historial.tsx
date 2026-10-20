@@ -56,9 +56,7 @@ export function agruparEventosPorFecha(eventos: RastreoEvento[]): GrupoEventos[]
   for (const evento of eventos) {
     const fecha = parsearFechaEvento(evento.F_Estatus);
     const ultimo = grupos.at(-1);
-    const claveUltimaFecha = ultimo
-      ? parsearFechaEvento(ultimo.eventos[0].F_Estatus).claveFecha
-      : null;
+    const claveUltimaFecha = ultimo ? parsearFechaEvento(ultimo.eventos[0].F_Estatus).claveFecha : null;
     if (ultimo && claveUltimaFecha === fecha.claveFecha) {
       ultimo.eventos.push(evento);
     } else {
@@ -80,15 +78,14 @@ type EnvioHistorialProps = {
   onReintentar: () => void;
 };
 
-export function EnvioHistorial({
-  eventos,
-  cargando,
-  error,
-  onReintentar,
-}: EnvioHistorialProps) {
+export function EnvioHistorial({ eventos, cargando, error, onReintentar }: EnvioHistorialProps) {
   if (cargando) {
     return (
-      <section aria-live="polite" aria-busy="true" className="rounded-md border border-neutral-line bg-white p-7 shadow-card-sm">
+      <section
+        aria-live="polite"
+        aria-busy="true"
+        className="rounded-md border border-neutral-line bg-white p-7 shadow-card-sm"
+      >
         <p className="text-center text-sm text-black/70">Cargando historial…</p>
       </section>
     );
@@ -97,7 +94,9 @@ export function EnvioHistorial({
   if (error) {
     return (
       <section className="rounded-md border border-neutral-line bg-white p-7 text-center shadow-card-sm">
-        <p role="alert" className="text-sm text-black">{error}</p>
+        <p role="alert" className="text-sm text-black">
+          {error}
+        </p>
         <button
           type="button"
           onClick={onReintentar}
@@ -112,9 +111,7 @@ export function EnvioHistorial({
   if (eventos.length === 0) {
     return (
       <section className="rounded-md border border-neutral-line bg-white p-7 shadow-card-sm">
-        <p className="text-center text-sm text-black/70">
-          Aún no hay movimientos disponibles para este envío.
-        </p>
+        <p className="text-center text-sm text-black/70">Aún no hay movimientos disponibles para este envío.</p>
       </section>
     );
   }
@@ -150,12 +147,8 @@ export function EnvioHistorial({
                   <div className="col-span-2 sm:col-span-1">
                     <span className="mb-1 block text-[10px] font-bold uppercase text-black/70 sm:hidden">Estado</span>
                     <p className="font-bold text-black">{evento.Estatus || "Sin estado"}</p>
-                    {evento.Observaciones && (
-                      <p className="mt-1 text-xs text-black/70">{evento.Observaciones}</p>
-                    )}
-                    {evento.Recibio && (
-                      <p className="mt-1 text-xs text-black/70">Recibió: {evento.Recibio}</p>
-                    )}
+                    {evento.Observaciones && <p className="mt-1 text-xs text-black/70">{evento.Observaciones}</p>}
+                    {evento.Recibio && <p className="mt-1 text-xs text-black/70">Recibió: {evento.Recibio}</p>}
                   </div>
                 </article>
               );

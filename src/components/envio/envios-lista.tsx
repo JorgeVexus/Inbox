@@ -17,13 +17,7 @@ type EnviosListaProps = {
   onSeleccionar: (guia: string) => void;
 };
 
-export function EnviosLista({
-  envios,
-  seleccionado,
-  busqueda,
-  onBusquedaChange,
-  onSeleccionar,
-}: EnviosListaProps) {
+export function EnviosLista({ envios, seleccionado, busqueda, onBusquedaChange, onSeleccionar }: EnviosListaProps) {
   return (
     <aside className="w-full overflow-hidden rounded-md border border-neutral-line bg-white shadow-card-sm lg:max-w-[310px]">
       <div className="border-b border-neutral-line px-5 py-5">
@@ -61,27 +55,17 @@ export function EnviosLista({
                   onClick={() => onSeleccionar(envio.guia)}
                   aria-current={activo ? "true" : undefined}
                   className={`flex w-full items-center gap-4 border-l-4 px-5 py-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary ${
-                    activo
-                      ? "border-primary bg-secondary/20"
-                      : "border-transparent bg-white hover:bg-neutral-bg"
+                    activo ? "border-primary bg-secondary/20" : "border-transparent bg-white hover:bg-neutral-bg"
                   }`}
                 >
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary bg-white">
-                    <Image
-                      src={ICONOS_ESTADO[paso]}
-                      alt=""
-                      width={28}
-                      height={28}
-                      className="size-7 object-contain"
-                    />
+                    <Image src={ICONOS_ESTADO[paso]} alt="" width={28} height={28} className="size-7 object-contain" />
                   </span>
                   <span className="min-w-0">
                     <span className="block truncate font-display text-sm font-bold text-black">
                       {envio.nombre || "Envío sin nombre"}
                     </span>
-                    <span className="mt-1 block text-xs text-black/70">
-                      Guía {envio.guia}
-                    </span>
+                    <span className="mt-1 block text-xs text-black/70">Guía {envio.guia}</span>
                   </span>
                 </button>
               </li>

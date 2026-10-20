@@ -52,10 +52,7 @@ function LoginModalForm() {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4"
-      onClick={closeLogin}
-    >
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4" onClick={closeLogin}>
       <div
         ref={panelRef}
         role="dialog"
@@ -156,11 +153,7 @@ function LoginModalForm() {
         <div className="flex items-center gap-4 font-display text-base">
           <span className="text-black">
             ¿No tienes una cuenta?{" "}
-            <Link
-              href="/cuenta/crear"
-              onClick={closeLogin}
-              className="inline-block py-2 text-primary hover:underline"
-            >
+            <Link href="/cuenta/crear" onClick={closeLogin} className="inline-block py-2 text-primary hover:underline">
               Crear cuenta
             </Link>
           </span>

@@ -29,7 +29,9 @@ test("rastreo: agrega guías, descarta duplicadas, vacías y con formato inváli
 test("rastreo: máximo 10 guías por consulta (también por URL)", async ({ page }) => {
   const muchas = Array.from({ length: 40 }, (_, i) => String(4000000000 + i)).join(",");
   await page.goto("/rastreo?guias=" + muchas);
-  await expect(page.getByRole("button", { name: "Quitar", exact: true }).or(page.getByLabel(/Quitar guía/))).toHaveCount(10);
+  await expect(
+    page.getByRole("button", { name: "Quitar", exact: true }).or(page.getByLabel(/Quitar guía/)),
+  ).toHaveCount(10);
 });
 
 test("rastreo: detalles se abren y 'Quitar' elimina la guía", async ({ page }) => {
@@ -54,7 +56,7 @@ test("guía en la URL con script no se ejecuta ni se refleja como HTML", async (
     dialogo = true;
     await d.dismiss();
   });
-  await page.goto("/rastreo?guias=" + encodeURIComponent("<img src=x onerror=alert(1)>,\"><script>alert(2)</script>"));
+  await page.goto("/rastreo?guias=" + encodeURIComponent('<img src=x onerror=alert(1)>,"><script>alert(2)</script>'));
   await page.waitForLoadState("networkidle");
   expect(dialogo).toBe(false);
   await expect(page.locator("main img[src='x']")).toHaveCount(0);

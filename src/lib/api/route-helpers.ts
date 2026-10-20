@@ -61,10 +61,7 @@ export async function proxySibox<Req, Res>(
       // no se pasa tal cual al cliente, se reporta como error de servidor
       // para que quede visible en logs en vez de silenciarse.
       console.error(`${opts.endpoint}: respuesta con forma inesperada`, parsedResponse.error);
-      return NextResponse.json(
-        { error: "SIBOX regreso datos con una forma inesperada." },
-        { status: 502 },
-      );
+      return NextResponse.json({ error: "SIBOX regreso datos con una forma inesperada." }, { status: 502 });
     }
     return NextResponse.json({ data: parsedResponse.data });
   } catch (err) {

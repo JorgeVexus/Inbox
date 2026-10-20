@@ -5,12 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { listarDomicilios } from "@/lib/domicilios";
-import {
-  diasDisponibles,
-  obtenerHorariosPorCP,
-  programarRecoleccion,
-  ventanasDisponibles,
-} from "@/lib/recoleccion";
+import { diasDisponibles, obtenerHorariosPorCP, programarRecoleccion, ventanasDisponibles } from "@/lib/recoleccion";
 import type { Domicilio } from "@/types/domicilio";
 import type { HorarioRecoleccion } from "@/types/recoleccion";
 
@@ -52,8 +47,7 @@ export function RecoleccionView() {
             Inicia sesión para agendar tu recolección
           </h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-black/70 sm:text-base">
-            Usamos tu cuenta para asociar la recolección a tus direcciones
-            guardadas.
+            Usamos tu cuenta para asociar la recolección a tus direcciones guardadas.
           </p>
           {!isLoginOpen && (
             <Button type="button" onClick={openLogin} className="mt-7">
@@ -186,17 +180,15 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
               <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
           </div>
-          <h1 className="font-display text-3xl font-bold text-black sm:text-4xl">
-            ¡Recolección agendada!
-          </h1>
+          <h1 className="font-display text-3xl font-bold text-black sm:text-4xl">¡Recolección agendada!</h1>
           <p className="max-w-md text-sm text-black/70 sm:text-base">
-            Folio de recolección{" "}
-            <span className="font-display font-bold text-primary">#{folio}</span>.
-            Un mensajero pasará por tu paquete en la ventana de horario que
-            elegiste.
+            Folio de recolección <span className="font-display font-bold text-primary">#{folio}</span>. Un mensajero
+            pasará por tu paquete en la ventana de horario que elegiste.
           </p>
           <div className="flex gap-4">
-            <Button href="/" variant="outline">Ir a inicio</Button>
+            <Button href="/" variant="outline">
+              Ir a inicio
+            </Button>
             <Button href="/rastreo">Rastrear un envío</Button>
           </div>
         </div>
@@ -208,34 +200,40 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
     <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[860px] px-5 pt-8 sm:px-8">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
-          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">Inicio</Link>
-          <span aria-hidden="true" className="mx-2">›</span>
-          <span aria-current="page" className="font-bold text-black">Solicita tu recolección</span>
+          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">
+            Inicio
+          </Link>
+          <span aria-hidden="true" className="mx-2">
+            ›
+          </span>
+          <span aria-current="page" className="font-bold text-black">
+            Solicita tu recolección
+          </span>
         </nav>
 
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-4xl font-bold text-black sm:text-5xl">
-            Solicita tu recolección
-          </h1>
+          <h1 className="font-display text-4xl font-bold text-black sm:text-5xl">Solicita tu recolección</h1>
           <span className="rounded-full bg-secondary/25 px-3 py-1 text-xs font-bold text-primary">Datos demo</span>
         </div>
         <p className="mt-3 max-w-xl text-sm leading-6 text-black/70 sm:text-base">
-          Ideal si ya generaste tus guías y solo necesitas que pasemos por
-          tus paquetes.
+          Ideal si ya generaste tus guías y solo necesitas que pasemos por tus paquetes.
         </p>
 
         {domicilios !== null && domicilios.length === 0 ? (
           <section className="mt-10 rounded-md bg-white p-10 text-center shadow-card-sm">
-            <h2 className="font-display text-2xl font-bold text-black">
-              Aún no tienes direcciones guardadas
-            </h2>
+            <h2 className="font-display text-2xl font-bold text-black">Aún no tienes direcciones guardadas</h2>
             <p className="mt-3 text-sm text-black/70">
               Agrega una dirección en tu perfil para poder agendar una recolección.
             </p>
-            <Button href="/perfil" className="mt-5">Ir a mi perfil</Button>
+            <Button href="/perfil" className="mt-5">
+              Ir a mi perfil
+            </Button>
           </section>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-6 rounded-md bg-white p-6 shadow-card-sm sm:p-8">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-10 flex flex-col gap-6 rounded-md bg-white p-6 shadow-card-sm sm:p-8"
+          >
             <Campo label="Dirección de recolección">
               <select
                 aria-label="Dirección de recolección"
@@ -252,27 +250,24 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
               </select>
             </Campo>
 
-            {buscandoHorarios && (
-              <p className="text-sm text-black/60">Consultando horarios disponibles…</p>
-            )}
+            {buscandoHorarios && <p className="text-sm text-black/60">Consultando horarios disponibles…</p>}
 
             {!buscandoHorarios && domicilioSeleccionado && horarios?.length === 0 && (
               <p role="alert" className="text-sm font-medium text-red-600">
-                No encontramos cobertura de recolección para el CP{" "}
-                {domicilioSeleccionado.cp}.
+                No encontramos cobertura de recolección para el CP {domicilioSeleccionado.cp}.
               </p>
             )}
 
             {horario && (
               <>
                 <p className="text-xs text-black/60">
-                  Oficina asignada: {horario.oficina}. Solicitudes el mismo día
-                  se aceptan hasta las {horario.horaLimiteCaptura} hrs.
+                  Oficina asignada: {horario.oficina}. Solicitudes el mismo día se aceptan hasta las{" "}
+                  {horario.horaLimiteCaptura} hrs.
                 </p>
 
                 <Campo label="Fecha">
                   <select
-                aria-label="Fecha de recolección"
+                    aria-label="Fecha de recolección"
                     value={fecha}
                     onChange={(e) => {
                       setFecha(e.target.value);
@@ -291,7 +286,7 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
 
                 <Campo label="Horario">
                   <select
-                aria-label="Horario de recolección"
+                    aria-label="Horario de recolección"
                     value={ventana}
                     onChange={(e) => setVentana(e.target.value)}
                     className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card-sm outline-none"
@@ -312,7 +307,8 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                 type="text"
                 value={guias}
                 onChange={(e) => setGuias(e.target.value)}
-                aria-label="Guías a recolectar (separadas por coma)" placeholder="Ej. 4003229791, 4159473741"
+                aria-label="Guías a recolectar (separadas por coma)"
+                placeholder="Ej. 4003229791, 4159473741"
                 className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
               />
             </Campo>
@@ -322,7 +318,8 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                 type="text"
                 value={contacto}
                 onChange={(e) => setContacto(e.target.value)}
-                aria-label="Nombre completo" placeholder="Nombre completo"
+                aria-label="Nombre completo"
+                placeholder="Nombre completo"
                 className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
               />
             </Campo>
@@ -354,7 +351,8 @@ function FormularioRecoleccion({ usuario, nombre }: { usuario: string; nombre: s
                 maxLength={300}
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
-                aria-label="Notas para el mensajero" placeholder="Notas para el mensajero"
+                aria-label="Notas para el mensajero"
+                placeholder="Notas para el mensajero"
                 rows={3}
                 className="w-full resize-none rounded-md border border-secondary-dark/50 bg-white px-6 py-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
               />

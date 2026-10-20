@@ -40,7 +40,8 @@ describe("estadoHorario", () => {
   });
 
   it("turnos partidos ('y de 16:00 a 18:00') y jueves con horario propio", () => {
-    const t = "Lunes, Martes, Miércoles, Viernes y Sábado\r\nde 9:00 a 14:00 y de 16:00 a 18:00\r\n\r\nJueves\r\n9:00 a 12:00 y de 14:00 a 18:00";
+    const t =
+      "Lunes, Martes, Miércoles, Viernes y Sábado\r\nde 9:00 a 14:00 y de 16:00 a 18:00\r\n\r\nJueves\r\n9:00 a 12:00 y de 14:00 a 18:00";
     expect(estadoHorario(t, mx(1, 15))).toBe("cerrado"); // lunes en la pausa
     expect(estadoHorario(t, mx(1, 17))).toBe("abierto");
     expect(estadoHorario(t, mx(4, 13))).toBe("cerrado"); // jueves pausa 12-14
@@ -56,7 +57,8 @@ describe("estadoHorario", () => {
   });
 
   it("'CERRADO LOS DIAS JUEVES' gana sobre el resto", () => {
-    const t = "Lunes-Martes-Miercoles-Viernes-Sabado y Domingo\r\n07:00 hrs-10:30 hrs. y\r\n17:00 hrs - 20:50 hrs.\r\nCERRADO LOS DIAS JUEVES";
+    const t =
+      "Lunes-Martes-Miercoles-Viernes-Sabado y Domingo\r\n07:00 hrs-10:30 hrs. y\r\n17:00 hrs - 20:50 hrs.\r\nCERRADO LOS DIAS JUEVES";
     expect(estadoHorario(t, mx(4, 8))).toBe("cerrado");
     expect(estadoHorario(t, mx(3, 8))).toBe("abierto");
     expect(estadoHorario(t, mx(0, 18))).toBe("abierto");

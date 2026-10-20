@@ -21,7 +21,9 @@ test("SEO: descripción propia, canonical, Open Graph y Twitter en cada página"
     });
     expect(meta.desc.length, `descripción de ${ruta}`).toBeGreaterThan(40);
     expect(meta.desc.length, `descripción de ${ruta}`).toBeLessThanOrEqual(200);
-    expect(meta.canonical, ruta).toMatch(ruta === "/" ? /^https?:\/\/[^/]+\/?$/ : new RegExp(ruta.replace("/", "\\/") + "$"));
+    expect(meta.canonical, ruta).toMatch(
+      ruta === "/" ? /^https?:\/\/[^/]+\/?$/ : new RegExp(ruta.replace("/", "\\/") + "$"),
+    );
     expect(meta.ogTitle, ruta).toContain("Inbox");
     expect(meta.ogDesc, ruta).toBe(meta.desc);
     expect(meta.ogImg, ruta).toMatch(/hero-1\.webp$/);
@@ -102,7 +104,13 @@ test.describe("reducir movimiento", () => {
   test.use({ reducedMotion: "reduce" });
   test("el carrusel del Hero no cambia de foto solo", async ({ page }) => {
     await page.goto("/");
-    const fotos = () => page.evaluate(() => [...document.querySelectorAll("section img")].slice(0, 6).map((i) => getComputedStyle(i).opacity).join(","));
+    const fotos = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll("section img")]
+          .slice(0, 6)
+          .map((i) => getComputedStyle(i).opacity)
+          .join(","),
+      );
     const antes = await fotos();
     await page.waitForTimeout(6500);
     expect(await fotos()).toBe(antes);

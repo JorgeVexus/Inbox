@@ -1,16 +1,10 @@
-import type {
-  CostoOpcion,
-  CotizacionInput,
-  Paquete,
-} from "@/types/cotizacion";
+import type { CostoOpcion, CotizacionInput, Paquete } from "@/types/cotizacion";
 
 /** "Sáb, 02 de agosto" para hoy + `dias` (hora local). Solo para datos de demo. */
 export function fechaDemo(dias: number, base: Date = new Date()): string {
   const d = new Date(base);
   d.setDate(d.getDate() + dias);
-  const dia = new Intl.DateTimeFormat("es-MX", { weekday: "short" })
-    .format(d)
-    .replace(".", "");
+  const dia = new Intl.DateTimeFormat("es-MX", { weekday: "short" }).format(d).replace(".", "");
   const mes = new Intl.DateTimeFormat("es-MX", { month: "long" }).format(d);
   return `${dia.charAt(0).toUpperCase()}${dia.slice(1)}, ${String(d.getDate()).padStart(2, "0")} de ${mes}`;
 }
@@ -22,10 +16,7 @@ export function fechaDemo(dias: number, base: Date = new Date()): string {
  * `../cotizacion.ts` calls the BFF instead.
  */
 export function calcularCostoMock(input: CotizacionInput): CostoOpcion[] {
-  const pesoTotal = input.paquetes.reduce(
-    (sum, p) => sum + (Number(p.peso) || 0) * p.cantidad,
-    0,
-  );
+  const pesoTotal = input.paquetes.reduce((sum, p) => sum + (Number(p.peso) || 0) * p.cantidad, 0);
   const volumenTotal = input.paquetes.reduce((sum, p) => {
     const alto = Number(p.alto) || 0;
     const largo = Number(p.largo) || 0;
@@ -41,8 +32,7 @@ export function calcularCostoMock(input: CotizacionInput): CostoOpcion[] {
   const total = Math.round((subtotal + iva) * 100) / 100;
 
   const entregaEstimada = fechaDemo(2);
-  const reservaAntes =
-    "Reserve antes de la(s) 03:00 PM para su recolección hoy mismo";
+  const reservaAntes = "Reserve antes de la(s) 03:00 PM para su recolección hoy mismo";
 
   const detalle = (label: string): CostoOpcion["detalle"] => [
     { label: "Flete", precio: Math.round(flete * 100) / 100 },

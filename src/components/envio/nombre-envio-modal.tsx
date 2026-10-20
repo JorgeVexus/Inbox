@@ -102,10 +102,7 @@ function NombreEnvioForm({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4"
-      onClick={onCerrar}
-    >
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4" onClick={onCerrar}>
       <div
         ref={panelRef}
         role="dialog"
@@ -114,18 +111,12 @@ function NombreEnvioForm({
         className="w-full max-w-[504px] rounded-md bg-neutral-bg px-8 py-9 shadow-card sm:px-12"
         onClick={(event) => event.stopPropagation()}
       >
-        <h2
-          id="nombre-envio-titulo"
-          className="text-center font-display text-2xl font-bold text-black"
-        >
+        <h2 id="nombre-envio-titulo" className="text-center font-display text-2xl font-bold text-black">
           Asigna un nombre a tu envío
         </h2>
 
         <form onSubmit={handleSubmit} className="mt-7 flex flex-col">
-          <label
-            htmlFor="nombre-envio"
-            className="text-sm font-medium text-black"
-          >
+          <label htmlFor="nombre-envio" className="text-sm font-medium text-black">
             ¿Cómo quieres identificar este envío?
           </label>
           <input
@@ -149,10 +140,7 @@ function NombreEnvioForm({
             ) : (
               <span />
             )}
-            <span
-              id="nombre-envio-contador"
-              className="shrink-0 text-xs text-black/70"
-            >
+            <span id="nombre-envio-contador" className="shrink-0 text-xs text-black/70">
               {nombre.length}/60
             </span>
           </div>

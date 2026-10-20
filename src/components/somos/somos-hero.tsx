@@ -3,12 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const SLIDES = [
-  "/images/hero-1.webp",
-  "/images/hero-2.webp",
-  "/images/hero-3.webp",
-  "/images/hero-4.webp",
-];
+const SLIDES = ["/images/hero-1.webp", "/images/hero-2.webp", "/images/hero-3.webp", "/images/hero-4.webp"];
 
 export function SomosHero() {
   const [slide, setSlide] = useState(0);
@@ -32,9 +27,7 @@ export function SomosHero() {
             alt=""
             fill
             priority={i === 0}
-            className={`object-cover transition-opacity duration-1000 ${
-              i === slide ? "opacity-100" : "opacity-0"
-            }`}
+            className={`object-cover transition-opacity duration-1000 ${i === slide ? "opacity-100" : "opacity-0"}`}
           />
         ))}
         <div className="absolute inset-0 bg-black/30 backdrop-blur-[1.5px]" />
@@ -47,9 +40,7 @@ export function SomosHero() {
           <h1 className="font-sans text-3xl font-bold text-primary sm:text-[40px]">
             Inbox, una solución confiable que crece contigo
           </h1>
-          <p className="text-base text-black">
-            Nuestra trayectoria, valores y visión detrás de cada entrega.
-          </p>
+          <p className="text-base text-black">Nuestra trayectoria, valores y visión detrás de cada entrega.</p>
         </div>
       </div>
     </section>

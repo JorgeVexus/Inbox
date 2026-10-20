@@ -28,11 +28,7 @@ function normalizar(texto: string): string {
     .replace(/\r/g, "\n");
 }
 
-type Token =
-  | { t: "dia"; dia: number }
-  | { t: "hora"; min: number }
-  | { t: "sep"; rango: boolean }
-  | { t: "cerrado" };
+type Token = { t: "dia"; dia: number } | { t: "hora"; min: number } | { t: "sep"; rango: boolean } | { t: "cerrado" };
 
 function tokenizar(texto: string): Token[] {
   const tokens: Token[] = [];
@@ -143,10 +139,7 @@ function ahoraEnMexico(ahora: Date): { dia: number; minutos: number } {
   return { dia, minutos: Number(get("hour")) * 60 + Number(get("minute")) };
 }
 
-export function estadoHorario(
-  observaciones: string | null | undefined,
-  ahora: Date = new Date(),
-): EstadoHorario {
+export function estadoHorario(observaciones: string | null | undefined, ahora: Date = new Date()): EstadoHorario {
   const h = interpretarHorario(observaciones);
   if (!h) return "desconocido";
   const { dia, minutos } = ahoraEnMexico(ahora);

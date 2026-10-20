@@ -4,7 +4,8 @@ import { paginaMeta } from "@/lib/seo";
 
 export const metadata: Metadata = paginaMeta({
   titulo: "Rastrear envío",
-  descripcion: "Rastrea uno o varios envíos con tu número de guía y consulta su último estado y su historial de movimientos.",
+  descripcion:
+    "Rastrea uno o varios envíos con tu número de guía y consulta su último estado y su historial de movimientos.",
   ruta: "/rastreo",
 });
 

@@ -57,7 +57,9 @@ test.describe("API /api/rastreo y /api/rastreo/detalle: entradas hostiles", () =
     });
 
     test(`${ruta}: JSON roto, cuerpo enorme y métodos incorrectos`, async ({ request }) => {
-      expect((await request.post(ruta, { data: "{roto", headers: { "content-type": "application/json" } })).status()).toBe(400);
+      expect(
+        (await request.post(ruta, { data: "{roto", headers: { "content-type": "application/json" } })).status(),
+      ).toBe(400);
       expect((await request.post(ruta, { data: { Guia: "A".repeat(20_000) } })).status()).toBe(413);
       for (const m of ["get", "put", "delete", "patch"] as const) {
         expect((await request[m](ruta)).status(), m).toBe(405);
@@ -66,7 +68,10 @@ test.describe("API /api/rastreo y /api/rastreo/detalle: entradas hostiles", () =
   }
 });
 
-test("el JavaScript que se envía al navegador no contiene credenciales ni la URL de la API", async ({ page, request }) => {
+test("el JavaScript que se envía al navegador no contiene credenciales ni la URL de la API", async ({
+  page,
+  request,
+}) => {
   const urls = new Set<string>();
   page.on("response", (r) => {
     if (r.url().includes("/_next/static/") && r.url().endsWith(".js")) urls.add(r.url());

@@ -25,9 +25,7 @@ export function FacturacionModal({
   usuario?: string;
   datosIniciales?: DatosFacturacion;
 }) {
-  const [datos, setDatos] = useState<DatosFacturacion>(
-    datosIniciales ?? datosFacturacionVacios(),
-  );
+  const [datos, setDatos] = useState<DatosFacturacion>(datosIniciales ?? datosFacturacionVacios());
   const [colonias, setColonias] = useState<string[]>([]);
   const [buscandoCP, setBuscandoCP] = useState(false);
 
@@ -128,10 +126,7 @@ export function FacturacionModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8" onClick={onClose}>
       <div
         ref={panelRef}
         role="dialog"
@@ -151,9 +146,7 @@ export function FacturacionModal({
           </svg>
         </button>
 
-        <p className="text-center font-display text-2xl font-bold text-black">
-          Datos de facturación
-        </p>
+        <p className="text-center font-display text-2xl font-bold text-black">Datos de facturación</p>
 
         <div className="flex flex-col gap-4">
           <p className="text-sm font-medium text-black">Constancia fiscal</p>
@@ -179,22 +172,14 @@ export function FacturacionModal({
             ) : archivoNombre ? (
               <p className="text-sm font-medium text-black">
                 {archivoNombre} —{" "}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-primary underline"
-                >
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary underline">
                   cambiar archivo
                 </button>
               </p>
             ) : (
               <p className="max-w-xs text-sm font-medium text-black">
                 Arrastra aquí tu imagen o{" "}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-primary underline"
-                >
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary underline">
                   explora archivos
                 </button>{" "}
                 para rellenar información
@@ -222,11 +207,13 @@ export function FacturacionModal({
 
         <div className="flex flex-col gap-3">
           <Row label="RFC">
-            <input autoComplete="off"
+            <input
+              autoComplete="off"
               type="text"
               value={datos.rfc}
               onChange={(e) => set("rfc", e.target.value.toUpperCase())}
-              aria-label="RFC" placeholder="Ejem: VECJ880326XXX"
+              aria-label="RFC"
+              placeholder="Ejem: VECJ880326XXX"
               maxLength={13}
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
@@ -249,14 +236,16 @@ export function FacturacionModal({
           </Row>
 
           <Row label="C.P">
-            <input autoComplete="postal-code"
+            <input
+              autoComplete="postal-code"
               type="text"
               inputMode="numeric"
               maxLength={5}
               value={datos.cp}
               onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
               onBlur={handleCpBlur}
-              aria-label="Código postal" placeholder="Ingrese código postal"
+              aria-label="Código postal"
+              placeholder="Ingrese código postal"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -282,9 +271,7 @@ export function FacturacionModal({
                 disabled={colonias.length === 0}
                 className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none disabled:opacity-50"
               >
-                <option value="">
-                  {colonias.length === 0 ? "Ingrese un C.P primero" : "Seleccione una opción"}
-                </option>
+                <option value="">{colonias.length === 0 ? "Ingrese un C.P primero" : "Seleccione una opción"}</option>
                 {colonias.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -293,45 +280,51 @@ export function FacturacionModal({
               </select>
             </Row>
             <div className="flex items-center gap-2 pl-[137px]">
-              <span className="shrink-0 text-xs font-medium text-[#707372]">
-                Especificar colonia
-              </span>
-              <input autoComplete="off"
+              <span className="shrink-0 text-xs font-medium text-[#707372]">Especificar colonia</span>
+              <input
+                autoComplete="off"
                 type="text"
                 value={datos.coloniaEspecificada}
                 onChange={(e) => set("coloniaEspecificada", e.target.value)}
-                aria-label="Especificar colonia" placeholder="Colonia"
+                aria-label="Especificar colonia"
+                placeholder="Colonia"
                 className="h-[34px] w-[144px] rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </div>
           </div>
 
           <Row label="Dirección">
-            <input autoComplete="address-line1"
+            <input
+              autoComplete="address-line1"
               type="text"
               value={datos.direccion}
               onChange={(e) => set("direccion", e.target.value)}
-              aria-label="Calle y número" placeholder="Calle y número"
+              aria-label="Calle y número"
+              placeholder="Calle y número"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
 
           <Row label="Teléfono">
-            <input autoComplete="tel"
+            <input
+              autoComplete="tel"
               type="tel"
               value={datos.telefono}
               onChange={(e) => set("telefono", e.target.value)}
-              aria-label="Teléfono" placeholder="Ingrese número celular"
+              aria-label="Teléfono"
+              placeholder="Ingrese número celular"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
 
           <Row label="Correo">
-            <input autoComplete="email"
+            <input
+              autoComplete="email"
               type="email"
               value={datos.correo}
               onChange={(e) => set("correo", e.target.value)}
-              aria-label="Correo electrónico" placeholder="Ingrese correo electrónico"
+              aria-label="Correo electrónico"
+              placeholder="Ingrese correo electrónico"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>

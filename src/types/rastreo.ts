@@ -52,20 +52,20 @@ export type PasoRastreo = 0 | 1 | 2 | 3;
 
 const PASO_POR_ESTATUS: Record<string, PasoRastreo> = {
   // 0 — Paquete recibido / documentado
-  "VENDIDA": 0,
+  VENDIDA: 0,
   "PRE-DOCUMENTADA": 0,
-  "DOCUMENTADA": 0,
-  "RECOLECTADA": 0,
+  DOCUMENTADA: 0,
+  RECOLECTADA: 0,
   // 1 — En tránsito entre oficinas / con otra paquetería
-  "EMBARCADA": 1,
-  "DESEMBARCADA": 1,
-  "TRANSBORDADA": 1,
-  "TRANSMITIDA": 1,
+  EMBARCADA: 1,
+  DESEMBARCADA: 1,
+  TRANSBORDADA: 1,
+  TRANSMITIDA: 1,
   // 2 — En proceso de entrega (ya en la oficina destino o saliendo a reparto)
   "LISTO PARA ENTREGAR": 2,
   "EN RUTA": 2,
   // 3 — Entregado
-  "ENTREGADA": 3,
+  ENTREGADA: 3,
 };
 
 export function pasoDesdeEstatus(estatus: string): PasoRastreo {

@@ -53,13 +53,11 @@ const NOMBRE_ESTADO: Record<string, string> = {
 };
 
 const entero = z.coerce.number().int();
-const coordenada = z
-  .union([z.string(), z.number(), z.null()])
-  .transform((v) => {
-    if (v === null || v === "") return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  });
+const coordenada = z.union([z.string(), z.number(), z.null()]).transform((v) => {
+  if (v === null || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+});
 
 export const oficinaSchema = z
   .object({
@@ -79,53 +77,49 @@ export const oficinaSchema = z
     Longitud: coordenada,
     Observaciones: z.string().nullable(),
   })
-  .transform(
-    (o): Sucursal => ({
-      K_Oficina: o.K_Oficina,
-      D_Oficina: o.D_Oficina.trim(),
-      C_Oficina: o.C_Oficina.trim(),
-      K_Estado: o.K_Estado,
-      C_Estado: o.C_Estado,
-      D_Estado: NOMBRE_ESTADO[o.C_Estado] ?? o.C_Estado,
-      K_Ciudad: o.K_Ciudad,
-      D_Ciudad: o.D_Ciudad.trim(),
-      Calle: (o.Calle ?? "").trim(),
-      Codigo_Postal: (o.Codigo_Postal ?? "").trim(),
-      Telefono: o.Telefono?.trim() ? o.Telefono.trim() : null,
-      B_Ocurre: o.B_Ocurre.toUpperCase() === "SI",
-      B_Frontera: o.B_Frontera.toUpperCase() === "SI",
-      Latitud: o.Latitud,
-      Longitud: o.Longitud,
-      Observaciones: o.Observaciones?.trim() ? o.Observaciones.trim() : null,
-      // `tipo` no existe en la API: se infiere de B_Ocurre (ver types/sucursal.ts).
-      tipo: o.B_Ocurre.toUpperCase() === "SI" ? "sucursal" : "distribucion",
-    }),
-  );
+  .transform((o): Sucursal => ({
+    K_Oficina: o.K_Oficina,
+    D_Oficina: o.D_Oficina.trim(),
+    C_Oficina: o.C_Oficina.trim(),
+    K_Estado: o.K_Estado,
+    C_Estado: o.C_Estado,
+    D_Estado: NOMBRE_ESTADO[o.C_Estado] ?? o.C_Estado,
+    K_Ciudad: o.K_Ciudad,
+    D_Ciudad: o.D_Ciudad.trim(),
+    Calle: (o.Calle ?? "").trim(),
+    Codigo_Postal: (o.Codigo_Postal ?? "").trim(),
+    Telefono: o.Telefono?.trim() ? o.Telefono.trim() : null,
+    B_Ocurre: o.B_Ocurre.toUpperCase() === "SI",
+    B_Frontera: o.B_Frontera.toUpperCase() === "SI",
+    Latitud: o.Latitud,
+    Longitud: o.Longitud,
+    Observaciones: o.Observaciones?.trim() ? o.Observaciones.trim() : null,
+    // `tipo` no existe en la API: se infiere de B_Ocurre (ver types/sucursal.ts).
+    tipo: o.B_Ocurre.toUpperCase() === "SI" ? "sucursal" : "distribucion",
+  }));
 
 export const oficinasResponseSchema = z.array(oficinaSchema);
 
 // ------------------------------------------------------------- BusquedaCP
 
 /** Lo unico que acepta el navegador: un CP. El resto del payload lo fija el servidor. */
-export const busquedaCpRequestSchema = z
-  .object({ CP: codigoPostalSchema })
-  .transform(({ CP }) => ({
-    CP,
-    Colonia: "",
-    Estado: "",
-    NombreEstado: "",
-    Ciudad: "",
-    NombreCiudad: "",
-    B_Remitente: false,
-    B_Destinatario: false,
-    B_Cobertura: false,
-    B_SoloCiudades: false,
-    B_BusquedaMAPS: false,
-    K_UsuarioApp: 0,
-    Session: "web",
-    NombreDispositivo: "web",
-    B_Operadores: false,
-  }));
+export const busquedaCpRequestSchema = z.object({ CP: codigoPostalSchema }).transform(({ CP }) => ({
+  CP,
+  Colonia: "",
+  Estado: "",
+  NombreEstado: "",
+  Ciudad: "",
+  NombreCiudad: "",
+  B_Remitente: false,
+  B_Destinatario: false,
+  B_Cobertura: false,
+  B_SoloCiudades: false,
+  B_BusquedaMAPS: false,
+  K_UsuarioApp: 0,
+  Session: "web",
+  NombreDispositivo: "web",
+  B_Operadores: false,
+}));
 
 const filaCpSchema = z.object({
   D_Estado: z.string(),

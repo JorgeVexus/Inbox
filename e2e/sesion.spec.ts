@@ -27,7 +27,12 @@ test("login: vacío, incorrecto y hostil dan error; el correcto entra", async ({
   await expect(modal.getByText("Usuario o contraseña incorrectos.")).toBeVisible();
   await iniciarSesion(page);
   await abrirMenuSiMovil(page);
-  await expect(page.getByText(/Hola, /).locator("visible=true").first()).toBeVisible();
+  await expect(
+    page
+      .getByText(/Hola, /)
+      .locator("visible=true")
+      .first(),
+  ).toBeVisible();
 });
 
 test("modal de login: foco atrapado, Escape cierra y devuelve el foco", async ({ page, browserName }, info) => {

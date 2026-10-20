@@ -5,7 +5,16 @@ import { domicilioVacio } from "../types/domicilio";
 
 describe("validarDomicilio", () => {
   it("exige un alias", () => {
-    expect(validarDomicilio({ ...domicilioVacio(), calle: "x", cp: "12345", ciudad: "y", estado: "z", telefono: "8112345678" })).toEqual({
+    expect(
+      validarDomicilio({
+        ...domicilioVacio(),
+        calle: "x",
+        cp: "12345",
+        ciudad: "y",
+        estado: "z",
+        telefono: "8112345678",
+      }),
+    ).toEqual({
       ok: false,
       mensaje: "Ponle un nombre a esta dirección (ej. Casa, Oficina).",
     });

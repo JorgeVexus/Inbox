@@ -61,9 +61,7 @@ async function readJson(res: Response, endpoint: string): Promise<unknown> {
 
 class SiboxConfigError extends Error {
   constructor(missingVar: string) {
-    super(
-      `Falta configurar ${missingVar} -- ver .env.example. El BFF no puede autenticar contra SIBOX sin esto.`,
-    );
+    super(`Falta configurar ${missingVar} -- ver .env.example. El BFF no puede autenticar contra SIBOX sin esto.`);
     this.name = "SiboxConfigError";
   }
 }
@@ -151,9 +149,7 @@ async function login(): Promise<{ token: string; cliente: SiboxCliente }> {
   const json = (await readJson(res, "/Login")) as {
     resp?: { result?: number; data?: unknown; token?: string | null };
   };
-  const [cuenta] = parseEnvelope<
-    { K_Cliente: number; D_Cliente: string; K_Usuario: number }[]
-  >(json, "/Login");
+  const [cuenta] = parseEnvelope<{ K_Cliente: number; D_Cliente: string; K_Usuario: number }[]>(json, "/Login");
   const token = json.resp?.token;
   if (!token || !cuenta) {
     throw new SiboxApiError("Login no regreso token o datos de cuenta.", "/Login");

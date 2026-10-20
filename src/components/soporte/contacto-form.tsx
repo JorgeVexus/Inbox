@@ -44,12 +44,10 @@ export function ContactoForm() {
     <section className="flex flex-col items-center gap-10 bg-neutral-bg px-6 py-16 lg:flex-row lg:items-start lg:justify-center lg:px-16">
       <div className="flex w-full max-w-[425px] flex-col gap-6">
         <div className="flex flex-col items-center gap-2 text-center">
-          <h2 className="font-display text-2xl font-bold text-black">
-            ¿Necesitas que te contactemos?
-          </h2>
+          <h2 className="font-display text-2xl font-bold text-black">¿Necesitas que te contactemos?</h2>
           <p className="text-xs text-black">
-            Llena este formulario y nos pondremos en contacto contigo lo antes
-            posible. Queremos ayudarte con lo que necesites.
+            Llena este formulario y nos pondremos en contacto contigo lo antes posible. Queremos ayudarte con lo que
+            necesites.
           </p>
         </div>
         <div className="relative h-[300px] w-full overflow-hidden rounded-md sm:h-[429px]">
@@ -70,7 +68,8 @@ export function ContactoForm() {
           <label className="text-sm font-medium text-black" htmlFor="soporte-nombre">
             Nombre
           </label>
-          <input autoComplete="name"
+          <input
+            autoComplete="name"
             id="soporte-nombre"
             type="text"
             maxLength={100}
@@ -85,7 +84,8 @@ export function ContactoForm() {
           <label className="text-sm font-medium text-black" htmlFor="soporte-correo">
             Correo electrónico
           </label>
-          <input autoComplete="email"
+          <input
+            autoComplete="email"
             id="soporte-correo"
             type="email"
             maxLength={120}
@@ -121,7 +121,11 @@ export function ContactoForm() {
             ¡Gracias! Recibimos tu mensaje y te contactaremos pronto.
           </p>
         ) : (
-          <Button type="submit" disabled={!puedeEnviar || enviando} className="mx-auto w-full max-w-[200px] disabled:opacity-50">
+          <Button
+            type="submit"
+            disabled={!puedeEnviar || enviando}
+            className="mx-auto w-full max-w-[200px] disabled:opacity-50"
+          >
             {enviando ? "Enviando…" : "Enviar"}
           </Button>
         )}

@@ -19,7 +19,8 @@ for (const ruta of rutas) {
   cdp.on("Network.loadingFinished", (e) => {
     const t = tipos.get(e.requestId) ?? "Other";
     const n = e.encodedDataLength;
-    const k = t === "Script" ? "js" : t === "Stylesheet" ? "css" : t === "Image" ? "img" : t === "Font" ? "font" : "otro";
+    const k =
+      t === "Script" ? "js" : t === "Stylesheet" ? "css" : t === "Image" ? "img" : t === "Font" ? "font" : "otro";
     bytes[k] += n;
     bytes.total += n;
   });
@@ -32,5 +33,20 @@ for (const ruta of rutas) {
 await navegador.close();
 
 const kb = (n) => (n / 1024).toFixed(0).padStart(6) + " KB";
-console.log("Ruta".padEnd(14), "JS".padStart(9), "CSS".padStart(9), "Imágenes".padStart(11), "Fuentes".padStart(10), "Total".padStart(10));
-for (const f of filas) console.log(f.ruta.padEnd(14), kb(f.js), kb(f.css), kb(f.img).padStart(11), kb(f.font).padStart(10), kb(f.total).padStart(10));
+console.log(
+  "Ruta".padEnd(14),
+  "JS".padStart(9),
+  "CSS".padStart(9),
+  "Imágenes".padStart(11),
+  "Fuentes".padStart(10),
+  "Total".padStart(10),
+);
+for (const f of filas)
+  console.log(
+    f.ruta.padEnd(14),
+    kb(f.js),
+    kb(f.css),
+    kb(f.img).padStart(11),
+    kb(f.font).padStart(10),
+    kb(f.total).padStart(10),
+  );

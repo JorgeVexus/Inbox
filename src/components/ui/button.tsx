@@ -4,12 +4,9 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 type Variant = "primary" | "outline" | "white";
 
 const variantClasses: Record<Variant, string> = {
-  primary:
-    "bg-primary border-2 border-primary text-white shadow-card hover:bg-primary/90",
-  outline:
-    "bg-transparent border-2 border-primary text-primary shadow-card hover:bg-primary/5",
-  white:
-    "bg-white border-2 border-white text-primary hover:bg-white/90",
+  primary: "bg-primary border-2 border-primary text-white shadow-card hover:bg-primary/90",
+  outline: "bg-transparent border-2 border-primary text-primary shadow-card hover:bg-primary/5",
+  white: "bg-white border-2 border-white text-primary hover:bg-white/90",
 };
 
 type CommonProps = {
@@ -18,8 +15,7 @@ type CommonProps = {
   className?: string;
 };
 
-type ButtonAsButton = CommonProps &
-  ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
+type ButtonAsButton = CommonProps & ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
 
 type ButtonAsLink = CommonProps & {
   href: string;
@@ -43,10 +39,7 @@ export function Button({
   }
 
   return (
-    <button
-      className={classes}
-      {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
-    >
+    <button className={classes} {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}>
       {children}
     </button>
   );

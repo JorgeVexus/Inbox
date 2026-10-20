@@ -24,9 +24,7 @@ export function RastreoView() {
   const [busqueda, setBusqueda] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
   const [intento, setIntento] = useState(0);
-  const [resultados, setResultados] = useState<
-    Record<string, { resultado: Rastreo | null; error?: string }>
-  >({});
+  const [resultados, setResultados] = useState<Record<string, { resultado: Rastreo | null; error?: string }>>({});
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
@@ -76,31 +74,34 @@ export function RastreoView() {
     <div className="mx-auto flex max-w-[1201px] flex-col gap-16 px-6 py-12 lg:px-0">
       <div className="flex flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="font-display text-3xl font-bold text-black">
-            Rastree su paquete
-          </h1>
+          <h1 className="font-display text-3xl font-bold text-black">Rastree su paquete</h1>
           {rastreoEsDemo() && (
             <span className="rounded-full bg-secondary/25 px-3 py-1 text-xs font-bold text-primary">
               Datos de demostración — prueba con la guía 4003229791
             </span>
           )}
           <p className="max-w-xl text-xs text-black">
-            ¿Tienes varios paquetes? Ingresa tus guías y mantente al tanto de
-            múltiples envíos al mismo tiempo.
+            ¿Tienes varios paquetes? Ingresa tus guías y mantente al tanto de múltiples envíos al mismo tiempo.
           </p>
         </div>
 
         <form onSubmit={handleBuscar} className="flex w-full max-w-[339px] items-center gap-3">
           <div className="flex h-[43px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 shadow-card">
-            <input autoComplete="off"
+            <input
+              autoComplete="off"
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               maxLength={400}
-              aria-label="Buscar envío" placeholder="Buscar envío"
+              aria-label="Buscar envío"
+              placeholder="Buscar envío"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
-            <button type="submit" aria-label="Buscar" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center">
+            <button
+              type="submit"
+              aria-label="Buscar"
+              className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center"
+            >
               <Image src="/icons/search2.svg" alt="" width={22} height={22} />
             </button>
           </div>
@@ -112,15 +113,11 @@ export function RastreoView() {
         )}
 
         {!session && (
-          <button
-            type="button"
-            onClick={openLogin}
-            className="text-center font-display text-sm"
-          >
+          <button type="button" onClick={openLogin} className="text-center font-display text-sm">
             <span className="font-bold text-primary underline">Inicia sesión</span>{" "}
             <span className="text-black">
-              para guardar tus guías. Accede a tus rastreos en cualquier
-              momento sin tener que ingresar tus guías cada vez.
+              para guardar tus guías. Accede a tus rastreos en cualquier momento sin tener que ingresar tus guías cada
+              vez.
             </span>
           </button>
         )}
@@ -133,9 +130,7 @@ export function RastreoView() {
           </p>
         )}
 
-        {cargando && guias.length > 0 && (
-          <p className="text-center text-sm text-black/60">Buscando tus guías…</p>
-        )}
+        {cargando && guias.length > 0 && <p className="text-center text-sm text-black/60">Buscando tus guías…</p>}
 
         {!cargando &&
           guias.map((guia) => (

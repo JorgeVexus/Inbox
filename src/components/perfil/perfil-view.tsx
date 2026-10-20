@@ -32,8 +32,7 @@ export function PerfilView() {
             Inicia sesión para ver tu perfil
           </h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-black/70 sm:text-base">
-            Tus direcciones guardadas y datos de facturación están
-            protegidos y solo se muestran dentro de tu cuenta.
+            Tus direcciones guardadas y datos de facturación están protegidos y solo se muestran dentro de tu cuenta.
           </p>
           {!isLoginOpen && (
             <Button type="button" onClick={openLogin} className="mt-7">
@@ -49,9 +48,15 @@ export function PerfilView() {
     <div className="bg-neutral-bg pb-20">
       <div className="mx-auto w-full max-w-[1200px] px-5 pt-8 sm:px-8 lg:px-10">
         <nav aria-label="Migas de pan" className="text-sm text-black/70">
-          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">Inicio</Link>
-          <span aria-hidden="true" className="mx-2">›</span>
-          <span aria-current="page" className="font-bold text-black">Mi perfil</span>
+          <Link href="/" className="inline-block py-2 transition-colors hover:text-primary">
+            Inicio
+          </Link>
+          <span aria-hidden="true" className="mx-2">
+            ›
+          </span>
+          <span aria-current="page" className="font-bold text-black">
+            Mi perfil
+          </span>
         </nav>
 
         <div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -84,9 +89,8 @@ export function PerfilView() {
                 </div>
               </dl>
               <p className="mt-4 max-w-md text-xs text-black/50">
-                Editar correo, teléfono o contraseña requiere un endpoint de
-                perfil que la API de SIBOX aún no documenta — por ahora esta
-                sección solo muestra lo que ya devuelve el inicio de sesión.
+                Editar correo, teléfono o contraseña requiere un endpoint de perfil que la API de SIBOX aún no documenta
+                — por ahora esta sección solo muestra lo que ya devuelve el inicio de sesión.
               </p>
             </div>
           </section>
@@ -98,9 +102,7 @@ export function PerfilView() {
           <section className="flex flex-col items-start gap-3 rounded-md bg-white p-6 shadow-card-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
               <h2 className="font-display text-2xl font-bold text-black">Mis envíos</h2>
-              <p className="mt-1 text-sm text-black/70">
-                Consulta el estado y el historial de tus guías.
-              </p>
+              <p className="mt-1 text-sm text-black/70">Consulta el estado y el historial de tus guías.</p>
             </div>
             <Button href="/envio" variant="outline" className="w-full sm:w-auto">
               Ver mis envíos

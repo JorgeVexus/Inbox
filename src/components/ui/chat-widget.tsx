@@ -46,7 +46,7 @@ const FAQ_TOPICS: FaqTopic[] = [
       {
         pregunta: "¿Cómo solicito una recolección a domicilio?",
         respuesta:
-          "Desde la sección Enviar, elige \"Entrega a domicilio\" y programa horario y dirección de recolección.",
+          'Desde la sección Enviar, elige "Entrega a domicilio" y programa horario y dirección de recolección.',
       },
     ],
   },
@@ -123,13 +123,7 @@ export function ChatWidget() {
   );
 }
 
-function BottomNav({
-  tab,
-  onChange,
-}: {
-  tab: Tab;
-  onChange: (tab: Tab) => void;
-}) {
+function BottomNav({ tab, onChange }: { tab: Tab; onChange: (tab: Tab) => void }) {
   const items: { id: Tab; label: string; icon: (active: boolean) => React.ReactNode }[] = [
     {
       id: "home",
@@ -225,21 +219,19 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
         onClick={() => onNavigate("chat")}
         className="flex h-[43px] items-center justify-between rounded-md bg-white px-5 shadow-card-sm"
       >
-        <span className="font-display text-base text-[#707372]">
-          Envíanos un mensaje
-        </span>
+        <span className="font-display text-base text-[#707372]">Envíanos un mensaje</span>
         <Image src="/icons/forum.svg" alt="" width={18} height={18} />
       </button>
 
       <div className="flex flex-col gap-4 rounded-md bg-white px-5 py-4 shadow-card-sm">
-        <p className="font-display text-base text-black">
-          Da seguimiento a tu pedido
-        </p>
-        <input autoComplete="off"
+        <p className="font-display text-base text-black">Da seguimiento a tu pedido</p>
+        <input
+          autoComplete="off"
           type="text"
           value={guia}
           onChange={(e) => setGuia(e.target.value)}
-          aria-label="Ingrese el número de rastreo" placeholder="Ingrese el número de rastreo"
+          aria-label="Ingrese el número de rastreo"
+          placeholder="Ingrese el número de rastreo"
           className="h-[43px] w-full rounded-md border border-secondary-dark/50 px-4 text-xs font-medium text-black placeholder:text-secondary-dark outline-none"
         />
         <button
@@ -257,14 +249,14 @@ function HomeTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
           </p>
         )}
         {resultado === "not-found" && (
-          <p className="text-xs text-black/60">
-            No encontramos esa guía. Verifica el número e intenta de nuevo.
-          </p>
+          <p className="text-xs text-black/60">No encontramos esa guía. Verifica el número e intenta de nuevo.</p>
         )}
         {resultado && resultado !== "not-found" && resultado !== "error" && (
           <div className="flex flex-col gap-1 rounded-md bg-neutral-bg px-3 py-2 text-xs text-black">
             <p className="font-bold">{resultado.Estatus}</p>
-            <p>{resultado.OficinaEstatus} — {resultado.F_Estatus}</p>
+            <p>
+              {resultado.OficinaEstatus} — {resultado.F_Estatus}
+            </p>
           </div>
         )}
       </div>
@@ -307,17 +299,14 @@ function ChatTab() {
   if (enviado) {
     return (
       <div className="flex flex-col gap-4 py-6">
-        <p className="text-base text-black">
-          Hola 👋 Soy el asistente de inbox®, encantado de ayudarte.
-        </p>
+        <p className="text-base text-black">Hola 👋 Soy el asistente de inbox®, encantado de ayudarte.</p>
         <div className="flex flex-col gap-2 rounded-md bg-white px-4 py-3 text-sm text-black shadow-card-sm">
           <p>
-            ¡Gracias! Recibimos tu correo <strong>{email.trim()}</strong>. Uno de
-            nuestros asesores te contactará en breve.
+            ¡Gracias! Recibimos tu correo <strong>{email.trim()}</strong>. Uno de nuestros asesores te contactará en
+            breve.
           </p>
           <p className="text-black/60">
-            Mientras tanto, puedes revisar nuestras preguntas frecuentes en la
-            pestaña de Ayuda.
+            Mientras tanto, puedes revisar nuestras preguntas frecuentes en la pestaña de Ayuda.
           </p>
         </div>
       </div>
@@ -327,16 +316,18 @@ function ChatTab() {
   return (
     <div className="flex flex-col gap-11 py-6">
       <p className="text-base text-black">
-        Hola 👋 Soy el asistente de inbox®, encantado de ayudarte. Para
-        comenzar, por favor comparte tu correo electrónico.
+        Hola 👋 Soy el asistente de inbox®, encantado de ayudarte. Para comenzar, por favor comparte tu correo
+        electrónico.
       </p>
       <div className="flex flex-col gap-4">
-        <input autoComplete="email"
+        <input
+          autoComplete="email"
           type="email"
           maxLength={120}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          aria-label="Ingrese un correo electrónico" placeholder="Ingrese un correo electrónico"
+          aria-label="Ingrese un correo electrónico"
+          placeholder="Ingrese un correo electrónico"
           className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black shadow-card-sm placeholder:text-secondary-dark outline-none"
         />
         {error && (
@@ -361,18 +352,18 @@ function HelpTab() {
   const [busqueda, setBusqueda] = useState("");
   const [abierto, setAbierto] = useState<string | null>(null);
 
-  const topics = FAQ_TOPICS.filter((t) =>
-    t.title.toLowerCase().includes(busqueda.trim().toLowerCase()),
-  );
+  const topics = FAQ_TOPICS.filter((t) => t.title.toLowerCase().includes(busqueda.trim().toLowerCase()));
 
   return (
     <div className="flex flex-col gap-5 py-6">
       <div className="flex h-[43px] items-center justify-between rounded-md bg-white px-5 shadow-card-sm">
-        <input autoComplete="off"
+        <input
+          autoComplete="off"
           type="text"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          aria-label="Buscar" placeholder="Buscar"
+          aria-label="Buscar"
+          placeholder="Buscar"
           className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
         />
         <Image src="/icons/search.svg" alt="" width={18} height={18} />
@@ -388,14 +379,10 @@ function HelpTab() {
                 onClick={() => setAbierto(isOpen ? null : topic.title)}
                 className="flex items-center justify-between rounded-md bg-white px-5 py-3 text-left shadow-card-sm"
               >
-                <span className="font-display text-base font-bold text-black">
-                  {topic.title}
-                </span>
+                <span className="font-display text-base font-bold text-black">{topic.title}</span>
                 <svg
                   viewBox="0 0 24 24"
-                  className={`h-3 w-3 shrink-0 fill-black transition-transform ${
-                    isOpen ? "rotate-90" : "-rotate-90"
-                  }`}
+                  className={`h-3 w-3 shrink-0 fill-black transition-transform ${isOpen ? "rotate-90" : "-rotate-90"}`}
                   aria-hidden
                 >
                   <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z" />
@@ -415,9 +402,7 @@ function HelpTab() {
           );
         })}
         {topics.length === 0 && (
-          <p className="px-1 text-sm text-black/60">
-            No encontramos temas que coincidan con “{busqueda}”.
-          </p>
+          <p className="px-1 text-sm text-black/60">No encontramos temas que coincidan con “{busqueda}”.</p>
         )}
       </div>
     </div>

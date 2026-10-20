@@ -31,9 +31,7 @@ export function AboutUs() {
         <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">
           Inbox, una solución confiable que crece contigo
         </h2>
-        <p className="max-w-xl text-base text-black">
-          Nuestra trayectoria, valores y visión detrás de cada entrega.
-        </p>
+        <p className="max-w-xl text-base text-black">Nuestra trayectoria, valores y visión detrás de cada entrega.</p>
       </div>
 
       <div className="flex w-full flex-col items-center gap-10 lg:flex-row lg:items-stretch">
@@ -59,12 +57,7 @@ export function AboutUs() {
         </div>
 
         <div className="relative h-[280px] w-full shrink-0 overflow-hidden rounded-md lg:h-auto lg:w-[557px]">
-          <Image
-            src="/images/about-truck.webp"
-            alt="Camión de reparto Inbox"
-            fill
-            className="object-cover"
-          />
+          <Image src="/images/about-truck.webp" alt="Camión de reparto Inbox" fill className="object-cover" />
         </div>
       </div>
 

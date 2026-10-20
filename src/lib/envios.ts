@@ -1,10 +1,6 @@
 import { MOCK_ENVIOS } from "./mock/envios";
 import { MOCK_RASTREO_DETALLE } from "./mock/rastreo";
-import type {
-  EnvioDetalle,
-  EnvioPerfil,
-  GuardarNombreResult,
-} from "@/types/envio";
+import type { EnvioDetalle, EnvioPerfil, GuardarNombreResult } from "@/types/envio";
 
 const LATENCIA_MOCK_MS = 350;
 
@@ -13,10 +9,7 @@ function esperarMock(): Promise<void> {
 }
 
 export function claveAliasEnvio(usuario: string, guia: string): string {
-  const usuarioCanonico = usuario
-    .trim()
-    .normalize("NFC")
-    .toLocaleUpperCase("es-MX");
+  const usuarioCanonico = usuario.trim().normalize("NFC").toLocaleUpperCase("es-MX");
   return `inbox:envio-alias:${encodeURIComponent(usuarioCanonico)}:${encodeURIComponent(guia.trim())}`;
 }
 
@@ -38,23 +31,15 @@ export async function listarEnvios(usuario: string): Promise<EnvioPerfil[]> {
   });
 }
 
-export async function obtenerDetalleEnvio(
-  guia: string,
-): Promise<EnvioDetalle | null> {
+export async function obtenerDetalleEnvio(guia: string): Promise<EnvioDetalle | null> {
   await esperarMock();
   const guiaLimpia = guia.trim();
   const eventos = MOCK_RASTREO_DETALLE[guiaLimpia];
 
-  return eventos
-    ? { guia: guiaLimpia, eventos: eventos.map((evento) => ({ ...evento })) }
-    : null;
+  return eventos ? { guia: guiaLimpia, eventos: eventos.map((evento) => ({ ...evento })) } : null;
 }
 
-export async function asignarNombreEnvio(
-  usuario: string,
-  guia: string,
-  valor: string,
-): Promise<GuardarNombreResult> {
+export async function asignarNombreEnvio(usuario: string, guia: string, valor: string): Promise<GuardarNombreResult> {
   const validacion = validarNombreEnvio(valor);
   if (!validacion.ok) return validacion;
 
@@ -62,10 +47,7 @@ export async function asignarNombreEnvio(
 
   try {
     if (typeof window === "undefined") throw new Error("Storage no disponible");
-    window.localStorage.setItem(
-      claveAliasEnvio(usuario, guia),
-      validacion.nombre,
-    );
+    window.localStorage.setItem(claveAliasEnvio(usuario, guia), validacion.nombre);
     return validacion;
   } catch {
     return {
@@ -92,21 +74,12 @@ export function validarNombreEnvio(nombre: string): GuardarNombreResult {
   return { ok: true, nombre: nombreNormalizado };
 }
 
-export function filtrarEnvios(
-  envios: EnvioPerfil[],
-  consulta: string,
-): EnvioPerfil[] {
-  const consultaNormalizada = consulta
-    .trim()
-    .normalize("NFC")
-    .toLocaleLowerCase("es-MX");
+export function filtrarEnvios(envios: EnvioPerfil[], consulta: string): EnvioPerfil[] {
+  const consultaNormalizada = consulta.trim().normalize("NFC").toLocaleLowerCase("es-MX");
 
   if (!consultaNormalizada) return envios;
 
   return envios.filter((envio) =>
-    `${envio.nombre} ${envio.guia}`
-      .normalize("NFC")
-      .toLocaleLowerCase("es-MX")
-      .includes(consultaNormalizada),
+    `${envio.nombre} ${envio.guia}`.normalize("NFC").toLocaleLowerCase("es-MX").includes(consultaNormalizada),
   );
 }

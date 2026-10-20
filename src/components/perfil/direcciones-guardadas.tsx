@@ -25,9 +25,7 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
     setDomicilios((actual) => {
       const lista = actual ?? [];
       const existe = lista.some((d) => d.id === domicilio.id);
-      const siguiente = existe
-        ? lista.map((d) => (d.id === domicilio.id ? domicilio : d))
-        : [...lista, domicilio];
+      const siguiente = existe ? lista.map((d) => (d.id === domicilio.id ? domicilio : d)) : [...lista, domicilio];
       return domicilio.predeterminado
         ? siguiente.map((d) => (d.id === domicilio.id ? d : { ...d, predeterminado: false }))
         : siguiente;
@@ -48,12 +46,8 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
     <section className="rounded-md bg-white p-6 shadow-card-sm sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-display text-2xl font-bold text-black">
-            Direcciones guardadas
-          </h2>
-          <p className="mt-1 text-sm text-black/70">
-            Úsalas para agilizar tus recolecciones a domicilio.
-          </p>
+          <h2 className="font-display text-2xl font-bold text-black">Direcciones guardadas</h2>
+          <p className="mt-1 text-sm text-black/70">Úsalas para agilizar tus recolecciones a domicilio.</p>
         </div>
         <Button type="button" onClick={() => setModal("nuevo")} variant="outline">
           Agregar dirección
@@ -63,16 +57,11 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
       {domicilios === null ? (
         <p className="mt-6 text-sm text-black/60">Cargando direcciones…</p>
       ) : domicilios.length === 0 ? (
-        <p className="mt-6 text-sm text-black/60">
-          Aún no tienes direcciones guardadas.
-        </p>
+        <p className="mt-6 text-sm text-black/60">Aún no tienes direcciones guardadas.</p>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {domicilios.map((d) => (
-            <div
-              key={d.id}
-              className="flex flex-col gap-2 rounded-md border border-secondary-dark/30 p-5"
-            >
+            <div key={d.id} className="flex flex-col gap-2 rounded-md border border-secondary-dark/30 p-5">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-display text-lg font-bold text-black">{d.alias}</p>
                 {d.predeterminado && (
@@ -88,15 +77,9 @@ export function DireccionesGuardadas({ usuario }: { usuario: string }) {
               </p>
               {d.contacto && <p className="text-sm text-black/70">Contacto: {d.contacto}</p>}
               {d.telefono && <p className="text-sm text-black/70">Tel. {d.telefono}</p>}
-              {d.referencias && (
-                <p className="text-xs text-black/50">{d.referencias}</p>
-              )}
+              {d.referencias && <p className="text-xs text-black/50">{d.referencias}</p>}
               <div className="mt-2 flex gap-4 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setModal(d)}
-                  className="px-2 py-2 text-primary underline"
-                >
+                <button type="button" onClick={() => setModal(d)} className="px-2 py-2 text-primary underline">
                   Editar
                 </button>
                 <button

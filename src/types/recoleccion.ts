@@ -41,18 +41,8 @@ export type SolicitudRecoleccion = {
   guiasReferencia: string[];
 };
 
-export type ResultadoRecoleccion =
-  | { ok: true; folio: number }
-  | { ok: false; mensaje: string };
+export type ResultadoRecoleccion = { ok: true; folio: number } | { ok: false; mensaje: string };
 
-export const DIAS_SEMANA = [
-  "domingo",
-  "lunes",
-  "martes",
-  "miercoles",
-  "jueves",
-  "viernes",
-  "sabado",
-] as const;
+export const DIAS_SEMANA = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"] as const;
 
 export type DiaSemana = (typeof DIAS_SEMANA)[number];

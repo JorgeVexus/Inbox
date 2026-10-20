@@ -40,29 +40,17 @@ const SOCIAL_LINKS = [
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-primary">
-      <Image
-        src="/images/footer-bg.png"
-        alt=""
-        fill
-        className="pointer-events-none object-cover opacity-30"
-      />
+      <Image src="/images/footer-bg.png" alt="" fill className="pointer-events-none object-cover opacity-30" />
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-10 px-6 py-14 lg:px-16">
         <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative h-[90px] w-[140px] shrink-0">
-            <Image
-              src="/images/logo-blanco.png"
-              alt="Inbox"
-              fill
-              className="object-contain"
-            />
+            <Image src="/images/logo-blanco.png" alt="Inbox" fill className="object-contain" />
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-16">
             {COLUMNS.map((col, i) => (
               <div key={i} className="flex flex-col gap-2 text-center sm:text-left">
-                <p className="mb-1 font-display text-base font-bold text-white">
-                  {col.title}
-                </p>
+                <p className="mb-1 font-display text-base font-bold text-white">{col.title}</p>
                 {col.links.map((link) => (
                   <Link
                     key={link.label}
@@ -82,9 +70,15 @@ export function Footer() {
         <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center justify-center gap-4 font-display text-xs font-bold text-white lg:gap-6">
             <p>{new Date().getFullYear()} Inbox todos los derechos reservados</p>
-            <Link href="/trabaja-en-inbox" className="inline-block py-2">Trabaja en Inbox</Link>
-            <Link href="/privacidad" className="inline-block py-2">Política de privacidad</Link>
-            <Link href="/terminos" className="inline-block py-2">Términos y condiciones</Link>
+            <Link href="/trabaja-en-inbox" className="inline-block py-2">
+              Trabaja en Inbox
+            </Link>
+            <Link href="/privacidad" className="inline-block py-2">
+              Política de privacidad
+            </Link>
+            <Link href="/terminos" className="inline-block py-2">
+              Términos y condiciones
+            </Link>
           </div>
 
           <div className="flex items-center gap-5">

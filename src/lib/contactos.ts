@@ -72,9 +72,7 @@ export async function guardarContacto(
   await esperarMock();
   const actual = leerLocal(usuario) ?? semilla(usuario);
   const final: ContactoGuardado = { ...contacto, id: contacto.id ?? crypto.randomUUID() };
-  const siguiente = contacto.id
-    ? actual.map((c) => (c.id === contacto.id ? final : c))
-    : [...actual, final];
+  const siguiente = contacto.id ? actual.map((c) => (c.id === contacto.id ? final : c)) : [...actual, final];
 
   if (!escribirLocal(usuario, siguiente)) {
     return { ok: false, mensaje: "No pudimos guardar el contacto. Intenta de nuevo." };
@@ -82,13 +80,15 @@ export async function guardarContacto(
   return { ok: true, contacto: final };
 }
 
-export async function eliminarContacto(
-  usuario: string,
-  id: string,
-): Promise<{ ok: boolean; mensaje?: string }> {
+export async function eliminarContacto(usuario: string, id: string): Promise<{ ok: boolean; mensaje?: string }> {
   await esperarMock();
   const actual = leerLocal(usuario) ?? semilla(usuario);
-  if (!escribirLocal(usuario, actual.filter((c) => c.id !== id))) {
+  if (
+    !escribirLocal(
+      usuario,
+      actual.filter((c) => c.id !== id),
+    )
+  ) {
     return { ok: false, mensaje: "No pudimos eliminar el contacto. Intenta de nuevo." };
   }
   return { ok: true };

@@ -10,7 +10,11 @@ for (const [archivo, v] of Object.entries(resumen)) {
   if (archivo === "total") continue;
   const rel = archivo.split("\\").join("/").split("/src/")[1];
   const partes = rel.split("/");
-  const clave = rel.startsWith("lib/api") ? partes.slice(0, 3).join("/") : rel.startsWith("lib") ? "lib" : partes.slice(0, 2).join("/");
+  const clave = rel.startsWith("lib/api")
+    ? partes.slice(0, 3).join("/")
+    : rel.startsWith("lib")
+      ? "lib"
+      : partes.slice(0, 2).join("/");
   const g = (grupos[clave] ??= { cubiertas: 0, total: 0, archivos: [] });
   g.cubiertas += v.statements.covered;
   g.total += v.statements.total;
@@ -18,7 +22,9 @@ for (const [archivo, v] of Object.entries(resumen)) {
 }
 
 console.log("Cobertura de sentencias por capa (menor primero):");
-for (const [k, g] of Object.entries(grupos).sort((a, b) => a[1].cubiertas / (a[1].total || 1) - b[1].cubiertas / (b[1].total || 1))) {
+for (const [k, g] of Object.entries(grupos).sort(
+  (a, b) => a[1].cubiertas / (a[1].total || 1) - b[1].cubiertas / (b[1].total || 1),
+)) {
   const pct = g.total ? ((100 * g.cubiertas) / g.total).toFixed(0) : "-";
   console.log(`${String(pct).padStart(4)}%  ${String(g.total).padStart(5)} sentencias  ${k}`);
 }

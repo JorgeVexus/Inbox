@@ -45,6 +45,4 @@ export function domicilioVacio(): Omit<Domicilio, "id"> {
   };
 }
 
-export type GuardarDomicilioResult =
-  | { ok: true; domicilio: Domicilio }
-  | { ok: false; mensaje: string };
+export type GuardarDomicilioResult = { ok: true; domicilio: Domicilio } | { ok: false; mensaje: string };

@@ -1,10 +1,6 @@
 import { MOCK_HORARIOS } from "./mock/recoleccion";
 import { DIAS_SEMANA } from "@/types/recoleccion";
-import type {
-  HorarioRecoleccion,
-  ResultadoRecoleccion,
-  SolicitudRecoleccion,
-} from "@/types/recoleccion";
+import type { HorarioRecoleccion, ResultadoRecoleccion, SolicitudRecoleccion } from "@/types/recoleccion";
 
 const LATENCIA_MOCK_MS = 350;
 
@@ -130,9 +126,7 @@ export function validarSolicitudRecoleccion(
  *     return { ok: true, folio: json.resp.data.K_Recoleccion };
  *   }
  */
-export async function programarRecoleccion(
-  datos: SolicitudRecoleccion,
-): Promise<ResultadoRecoleccion> {
+export async function programarRecoleccion(datos: SolicitudRecoleccion): Promise<ResultadoRecoleccion> {
   const validacion = validarSolicitudRecoleccion(datos);
   if (!validacion.ok) return validacion;
 
@@ -145,7 +139,5 @@ export function observacionesConGuias(datos: Pick<SolicitudRecoleccion, "observa
   const guias = datos.guiasReferencia.filter((g) => g.trim() !== "");
   if (guias.length === 0) return datos.observaciones.trim();
   const lineaGuias = `Guías a recolectar: ${guias.join(", ")}`;
-  return datos.observaciones.trim()
-    ? `${lineaGuias}\n${datos.observaciones.trim()}`
-    : lineaGuias;
+  return datos.observaciones.trim() ? `${lineaGuias}\n${datos.observaciones.trim()}` : lineaGuias;
 }

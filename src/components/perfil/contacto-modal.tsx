@@ -72,10 +72,7 @@ export function ContactoModal({
   const canSubmit = datos.nombre.trim() !== "" && datos.telefono.replace(/\D/g, "").length >= 10;
 
   return (
-    <div
-      className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8" onClick={onClose}>
       <div
         ref={panelRef}
         role="dialog"
@@ -101,28 +98,103 @@ export function ContactoModal({
 
         <div className="flex flex-col gap-3">
           <Row label="Nombre">
-            <input autoComplete="off" type="text" value={datos.nombre} onChange={(e) => set("nombre", e.target.value)} aria-label="Nombre completo" placeholder="Nombre completo" className={INPUT} />
+            <input
+              autoComplete="off"
+              type="text"
+              value={datos.nombre}
+              onChange={(e) => set("nombre", e.target.value)}
+              aria-label="Nombre completo"
+              placeholder="Nombre completo"
+              className={INPUT}
+            />
           </Row>
           <Row label="Teléfono">
-            <input autoComplete="off" type="tel" value={datos.telefono} onChange={(e) => set("telefono", e.target.value)} aria-label="Teléfono" placeholder="10 dígitos" className={INPUT} />
+            <input
+              autoComplete="off"
+              type="tel"
+              value={datos.telefono}
+              onChange={(e) => set("telefono", e.target.value)}
+              aria-label="Teléfono"
+              placeholder="10 dígitos"
+              className={INPUT}
+            />
           </Row>
           <Row label="Correo">
-            <input autoComplete="off" type="email" value={datos.email} onChange={(e) => set("email", e.target.value)} aria-label="Correo electrónico" placeholder="Opcional" className={INPUT} />
+            <input
+              autoComplete="off"
+              type="email"
+              value={datos.email}
+              onChange={(e) => set("email", e.target.value)}
+              aria-label="Correo electrónico"
+              placeholder="Opcional"
+              className={INPUT}
+            />
           </Row>
           <Row label="C.P">
-            <input autoComplete="off" type="text" inputMode="numeric" maxLength={5} value={datos.cp} onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))} onBlur={handleCpBlur} aria-label="Código postal" placeholder="Código postal" className={INPUT} />
+            <input
+              autoComplete="off"
+              type="text"
+              inputMode="numeric"
+              maxLength={5}
+              value={datos.cp}
+              onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
+              onBlur={handleCpBlur}
+              aria-label="Código postal"
+              placeholder="Código postal"
+              className={INPUT}
+            />
           </Row>
           <Row label="Ciudad">
-            <input autoComplete="off" type="text" value={datos.ciudad} onChange={(e) => set("ciudad", e.target.value)} aria-label="Ciudad" placeholder="Ciudad" className={INPUT} />
+            <input
+              autoComplete="off"
+              type="text"
+              value={datos.ciudad}
+              onChange={(e) => set("ciudad", e.target.value)}
+              aria-label="Ciudad"
+              placeholder="Ciudad"
+              className={INPUT}
+            />
           </Row>
           <Row label="Colonia">
-            <input autoComplete="off" type="text" value={datos.colonia} onChange={(e) => set("colonia", e.target.value)} aria-label="Colonia" placeholder="Colonia" className={INPUT} />
+            <input
+              autoComplete="off"
+              type="text"
+              value={datos.colonia}
+              onChange={(e) => set("colonia", e.target.value)}
+              aria-label="Colonia"
+              placeholder="Colonia"
+              className={INPUT}
+            />
           </Row>
           <Row label="Dirección">
             <div className="flex w-full gap-3">
-              <input autoComplete="off" type="text" value={datos.direccion} onChange={(e) => set("direccion", e.target.value)} aria-label="Calle" placeholder="Calle" className={`${INPUT} min-w-0 flex-1`} />
-              <input autoComplete="off" type="text" value={datos.numExt} onChange={(e) => set("numExt", e.target.value)} placeholder="Ext." aria-label="Número exterior" className={`${INPUT} w-[78px] shrink-0 px-3`} />
-              <input autoComplete="off" type="text" value={datos.numInt} onChange={(e) => set("numInt", e.target.value)} placeholder="Int." aria-label="Número interior" className={`${INPUT} w-[78px] shrink-0 px-3`} />
+              <input
+                autoComplete="off"
+                type="text"
+                value={datos.direccion}
+                onChange={(e) => set("direccion", e.target.value)}
+                aria-label="Calle"
+                placeholder="Calle"
+                className={`${INPUT} min-w-0 flex-1`}
+              />
+              <input
+                autoComplete="off"
+                type="text"
+                value={datos.numExt}
+                onChange={(e) => set("numExt", e.target.value)}
+                placeholder="Ext."
+                aria-label="Número exterior"
+                className={`${INPUT} w-[78px] shrink-0 px-3`}
+              />
+              <input
+                autoComplete="off"
+                type="text"
+                value={datos.numInt}
+                onChange={(e) => set("numInt", e.target.value)}
+                placeholder="Int."
+                aria-label="Número interior"
+                className={`${INPUT} w-[78px] shrink-0 px-3`}
+              />
             </div>
           </Row>
         </div>

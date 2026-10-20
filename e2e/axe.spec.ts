@@ -13,11 +13,27 @@ const ETIQUETAS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 async function auditar(page: Page, nombre: string) {
   await page.waitForLoadState("networkidle");
   const r = await new AxeBuilder({ page }).withTags(ETIQUETAS).disableRules(["color-contrast"]).analyze();
-  const resumen = r.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
+  const resumen = r.violations.map(
+    (v) =>
+      `${v.id} (${v.impact}): ${v.nodes
+        .slice(0, 3)
+        .map((n) => n.target.join(" "))
+        .join(" | ")}`,
+  );
   expect(resumen, `axe en ${nombre}`).toEqual([]);
 }
 
-const PUBLICAS = ["/", "/cotizar", "/rastreo?guias=4003229791", "/cobertura", "/somos", "/soporte", "/privacidad", "/cuenta/crear", "/no-existe"];
+const PUBLICAS = [
+  "/",
+  "/cotizar",
+  "/rastreo?guias=4003229791",
+  "/cobertura",
+  "/somos",
+  "/soporte",
+  "/privacidad",
+  "/cuenta/crear",
+  "/no-existe",
+];
 
 for (const ruta of PUBLICAS) {
   test(`axe: ${ruta}`, async ({ page }) => {

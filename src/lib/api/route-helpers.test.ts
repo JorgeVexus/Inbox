@@ -7,8 +7,7 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 }
 
-const login = () =>
-  json({ resp: { result: 0, data: [{ K_Cliente: 1, D_Cliente: "X", K_Usuario: 2 }], token: "t" } });
+const login = () => json({ resp: { result: 0, data: [{ K_Cliente: 1, D_Cliente: "X", K_Usuario: 2 }], token: "t" } });
 
 async function llamar(respuestaSibox: Response) {
   vi.resetModules();
@@ -50,7 +49,9 @@ describe("proxySibox", () => {
 
   it("NO filtra al navegador el error interno de base de datos de SIBOX", async () => {
     const res = await llamar(
-      json({ resp: { result: 1, data: "Error interno: Could not find stored procedure 'GP_Valida_OrigenCotizacion'." } }),
+      json({
+        resp: { result: 1, data: "Error interno: Could not find stored procedure 'GP_Valida_OrigenCotizacion'." },
+      }),
     );
     expect(res.status).toBe(502);
     const texto = JSON.stringify(await res.json());
@@ -63,7 +64,10 @@ describe("proxySibox", () => {
     vi.resetModules();
     vi.stubGlobal(
       "fetch",
-      vi.fn<typeof fetch>().mockResolvedValueOnce(login()).mockRejectedValueOnce(new DOMException("timeout", "TimeoutError")),
+      vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(login())
+        .mockRejectedValueOnce(new DOMException("timeout", "TimeoutError")),
     );
     const { proxySibox } = await import("@/lib/api/route-helpers");
     const request = new Request("http://localhost/api/x", { method: "POST", body: JSON.stringify({ Guia: "1" }) });

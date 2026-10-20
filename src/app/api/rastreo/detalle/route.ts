@@ -1,8 +1,5 @@
 import { proxySibox } from "@/lib/api/route-helpers";
-import {
-  rastreoDetalleRequestSchema,
-  rastreoDetalleResponseSchema,
-} from "@/lib/api/schemas/rastreo-detalle";
+import { rastreoDetalleRequestSchema, rastreoDetalleResponseSchema } from "@/lib/api/schemas/rastreo-detalle";
 
 export async function POST(request: Request) {
   return proxySibox(request, {

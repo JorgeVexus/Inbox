@@ -8,10 +8,7 @@ export default function CoberturaPage() {
     <>
       <h1 className="sr-only">Cobertura de Inbox</h1>
       <div className="mx-auto flex max-w-[1440px] items-center justify-end gap-2 px-6 pt-6 lg:px-16">
-        <Link
-          href="/"
-          className="inline-block py-2 text-xs font-medium text-[#707372]"
-        >
+        <Link href="/" className="inline-block py-2 text-xs font-medium text-[#707372]">
           Inicio
         </Link>
         <svg viewBox="0 0 24 24" className="h-4 w-4 rotate-180 fill-secondary-dark" aria-hidden>

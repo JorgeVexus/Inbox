@@ -20,10 +20,7 @@ import type { LoginResponse } from "@/types/auth";
  *
  * Try the seeded demo user: usuario "INBOX", contraseña "Prueba".
  */
-export async function loginRequest(
-  usuario: string,
-  password: string,
-): Promise<LoginResponse> {
+export async function loginRequest(usuario: string, password: string): Promise<LoginResponse> {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   const user = MOCK_USERS[usuario.trim().toUpperCase()];

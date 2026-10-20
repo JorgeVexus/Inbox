@@ -35,8 +35,7 @@ const SERVICES = [
   {
     icon: "/icons/beenhere.svg",
     title: "Seguro por valor declarado",
-    description:
-      "Protege tu envío al 100% en caso de daño o pérdida. Puedes declarar hasta $10,000 MXN.",
+    description: "Protege tu envío al 100% en caso de daño o pérdida. Puedes declarar hasta $10,000 MXN.",
   },
   {
     icon: "/icons/order-approve.svg",
@@ -75,12 +74,10 @@ export function Servicios() {
     <section className="mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-16 lg:px-16">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4">
-          <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">
-            Servicios que se adaptan a ti
-          </h2>
+          <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">Servicios que se adaptan a ti</h2>
           <p className="max-w-2xl text-base text-black">
-            Cotiza tu envío en segundos y descubre lo fácil que es enviar con
-            inbox®. Rápido, seguro y a tu medida. ¡Haz tu envío hoy mismo!
+            Cotiza tu envío en segundos y descubre lo fácil que es enviar con inbox®. Rápido, seguro y a tu medida. ¡Haz
+            tu envío hoy mismo!
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-6">
@@ -103,9 +100,7 @@ export function Servicios() {
           >
             <Image src={service.icon} alt="" width={64} height={64} className="h-[64px] w-[64px] object-contain" />
             <div className="flex flex-col gap-3">
-              <h3 className="font-display text-2xl font-bold text-black">
-                {service.title}
-              </h3>
+              <h3 className="font-display text-2xl font-bold text-black">{service.title}</h3>
               <p className="text-sm text-black">{service.description}</p>
             </div>
           </article>
@@ -113,10 +108,9 @@ export function Servicios() {
       </section>
 
       <p className="mx-auto max-w-3xl text-center text-base text-black">
-        En inbox® te ofrecemos soluciones confiables y eficientes para cubrir
-        todas tus necesidades de envío. Con atención personalizada y
-        cobertura nacional, trabajamos para que tu experiencia sea ágil,
-        segura y sin complicaciones.
+        En inbox® te ofrecemos soluciones confiables y eficientes para cubrir todas tus necesidades de envío. Con
+        atención personalizada y cobertura nacional, trabajamos para que tu experiencia sea ágil, segura y sin
+        complicaciones.
       </p>
     </section>
   );

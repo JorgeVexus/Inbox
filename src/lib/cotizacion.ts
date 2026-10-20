@@ -22,9 +22,7 @@ import type {
  *     return (await res.json()) as CostoOpcion[];
  *   }
  */
-export async function obtenerCotizacion(
-  input: CotizacionInput,
-): Promise<CostoOpcion[]> {
+export async function obtenerCotizacion(input: CotizacionInput): Promise<CostoOpcion[]> {
   await new Promise((resolve) => setTimeout(resolve, 500));
   return calcularCostoMock(input);
 }
@@ -61,10 +59,7 @@ export async function generarGuia(
  * only simulates a delay and returns success — do not build real payment
  * processing on top of this without a real gateway integration.
  */
-export async function procesarPago(
-  metodo: MetodoPago,
-  tarjeta?: TarjetaInput,
-): Promise<{ ok: boolean }> {
+export async function procesarPago(metodo: MetodoPago, tarjeta?: TarjetaInput): Promise<{ ok: boolean }> {
   void metodo;
   void tarjeta; // never sent anywhere — see doc comment above
   await new Promise((resolve) => setTimeout(resolve, 700));

@@ -16,12 +16,7 @@ type EnvioResumenProps = {
   onEditarNombre: () => void;
 };
 
-export function EnvioResumen({
-  envio,
-  detalleAbierto,
-  onToggleDetalle,
-  onEditarNombre,
-}: EnvioResumenProps) {
+export function EnvioResumen({ envio, detalleAbierto, onToggleDetalle, onEditarNombre }: EnvioResumenProps) {
   const pasoActual = pasoDesdeEstatus(envio.rastreo.Estatus);
 
   return (
@@ -67,9 +62,7 @@ export function EnvioResumen({
                   <span
                     aria-hidden="true"
                     className={`absolute right-1/2 top-7 -z-0 w-full border-t-2 border-dashed sm:top-9 ${
-                      completado || indice <= pasoActual
-                        ? "border-primary"
-                        : "border-secondary-dark/50"
+                      completado || indice <= pasoActual ? "border-primary" : "border-secondary-dark/50"
                     }`}
                   />
                 )}

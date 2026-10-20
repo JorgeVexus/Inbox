@@ -35,9 +35,7 @@ export function StepCosto({
   }, []);
 
   const paquete = cotizacion.paquetes[0];
-  const medidasLabel = paquete
-    ? `${paquete.alto} cm x ${paquete.largo} cm x ${paquete.ancho}cm`
-    : "—";
+  const medidasLabel = paquete ? `${paquete.alto} cm x ${paquete.largo} cm x ${paquete.ancho}cm` : "—";
   const opcionElegida = opciones?.find((o) => o.id === seleccionada);
 
   return (
@@ -45,9 +43,7 @@ export function StepCosto({
       <div className="flex w-full flex-col items-center gap-6 lg:items-start">
         <p className="text-xl font-medium text-black">Selecciona una opción</p>
 
-        {!opciones && (
-          <p className="text-sm text-black/60">Calculando tu cotización…</p>
-        )}
+        {!opciones && <p className="text-sm text-black/60">Calculando tu cotización…</p>}
 
         <div className="flex w-full flex-col gap-8">
           {opciones?.map((opcion) => (
@@ -58,48 +54,30 @@ export function StepCosto({
                 aria-label={`Seleccionar ${opcion.titulo}`}
                 aria-pressed={seleccionada === opcion.id}
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${
-                  seleccionada === opcion.id
-                    ? "border-primary bg-primary"
-                    : "border-secondary-dark/40 bg-white"
+                  seleccionada === opcion.id ? "border-primary bg-primary" : "border-secondary-dark/40 bg-white"
                 }`}
               >
-                {seleccionada === opcion.id && (
-                  <span className="h-2.5 w-2.5 rounded-full bg-white" />
-                )}
+                {seleccionada === opcion.id && <span className="h-2.5 w-2.5 rounded-full bg-white" />}
               </button>
 
               <div className="flex w-full flex-col gap-1">
-                <p className="text-right text-base font-medium text-black">
-                  {opcion.titulo}
-                </p>
+                <p className="text-right text-base font-medium text-black">{opcion.titulo}</p>
                 <div className="flex flex-col gap-4 rounded-md bg-white p-6 shadow-card">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex flex-col gap-1">
-                      <p className="text-xs font-medium text-black">
-                        Entrega estimada
-                      </p>
-                      <p className="font-display text-2xl font-bold text-black">
-                        {opcion.entregaEstimada}
-                      </p>
-                      <p className="max-w-xs text-[10px] text-black">
-                        {opcion.reservaAntes}
-                      </p>
+                      <p className="text-xs font-medium text-black">Entrega estimada</p>
+                      <p className="font-display text-2xl font-bold text-black">{opcion.entregaEstimada}</p>
+                      <p className="max-w-xs text-[10px] text-black">{opcion.reservaAntes}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <p className="text-xs font-medium text-black">
-                        Precio desde
-                      </p>
-                      <p className="font-display text-2xl font-bold uppercase text-black">
-                        {formatMXN(opcion.precio)}
-                      </p>
+                      <p className="text-xs font-medium text-black">Precio desde</p>
+                      <p className="font-display text-2xl font-bold uppercase text-black">{formatMXN(opcion.precio)}</p>
                     </div>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setExpandida(expandida === opcion.id ? null : opcion.id)
-                    }
+                    onClick={() => setExpandida(expandida === opcion.id ? null : opcion.id)}
                     className="mx-auto flex items-center gap-2 rounded-md border-2 border-primary px-4 py-2 font-display text-sm font-bold text-primary"
                   >
                     {expandida === opcion.id ? "Ver menos" : "Ver detalles"}
@@ -117,10 +95,7 @@ export function StepCosto({
                   {expandida === opcion.id && (
                     <div className="flex flex-col items-end gap-1.5 border-t border-neutral-line pt-3">
                       {opcion.detalle.map((linea) => (
-                        <div
-                          key={linea.label}
-                          className="flex w-full max-w-[230px] justify-between text-xs text-black"
-                        >
+                        <div key={linea.label} className="flex w-full max-w-[230px] justify-between text-xs text-black">
                           <span>{linea.label}</span>
                           <span>{formatMXN(linea.precio)}</span>
                         </div>

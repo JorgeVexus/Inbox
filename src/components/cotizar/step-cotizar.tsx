@@ -4,13 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import type {
-  CotizacionInput,
-  Direccion,
-  EntregaTipo,
-  EnvioTipo,
-  Paquete,
-} from "@/types/cotizacion";
+import type { CotizacionInput, Direccion, EntregaTipo, EnvioTipo, Paquete } from "@/types/cotizacion";
 
 function nuevoPaquete(): Paquete {
   return {
@@ -67,13 +61,14 @@ export function StepCotizar({
     cpValido(destino.cp) &&
     destino.ciudad.trim() !== "" &&
     paquetesValidos;
-  const motivo = !cpValido(origen.cp) || !cpValido(destino.cp)
-    ? "Escribe códigos postales de 5 dígitos."
-    : origen.ciudad.trim() === "" || destino.ciudad.trim() === ""
-      ? "Indica la ciudad de origen y de destino."
-      : !paquetesValidos
-        ? "Peso y medidas deben ser mayores a 0 (máximo 1000)."
-        : "";
+  const motivo =
+    !cpValido(origen.cp) || !cpValido(destino.cp)
+      ? "Escribe códigos postales de 5 dígitos."
+      : origen.ciudad.trim() === "" || destino.ciudad.trim() === ""
+        ? "Indica la ciudad de origen y de destino."
+        : !paquetesValidos
+          ? "Peso y medidas deben ser mayores a 0 (máximo 1000)."
+          : "";
 
   function swap() {
     setOrigen(destino);
@@ -117,9 +112,7 @@ export function StepCotizar({
       </div>
 
       <div className="flex w-full flex-col gap-4">
-        <p className="text-xl font-medium text-black">
-          Selecciona el tipo de entrega
-        </p>
+        <p className="text-xl font-medium text-black">Selecciona el tipo de entrega</p>
         <div className="flex flex-wrap items-center justify-center gap-10">
           <OpcionRadio
             label="Entrega en sucursal"
@@ -138,16 +131,8 @@ export function StepCotizar({
         <div className="flex flex-col gap-4">
           <p className="text-xl font-medium text-black">Selecciona una opción</p>
           <div className="flex flex-wrap items-center justify-center gap-10">
-            <OpcionRadio
-              label="Paquete"
-              checked={envio === "paquete"}
-              onClick={() => setEnvio("paquete")}
-            />
-            <OpcionRadio
-              label="Sobre"
-              checked={envio === "sobre"}
-              onClick={() => setEnvio("sobre")}
-            />
+            <OpcionRadio label="Paquete" checked={envio === "paquete"} onClick={() => setEnvio("paquete")} />
+            <OpcionRadio label="Sobre" checked={envio === "sobre"} onClick={() => setEnvio("sobre")} />
           </div>
         </div>
 
@@ -203,17 +188,17 @@ function DireccionCard({
       <p className="font-display text-2xl font-bold text-black">{label}</p>
       <div className="flex w-full flex-col gap-3 rounded-md bg-white p-5 shadow-card">
         <div className="flex flex-col gap-1.5">
-          <p className="text-xs font-medium text-[#707372]">
-            Ingrese el C.P de {label.toLowerCase()}
-          </p>
+          <p className="text-xs font-medium text-[#707372]">Ingrese el C.P de {label.toLowerCase()}</p>
           <div className="flex items-start gap-2.5">
-            <input autoComplete={label === "Origen" ? "postal-code" : "off"}
+            <input
+              autoComplete={label === "Origen" ? "postal-code" : "off"}
               type="text"
               inputMode="numeric"
               maxLength={5}
               value={value.cp}
               onChange={(e) => onChange({ ...value, cp: e.target.value.replace(/\D/g, "").slice(0, 5) })}
-              aria-label={`Código postal de ${label.toLowerCase()}`} placeholder="Código postal"
+              aria-label={`Código postal de ${label.toLowerCase()}`}
+              placeholder="Código postal"
               className="h-[53px] min-w-0 flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card-sm outline-none"
             />
             <Link
@@ -227,18 +212,22 @@ function DireccionCard({
             </Link>
           </div>
         </div>
-        <input autoComplete={label === "Origen" ? "address-level2" : "off"}
+        <input
+          autoComplete={label === "Origen" ? "address-level2" : "off"}
           type="text"
           value={value.ciudad}
           onChange={(e) => onChange({ ...value, ciudad: e.target.value })}
-          aria-label={`Ciudad de ${label.toLowerCase()}`} placeholder="Ciudad"
+          aria-label={`Ciudad de ${label.toLowerCase()}`}
+          placeholder="Ciudad"
           className="h-[48px] w-full rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
         />
-        <input autoComplete={label === "Origen" ? "off" : "off"}
+        <input
+          autoComplete={label === "Origen" ? "off" : "off"}
           type="text"
           value={value.colonia}
           onChange={(e) => onChange({ ...value, colonia: e.target.value })}
-          aria-label={`Colonia de ${label.toLowerCase()}`} placeholder="Colonia"
+          aria-label={`Colonia de ${label.toLowerCase()}`}
+          placeholder="Colonia"
           className="h-[48px] w-full rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
         />
       </div>
@@ -246,21 +235,9 @@ function DireccionCard({
   );
 }
 
-function OpcionRadio({
-  label,
-  checked,
-  onClick,
-}: {
-  label: string;
-  checked: boolean;
-  onClick: () => void;
-}) {
+function OpcionRadio({ label, checked, onClick }: { label: string; checked: boolean; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center gap-2 text-sm font-medium text-black"
-    >
+    <button type="button" onClick={onClick} className="flex items-center gap-2 text-sm font-medium text-black">
       <span
         className={`flex h-[25px] w-[25px] items-center justify-center rounded-[3px] border-2 bg-white ${
           checked ? "border-primary" : "border-secondary"
@@ -307,34 +284,14 @@ function PaqueteCard({
       <div className="flex flex-wrap items-start gap-8">
         <div className="flex flex-col gap-3">
           <p className="text-xl font-medium text-black">Peso</p>
-          <MedidaInput
-            label="Peso"
-            unit="Kg"
-            value={paquete.peso}
-            onChange={(v) => onChange({ peso: v })}
-          />
+          <MedidaInput label="Peso" unit="Kg" value={paquete.peso} onChange={(v) => onChange({ peso: v })} />
         </div>
         <div className="flex flex-col gap-3">
           <p className="text-xl font-medium text-black">Medidas</p>
           <div className="flex items-center gap-4">
-            <MedidaInput
-              label="Alto"
-              unit="Cm"
-              value={paquete.alto}
-              onChange={(v) => onChange({ alto: v })}
-            />
-            <MedidaInput
-              label="Largo"
-              unit="Cm"
-              value={paquete.largo}
-              onChange={(v) => onChange({ largo: v })}
-            />
-            <MedidaInput
-              label="Ancho"
-              unit="Cm"
-              value={paquete.ancho}
-              onChange={(v) => onChange({ ancho: v })}
-            />
+            <MedidaInput label="Alto" unit="Cm" value={paquete.alto} onChange={(v) => onChange({ alto: v })} />
+            <MedidaInput label="Largo" unit="Cm" value={paquete.largo} onChange={(v) => onChange({ largo: v })} />
+            <MedidaInput label="Ancho" unit="Cm" value={paquete.ancho} onChange={(v) => onChange({ ancho: v })} />
           </div>
           <div className="flex justify-end gap-4 pr-3 text-xs text-[#707372]">
             <span className="min-w-0 flex-1 text-right sm:w-[82px] sm:flex-none">Alto</span>
@@ -360,9 +317,7 @@ function PaqueteCard({
               <button
                 type="button"
                 aria-label="Disminuir cantidad"
-                onClick={() =>
-                  onChange({ cantidad: Math.max(1, paquete.cantidad - 1) })
-                }
+                onClick={() => onChange({ cantidad: Math.max(1, paquete.cantidad - 1) })}
                 className="flex h-6 w-6 items-center justify-center"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-black">
@@ -398,7 +353,8 @@ function MedidaInput({
         min={0}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        aria-label={label} placeholder="0"
+        aria-label={label}
+        placeholder="0"
         className="h-full w-full min-w-0 text-right text-xs font-medium text-black outline-none"
       />
       <span className="shrink-0 text-xs font-medium text-black">{unit}</span>

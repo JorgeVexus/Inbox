@@ -28,10 +28,7 @@ export function SomosHistoria() {
     <section className="mx-auto flex max-w-[1330px] flex-col items-center gap-10 px-6 py-16 lg:flex-row lg:items-center lg:px-16">
       <div className="flex w-full flex-col divide-y divide-neutral-line lg:min-w-0 lg:max-w-[796px] lg:flex-1">
         {CARDS.map((card) => (
-          <div
-            key={card.title}
-            className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:gap-8"
-          >
+          <div key={card.title} className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:gap-8">
             <h2 className="w-full shrink-0 font-display text-xl font-bold text-black sm:w-[220px] sm:text-[25px]">
               {card.title}
             </h2>
@@ -41,12 +38,7 @@ export function SomosHistoria() {
       </div>
 
       <div className="relative h-[280px] w-full shrink-0 lg:h-[340px] lg:w-[340px] xl:h-[444px] xl:w-[665px]">
-        <Image
-          src="/images/somos-auto.png"
-          alt="Camioneta de reparto Inbox"
-          fill
-          className="object-contain"
-        />
+        <Image src="/images/somos-auto.png" alt="Camioneta de reparto Inbox" fill className="object-contain" />
       </div>
     </section>
   );

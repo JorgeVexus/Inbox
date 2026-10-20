@@ -1,28 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  WizardStepper,
-  type CotizarStepKey,
-} from "@/components/cotizar/wizard-stepper";
+import { WizardStepper, type CotizarStepKey } from "@/components/cotizar/wizard-stepper";
 import { StepCotizar, defaultCotizacionInput } from "@/components/cotizar/step-cotizar";
 import { StepCosto } from "@/components/cotizar/step-costo";
 import { StepConfirmar } from "@/components/cotizar/step-confirmar";
 import { StepPago } from "@/components/cotizar/step-pago";
 import { readAndClearCotizacionDraft } from "@/lib/cotizacion-draft";
-import type {
-  ConfirmarInput,
-  CostoOpcion,
-  CotizacionInput,
-} from "@/types/cotizacion";
+import type { ConfirmarInput, CostoOpcion, CotizacionInput } from "@/types/cotizacion";
 
 export default function CotizarPage() {
   const [step, setStep] = useState<CotizarStepKey>("cotizar");
   const [completed, setCompleted] = useState<Set<CotizarStepKey>>(new Set());
 
-  const [cotizacion, setCotizacion] = useState<CotizacionInput>(
-    defaultCotizacionInput(),
-  );
+  const [cotizacion, setCotizacion] = useState<CotizacionInput>(defaultCotizacionInput());
   const [opcion, setOpcion] = useState<CostoOpcion | null>(null);
   const [confirmar, setConfirmar] = useState<ConfirmarInput | null>(null);
 

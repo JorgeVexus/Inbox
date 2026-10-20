@@ -8,12 +8,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { listarContactos } from "@/lib/contactos";
 import { pesoTotalPaquetes } from "@/lib/mock/cotizacion";
 import type { ContactoGuardado } from "@/types/contacto";
-import type {
-  ConfirmarInput,
-  ContactoEnvio,
-  CostoOpcion,
-  CotizacionInput,
-} from "@/types/cotizacion";
+import type { ConfirmarInput, ContactoEnvio, CostoOpcion, CotizacionInput } from "@/types/cotizacion";
 
 function contactoVacio(cp: string, ciudad: string, colonia: string): ContactoEnvio {
   return {
@@ -45,8 +40,7 @@ export function StepConfirmar({
   const { session, openLogin } = useAuth();
 
   const [remitente, setRemitente] = useState<ContactoEnvio>(
-    initial?.remitente ??
-      contactoVacio(cotizacion.origen.cp, cotizacion.origen.ciudad, cotizacion.origen.colonia),
+    initial?.remitente ?? contactoVacio(cotizacion.origen.cp, cotizacion.origen.ciudad, cotizacion.origen.colonia),
   );
   const [destinatario, setDestinatario] = useState<ContactoEnvio>(
     initial?.destinatario ??
@@ -57,9 +51,7 @@ export function StepConfirmar({
   const [seguro, setSeguro] = useState(initial?.seguro ?? false);
 
   const paquete = cotizacion.paquetes[0];
-  const medidasLabel = paquete
-    ? `${paquete.alto} cm x ${paquete.largo} cm x ${paquete.ancho}cm`
-    : "—";
+  const medidasLabel = paquete ? `${paquete.alto} cm x ${paquete.largo} cm x ${paquete.ancho}cm` : "—";
   const total = opcion.precio + (seguro ? 200 : 0);
 
   const telefonoValido = (t: string) => {
@@ -150,11 +142,7 @@ export function StepConfirmar({
       className="flex w-full flex-col gap-8 rounded-xl bg-neutral-bg px-6 py-8 sm:px-12 min-[1400px]:flex-row min-[1400px]:items-start"
     >
       <div className="flex w-full flex-col gap-6">
-        <button
-          type="button"
-          onClick={autocompletarConSesion}
-          className="self-end py-2 font-display text-sm"
-        >
+        <button type="button" onClick={autocompletarConSesion} className="self-end py-2 font-display text-sm">
           {session ? (
             <span className="text-black">
               Usar datos de <span className="font-bold">{session.nombre}</span>
@@ -195,14 +183,13 @@ export function StepConfirmar({
 
         <div className="flex flex-wrap gap-8">
           <div className="flex w-full max-w-[303px] flex-col gap-2">
-            <label className="text-xs font-medium text-black">
-              Detalle del contenido
-            </label>
+            <label className="text-xs font-medium text-black">Detalle del contenido</label>
             <input
               type="text"
               value={contenido}
               onChange={(e) => setContenido(e.target.value)}
-              aria-label="Descripción del contenido" placeholder="Descripción del contenido"
+              aria-label="Descripción del contenido"
+              placeholder="Descripción del contenido"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
             <Link
@@ -218,14 +205,13 @@ export function StepConfirmar({
             </Link>
           </div>
           <div className="flex flex-1 flex-col gap-2">
-            <label className="text-xs font-medium text-black">
-              Tipo de contenido
-            </label>
+            <label className="text-xs font-medium text-black">Tipo de contenido</label>
             <input
               type="text"
               value={tipoContenido}
               onChange={(e) => setTipoContenido(e.target.value)}
-              aria-label="Producto SAT" placeholder="Producto SAT"
+              aria-label="Producto SAT"
+              placeholder="Producto SAT"
               className="h-[43px] w-full max-w-[303px] rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </div>
@@ -248,11 +234,7 @@ export function StepConfirmar({
             {motivo}
           </p>
         )}
-        <Button
-          type="submit"
-          disabled={!canSubmit}
-          className="disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <Button type="submit" disabled={!canSubmit} className="disabled:cursor-not-allowed disabled:opacity-50">
           Continuar
         </Button>
       </InfoEnvioCard>
@@ -304,18 +286,21 @@ function ContactoForm({
       )}
       <div className="flex w-full flex-col gap-4">
         <Field label={nombreLabel}>
-          <input autoComplete={titulo === "Origen" ? "name" : "off"}
+          <input
+            autoComplete={titulo === "Origen" ? "name" : "off"}
             type="text"
             value={value.nombre}
             onChange={(e) => set("nombre", e.target.value)}
-            aria-label={`Nombre completo (${titulo.toLowerCase()})`} placeholder="Nombre completo"
+            aria-label={`Nombre completo (${titulo.toLowerCase()})`}
+            placeholder="Nombre completo"
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
         </Field>
 
         <div className="flex gap-2.5">
           <Field label="C.P" className="w-[86px]">
-            <input autoComplete={titulo === "Origen" ? "postal-code" : "off"}
+            <input
+              autoComplete={titulo === "Origen" ? "postal-code" : "off"}
               type="text"
               inputMode="numeric"
               maxLength={5}
@@ -326,27 +311,32 @@ function ContactoForm({
             />
           </Field>
           <Field label="Ciudad" className="flex-1">
-            <input autoComplete={titulo === "Origen" ? "address-level1" : "off"}
+            <input
+              autoComplete={titulo === "Origen" ? "address-level1" : "off"}
               type="text"
               value={value.ciudad}
               onChange={(e) => set("ciudad", e.target.value)}
-              aria-label={`Estado (${titulo.toLowerCase()})`} placeholder="Estado"
+              aria-label={`Estado (${titulo.toLowerCase()})`}
+              placeholder="Estado"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
           <Field label="Colonia" className="flex-1">
-            <input autoComplete={titulo === "Origen" ? "off" : "off"}
+            <input
+              autoComplete={titulo === "Origen" ? "off" : "off"}
               type="text"
               value={value.colonia}
               onChange={(e) => set("colonia", e.target.value)}
-              aria-label={`Colonia (${titulo.toLowerCase()})`} placeholder="Colonia"
+              aria-label={`Colonia (${titulo.toLowerCase()})`}
+              placeholder="Colonia"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-3 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
         </div>
 
         <Field label="Dirección">
-          <input autoComplete={titulo === "Origen" ? "address-line1" : "off"}
+          <input
+            autoComplete={titulo === "Origen" ? "address-line1" : "off"}
             type="text"
             value={value.direccion}
             onChange={(e) => set("direccion", e.target.value)}
@@ -358,41 +348,49 @@ function ContactoForm({
 
         <div className="flex gap-4">
           <Field label="No. Exterior" className="flex-1">
-            <input autoComplete={titulo === "Origen" ? "off" : "off"}
+            <input
+              autoComplete={titulo === "Origen" ? "off" : "off"}
               type="text"
               value={value.numExt}
               onChange={(e) => set("numExt", e.target.value)}
-              aria-label={`No. ext (${titulo.toLowerCase()})`} placeholder="No. ext"
+              aria-label={`No. ext (${titulo.toLowerCase()})`}
+              placeholder="No. ext"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
           <Field label="No. Interior" className="flex-1">
-            <input autoComplete={titulo === "Origen" ? "off" : "off"}
+            <input
+              autoComplete={titulo === "Origen" ? "off" : "off"}
               type="text"
               value={value.numInt}
               onChange={(e) => set("numInt", e.target.value)}
-              aria-label={`No. int (${titulo.toLowerCase()})`} placeholder="No. int"
+              aria-label={`No. int (${titulo.toLowerCase()})`}
+              placeholder="No. int"
               className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Field>
         </div>
 
         <Field label="Teléfono">
-          <input autoComplete={titulo === "Origen" ? "tel" : "off"}
+          <input
+            autoComplete={titulo === "Origen" ? "tel" : "off"}
             type="tel"
             value={value.telefono}
             onChange={(e) => set("telefono", e.target.value)}
-            aria-label={`Número celular (${titulo.toLowerCase()})`} placeholder="Número celular"
+            aria-label={`Número celular (${titulo.toLowerCase()})`}
+            placeholder="Número celular"
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
         </Field>
 
         <Field label="Email">
-          <input autoComplete={titulo === "Origen" ? "email" : "off"}
+          <input
+            autoComplete={titulo === "Origen" ? "email" : "off"}
             type="email"
             value={value.email}
             onChange={(e) => set("email", e.target.value)}
-            aria-label={`Correo electrónico (${titulo.toLowerCase()})`} placeholder="Correo electrónico"
+            aria-label={`Correo electrónico (${titulo.toLowerCase()})`}
+            placeholder="Correo electrónico"
             className="h-[43px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
           />
         </Field>
@@ -401,15 +399,7 @@ function ContactoForm({
   );
 }
 
-function Field({
-  label,
-  className = "",
-  children,
-}: {
-  label: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, className = "", children }: { label: string; className?: string; children: React.ReactNode }) {
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       <label className="text-xs font-medium text-black">{label}</label>

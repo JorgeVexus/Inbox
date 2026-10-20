@@ -98,24 +98,16 @@ describe("filtrarEnvios", () => {
 
 describe("seam de envios", () => {
   it("genera una clave de alias estable y aislada por usuario", () => {
-    expect(claveAliasEnvio("INBOX", "4003229791")).toBe(
-      "inbox:envio-alias:INBOX:4003229791",
-    );
-    expect(claveAliasEnvio("OTRO", "4003229791")).not.toBe(
-      claveAliasEnvio("INBOX", "4003229791"),
-    );
+    expect(claveAliasEnvio("INBOX", "4003229791")).toBe("inbox:envio-alias:INBOX:4003229791");
+    expect(claveAliasEnvio("OTRO", "4003229791")).not.toBe(claveAliasEnvio("INBOX", "4003229791"));
   });
 
   it("normaliza la identidad del usuario para compartir sus aliases", () => {
-    expect(claveAliasEnvio(" inbox ", "4003229791")).toBe(
-      claveAliasEnvio("INBOX", "4003229791"),
-    );
+    expect(claveAliasEnvio(" inbox ", "4003229791")).toBe(claveAliasEnvio("INBOX", "4003229791"));
   });
 
   it("unifica formas unicode equivalentes de la identidad del usuario", () => {
-    expect(claveAliasEnvio("JOSÉ", "4003229791")).toBe(
-      claveAliasEnvio("JOSE\u0301", "4003229791"),
-    );
+    expect(claveAliasEnvio("JOSÉ", "4003229791")).toBe(claveAliasEnvio("JOSE\u0301", "4003229791"));
   });
 
   it("devuelve aliases iniciales en SSR", async () => {

@@ -92,9 +92,7 @@ export function CoberturaMap({
             eventHandlers={{
               click: () => onSelect?.(s),
             }}
-            opacity={
-              selectedOficina && selectedOficina !== s.K_Oficina ? 0.55 : 1
-            }
+            opacity={selectedOficina && selectedOficina !== s.K_Oficina ? 0.55 : 1}
           />
         ))}
     </MapContainer>

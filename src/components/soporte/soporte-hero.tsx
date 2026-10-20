@@ -6,11 +6,9 @@ const TARJETAS = [
     titulo: "Llámanos",
     contenido: (
       <>
-        <span className="font-semibold text-primary">01 800 713 1000</span>{" "}
-        (línea nacional gratuita)
+        <span className="font-semibold text-primary">01 800 713 1000</span> (línea nacional gratuita)
         <br />
-        <span className="font-semibold text-primary">834 171 3030</span>{" "}
-        (línea directa)
+        <span className="font-semibold text-primary">834 171 3030</span> (línea directa)
         <br />
         <br />
         Lunes a sábado de 8:00 a 20:00 hrs GTM-5
@@ -25,8 +23,7 @@ const TARJETAS = [
         <span className="font-semibold text-primary">info@inbox.com.mx</span>
         <br />
         <br />
-        También puedes utilizar el formulario en línea si prefieres una
-        respuesta rápida.
+        También puedes utilizar el formulario en línea si prefieres una respuesta rápida.
       </>
     ),
   },
@@ -46,10 +43,8 @@ export function SoporteHero() {
           ¿Tienes dudas? Pregunta a nuestro chat
         </h1>
         <p className="max-w-3xl text-base text-black">
-          Nuestro asistente está listo para ayudarte en todo momento. Haz tus
-          preguntas sobre envíos, facturación, rastreo o cobertura y obtén
-          respuestas al instante. Si lo necesitas, te conectamos con un
-          asesor.
+          Nuestro asistente está listo para ayudarte en todo momento. Haz tus preguntas sobre envíos, facturación,
+          rastreo o cobertura y obtén respuestas al instante. Si lo necesitas, te conectamos con un asesor.
         </p>
       </div>
 
@@ -60,9 +55,7 @@ export function SoporteHero() {
             className="flex h-[201px] w-full max-w-[339px] flex-col justify-center gap-4 rounded-md border-2 border-secondary-dark/50 bg-white px-5 py-4 shadow-card"
           >
             <div className="flex w-full items-center justify-between gap-4">
-              <p className="font-display text-2xl font-bold text-black">
-                {t.titulo}
-              </p>
+              <p className="font-display text-2xl font-bold text-black">{t.titulo}</p>
               <Image src={t.icon} alt="" width={50} height={50} />
             </div>
             <p className="text-sm text-black">{t.contenido}</p>
@@ -71,12 +64,9 @@ export function SoporteHero() {
 
         <div className="flex h-[201px] w-full max-w-[339px] flex-col justify-between gap-4 rounded-md border-2 border-secondary-dark/50 bg-white px-6 py-6 shadow-card">
           <div className="flex flex-col gap-2">
-            <p className="font-display text-2xl font-bold text-black">
-              ¡Síguenos en redes!
-            </p>
+            <p className="font-display text-2xl font-bold text-black">¡Síguenos en redes!</p>
             <p className="text-sm text-black">
-              Mantente al día con nuestras novedades, consejos de envío,
-              promociones y más.
+              Mantente al día con nuestras novedades, consejos de envío, promociones y más.
             </p>
           </div>
           <div className="flex items-center justify-between px-4">

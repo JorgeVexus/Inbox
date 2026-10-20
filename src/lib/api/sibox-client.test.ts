@@ -45,12 +45,8 @@ describe("siboxPost", () => {
   it("hace login una vez y reusa el token en la llamada siguiente", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
-      .mockResolvedValueOnce(
-        loginOk("abc123"),
-      )
-      .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } }),
-      );
+      .mockResolvedValueOnce(loginOk("abc123"))
+      .mockResolvedValueOnce(jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } }));
     vi.stubGlobal("fetch", fetchMock);
 
     const { siboxPost } = await importFreshClient();
@@ -66,21 +62,10 @@ describe("siboxPost", () => {
   it("reintenta login si el token cacheado da 401", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
-      .mockResolvedValueOnce(
-        loginOk("viejo"),
-      )
-      .mockResolvedValueOnce(
-        jsonResponse(
-          { resp: { result: 1, data: "El formato del token es incorrecto." } },
-          401,
-        ),
-      )
-      .mockResolvedValueOnce(
-        loginOk("nuevo"),
-      )
-      .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } }),
-      );
+      .mockResolvedValueOnce(loginOk("viejo"))
+      .mockResolvedValueOnce(jsonResponse({ resp: { result: 1, data: "El formato del token es incorrecto." } }, 401))
+      .mockResolvedValueOnce(loginOk("nuevo"))
+      .mockResolvedValueOnce(jsonResponse({ resp: { result: 0, data: [{ Guia: "1" }] } }));
     vi.stubGlobal("fetch", fetchMock);
 
     const { siboxPost } = await importFreshClient();
@@ -95,12 +80,8 @@ describe("siboxPost", () => {
   it("lanza SiboxApiError con el mensaje de la API cuando result no es 0", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
-      .mockResolvedValueOnce(
-        loginOk("abc123"),
-      )
-      .mockResolvedValueOnce(
-        jsonResponse({ resp: { result: 1, data: "No se encontro la guia." } }),
-      );
+      .mockResolvedValueOnce(loginOk("abc123"))
+      .mockResolvedValueOnce(jsonResponse({ resp: { result: 1, data: "No se encontro la guia." } }));
     vi.stubGlobal("fetch", fetchMock);
 
     const { siboxPost, SiboxApiError } = await importFreshClient();
@@ -112,12 +93,8 @@ describe("siboxPost", () => {
   it("tolera el sobre alterno {success,mensaje,data}", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock
-      .mockResolvedValueOnce(
-        loginOk("abc123"),
-      )
-      .mockResolvedValueOnce(
-        jsonResponse({ success: true, mensaje: "ok", data: [{ Guia: "1" }] }),
-      );
+      .mockResolvedValueOnce(loginOk("abc123"))
+      .mockResolvedValueOnce(jsonResponse({ success: true, mensaje: "ok", data: [{ Guia: "1" }] }));
     vi.stubGlobal("fetch", fetchMock);
 
     const { siboxPost } = await importFreshClient();
@@ -235,7 +212,8 @@ describe("protecciones del Login (anti-martilleo hacia SIBOX)", () => {
     process.env.SIBOX_SERVICE_PASSWORD = "ya-configurada";
     vi.stubGlobal(
       "fetch",
-      vi.fn<typeof fetch>()
+      vi
+        .fn<typeof fetch>()
         .mockResolvedValueOnce(loginOk("tok"))
         .mockResolvedValueOnce(jsonResponse({ resp: { result: 0, data: [] } })),
     );

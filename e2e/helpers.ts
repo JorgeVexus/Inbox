@@ -40,7 +40,10 @@ export async function iniciarSesion(page: Page) {
 
 /** Navegación interna sin recargar (la sesión demo vive en memoria). */
 export async function irA(page: Page, ruta: string) {
-  await page.evaluate((r) => (window as unknown as { next: { router: { push: (p: string) => void } } }).next.router.push(r), ruta);
+  await page.evaluate(
+    (r) => (window as unknown as { next: { router: { push: (p: string) => void } } }).next.router.push(r),
+    ruta,
+  );
   await page.waitForURL("**" + ruta);
 }
 

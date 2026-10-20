@@ -91,9 +91,7 @@ describe("validarSolicitudRecoleccion", () => {
 
 describe("observacionesConGuias", () => {
   it("no agrega nada si no hay guías de referencia", () => {
-    expect(
-      observacionesConGuias({ observaciones: "Tocar timbre", guiasReferencia: [] }),
-    ).toBe("Tocar timbre");
+    expect(observacionesConGuias({ observaciones: "Tocar timbre", guiasReferencia: [] })).toBe("Tocar timbre");
   });
 
   it("antepone las guías a las observaciones existentes", () => {
@@ -106,9 +104,9 @@ describe("observacionesConGuias", () => {
   });
 
   it("funciona sin observaciones adicionales", () => {
-    expect(
-      observacionesConGuias({ observaciones: "", guiasReferencia: ["4003229791"] }),
-    ).toBe("Guías a recolectar: 4003229791");
+    expect(observacionesConGuias({ observaciones: "", guiasReferencia: ["4003229791"] })).toBe(
+      "Guías a recolectar: 4003229791",
+    );
   });
 });
 

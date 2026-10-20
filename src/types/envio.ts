@@ -12,6 +12,4 @@ export type EnvioDetalle = {
   eventos: RastreoEvento[];
 };
 
-export type GuardarNombreResult =
-  | { ok: true; nombre: string }
-  | { ok: false; mensaje: string };
+export type GuardarNombreResult = { ok: true; nombre: string } | { ok: false; mensaje: string };

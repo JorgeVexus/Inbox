@@ -19,17 +19,14 @@ const ETIQUETA_ESTADO: Record<EstadoHorario, string> = {
 };
 import type { Sucursal } from "@/types/sucursal";
 
-const CoberturaMap = dynamic(
-  () => import("@/components/home/cobertura-map").then((m) => m.CoberturaMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-neutral-bg text-sm text-[#707372]">
-        Cargando mapa…
-      </div>
-    ),
-  },
-);
+const CoberturaMap = dynamic(() => import("@/components/home/cobertura-map").then((m) => m.CoberturaMap), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center bg-neutral-bg text-sm text-[#707372]">
+      Cargando mapa…
+    </div>
+  ),
+});
 
 export function Cobertura({
   headlineImage,
@@ -51,10 +48,7 @@ export function Cobertura({
   });
   const [seleccionada, setSeleccionada] = useState<Sucursal | null>(null);
 
-  const ciudades = useMemo(
-    () => getCiudades(sucursales, kEstado === "" ? undefined : kEstado),
-    [sucursales, kEstado],
-  );
+  const ciudades = useMemo(() => getCiudades(sucursales, kEstado === "" ? undefined : kEstado), [sucursales, kEstado]);
 
   const filtradas = useMemo(() => {
     const term = busqueda.trim().toLowerCase();
@@ -62,11 +56,7 @@ export function Cobertura({
       if (kEstado !== "" && s.K_Estado !== kEstado) return false;
       if (kCiudad !== "" && s.K_Ciudad !== kCiudad) return false;
       if (!tiposVisibles[s.tipo]) return false;
-      if (
-        term &&
-        !`${s.D_Oficina} ${s.D_Ciudad} ${s.D_Estado}`.toLowerCase().includes(term)
-      )
-        return false;
+      if (term && !`${s.D_Oficina} ${s.D_Ciudad} ${s.D_Estado}`.toLowerCase().includes(term)) return false;
       return true;
     });
   }, [sucursales, kEstado, kCiudad, tiposVisibles, busqueda]);
@@ -76,25 +66,23 @@ export function Cobertura({
       <div className="flex flex-col items-center gap-8 lg:flex-row">
         {headlineImage && (
           <div className="relative h-[220px] w-full shrink-0 sm:h-[280px] lg:h-[320px] lg:w-[480px]">
-            <Image src={headlineImage} alt="" fill priority sizes="(min-width: 1024px) 480px, 100vw" className="object-contain" />
+            <Image
+              src={headlineImage}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 480px, 100vw"
+              className="object-contain"
+            />
           </div>
         )}
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">
-              Tu Inbox más cercana
-            </h2>
-            <Image
-              src="/icons/globe-location-pin.svg"
-              alt=""
-              width={48}
-              height={48}
-              className="hidden sm:block"
-            />
+            <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">Tu Inbox más cercana</h2>
+            <Image src="/icons/globe-location-pin.svg" alt="" width={48} height={48} className="hidden sm:block" />
           </div>
           <p className="max-w-2xl text-base text-black">
-            Explora nuestras ubicaciones y elige la que mejor se adapte a tus
-            necesidades de envío o recolección.
+            Explora nuestras ubicaciones y elige la que mejor se adapte a tus necesidades de envío o recolección.
           </p>
         </div>
       </div>
@@ -130,9 +118,7 @@ export function Cobertura({
           <select
             aria-label="Filtrar el mapa por ciudad"
             value={kCiudad}
-            onChange={(e) =>
-              setKCiudad(e.target.value === "" ? "" : Number(e.target.value))
-            }
+            onChange={(e) => setKCiudad(e.target.value === "" ? "" : Number(e.target.value))}
             className="pointer-events-auto flex h-[53px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none sm:w-[259px]"
           >
             <option value="">Ciudad</option>
@@ -150,7 +136,8 @@ export function Cobertura({
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              aria-label="Buscar sucursal en el mapa" placeholder="Buscar"
+              aria-label="Buscar sucursal en el mapa"
+              placeholder="Buscar"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <Image src="/icons/search2.svg" alt="" width={20} height={20} />
@@ -159,15 +146,11 @@ export function Cobertura({
 
         <div className="pointer-events-none absolute bottom-6 left-6 z-[500] hidden sm:block">
           <div className="pointer-events-auto flex w-[220px] flex-col items-center gap-3 rounded-md bg-white px-4 py-4 shadow-card">
-            <p className="text-center text-xs font-semibold uppercase text-black">
-              Indicadores ({filtradas.length})
-            </p>
+            <p className="text-center text-xs font-semibold uppercase text-black">Indicadores ({filtradas.length})</p>
             <button
               type="button"
               aria-pressed={tiposVisibles.sucursal}
-              onClick={() =>
-                setTiposVisibles((v) => ({ ...v, sucursal: !v.sucursal }))
-              }
+              onClick={() => setTiposVisibles((v) => ({ ...v, sucursal: !v.sucursal }))}
               className="flex w-full items-center justify-between"
             >
               <span className="flex items-center gap-3">
@@ -179,16 +162,12 @@ export function Cobertura({
             <button
               type="button"
               aria-pressed={tiposVisibles.distribucion}
-              onClick={() =>
-                setTiposVisibles((v) => ({ ...v, distribucion: !v.distribucion }))
-              }
+              onClick={() => setTiposVisibles((v) => ({ ...v, distribucion: !v.distribucion }))}
               className="flex w-full items-center justify-between"
             >
               <span className="flex items-center gap-3">
                 <span className="h-3 w-3 rounded-full bg-gray-800" />
-                <span className="text-xs font-semibold text-black">
-                  Centro de distribución
-                </span>
+                <span className="text-xs font-semibold text-black">Centro de distribución</span>
               </span>
               <CheckSwatch checked={tiposVisibles.distribucion} />
             </button>
@@ -196,19 +175,17 @@ export function Cobertura({
         </div>
 
         {filtradas.length === 0 && (
-          <div role="status" className="pointer-events-none absolute inset-0 z-[400] flex items-center justify-center px-6">
+          <div
+            role="status"
+            className="pointer-events-none absolute inset-0 z-[400] flex items-center justify-center px-6"
+          >
             <p className="rounded-md bg-white px-5 py-3 text-center text-sm font-medium text-black shadow-card">
               No encontramos sucursales con esos filtros.
             </p>
           </div>
         )}
 
-        {seleccionada && (
-          <SucursalPanel
-            sucursal={seleccionada}
-            onClose={() => setSeleccionada(null)}
-          />
-        )}
+        {seleccionada && <SucursalPanel sucursal={seleccionada} onClose={() => setSeleccionada(null)} />}
       </div>
     </section>
   );
@@ -218,13 +195,7 @@ export function Cobertura({
  * Overlays the right side of the map card; the "Buscar"/tabs are decorative
  * (they mirror the Google-Maps-style reference in the Figma but aren't wired
  * to anything — there's nothing to search within a single sucursal's info). */
-function SucursalPanel({
-  sucursal,
-  onClose,
-}: {
-  sucursal: Sucursal;
-  onClose: () => void;
-}) {
+function SucursalPanel({ sucursal, onClose }: { sucursal: Sucursal; onClose: () => void }) {
   const estado = estadoHorario(sucursal.Observaciones);
 
   return (
@@ -256,9 +227,7 @@ function SucursalPanel({
         </div>
 
         <div className="flex items-center justify-between px-1 font-display text-sm font-bold whitespace-nowrap">
-          <span className="border-b-2 border-primary pb-1 text-primary">
-            Descripción general
-          </span>
+          <span className="border-b-2 border-primary pb-1 text-primary">Descripción general</span>
           <span className="text-black">Opiniones</span>
           <span className="text-black">Acerca de</span>
         </div>
@@ -269,18 +238,14 @@ function SucursalPanel({
             <span className="text-xs font-semibold text-black">{ETIQUETA_ESTADO[estado]}</span>
           </div>
 
-          <p className="font-display text-lg font-bold text-black">
-            {sucursal.D_Oficina}
-          </p>
+          <p className="font-display text-lg font-bold text-black">{sucursal.D_Oficina}</p>
 
           {sucursal.Observaciones && (
             <div className="flex items-center gap-4">
               <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 fill-primary" aria-hidden>
                 <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm.75 5v5.3l4.2 2.5-.75 1.2-5-3V7h1.55z" />
               </svg>
-              <p className="whitespace-pre-line text-xs text-black">
-                {sucursal.Observaciones}
-              </p>
+              <p className="whitespace-pre-line text-xs text-black">{sucursal.Observaciones}</p>
             </div>
           )}
 
@@ -289,8 +254,7 @@ function SucursalPanel({
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
             </svg>
             <p className="text-xs text-black">
-              {sucursal.Calle}, {sucursal.D_Ciudad}, {sucursal.D_Estado} — CP{" "}
-              {sucursal.Codigo_Postal}
+              {sucursal.Calle}, {sucursal.D_Ciudad}, {sucursal.D_Estado} — CP {sucursal.Codigo_Postal}
             </p>
           </div>
 
@@ -335,10 +299,7 @@ export function CoberturaCTA() {
   const [kCiudad, setKCiudad] = useState<number | "">("");
   const [busqueda, setBusqueda] = useState("");
 
-  const ciudades = useMemo(
-    () => getCiudades(sucursales, kEstado === "" ? undefined : kEstado),
-    [sucursales, kEstado],
-  );
+  const ciudades = useMemo(() => getCiudades(sucursales, kEstado === "" ? undefined : kEstado), [sucursales, kEstado]);
 
   const estadoSeleccionado = estados.find((e) => e.K_Estado === kEstado);
 
@@ -348,11 +309,7 @@ export function CoberturaCTA() {
     return sucursales.filter((s) => {
       if (s.K_Estado !== kEstado) return false;
       if (kCiudad !== "" && s.K_Ciudad !== kCiudad) return false;
-      if (
-        term &&
-        !`${s.D_Oficina} ${s.D_Ciudad} ${s.Calle}`.toLowerCase().includes(term)
-      )
-        return false;
+      if (term && !`${s.D_Oficina} ${s.D_Ciudad} ${s.Calle}`.toLowerCase().includes(term)) return false;
       return true;
     });
   }, [sucursales, kEstado, kCiudad, busqueda]);
@@ -363,31 +320,18 @@ export function CoberturaCTA() {
     <section className="mx-6 flex flex-col gap-10 rounded-xl bg-neutral-bg px-6 py-10 lg:mx-16 lg:px-11 lg:py-10">
       <div
         className={`flex flex-col gap-6 ${
-          mostrarResultados
-            ? "lg:flex-row lg:items-center lg:justify-between"
-            : "items-center text-center"
+          mostrarResultados ? "lg:flex-row lg:items-center lg:justify-between" : "items-center text-center"
         }`}
       >
         <div
-          className={`flex flex-col gap-4 ${
-            mostrarResultados ? "items-start text-left" : "max-w-2xl items-center"
-          }`}
+          className={`flex flex-col gap-4 ${mostrarResultados ? "items-start text-left" : "max-w-2xl items-center"}`}
         >
           <div className="flex items-center gap-3">
-            <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">
-              Tu inbox más cercana
-            </h2>
-            <Image
-              src="/icons/globe-location-pin.svg"
-              alt=""
-              width={40}
-              height={40}
-              className="hidden sm:block"
-            />
+            <h2 className="font-display text-3xl font-bold text-black sm:text-[50px]">Tu inbox más cercana</h2>
+            <Image src="/icons/globe-location-pin.svg" alt="" width={40} height={40} className="hidden sm:block" />
           </div>
           <p className="text-base text-black">
-            Explora nuestras ubicaciones y elige la que mejor se adapte a tus
-            necesidades de envío o recolección.
+            Explora nuestras ubicaciones y elige la que mejor se adapte a tus necesidades de envío o recolección.
           </p>
         </div>
 
@@ -397,7 +341,8 @@ export function CoberturaCTA() {
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              aria-label="Buscar sucursal en la lista" placeholder="Buscar"
+              aria-label="Buscar sucursal en la lista"
+              placeholder="Buscar"
               className="w-full min-w-0 font-display text-base text-black placeholder:text-secondary-dark outline-none"
             />
             <Image src="/icons/search2.svg" alt="" width={20} height={20} />
@@ -405,26 +350,14 @@ export function CoberturaCTA() {
         )}
       </div>
 
-      <div
-        className={`flex flex-col gap-10 ${
-          mostrarResultados ? "lg:flex-row lg:items-start" : "items-center"
-        }`}
-      >
+      <div className={`flex flex-col gap-10 ${mostrarResultados ? "lg:flex-row lg:items-start" : "items-center"}`}>
         <div
           className={`flex flex-col gap-10 lg:gap-14 ${
             mostrarResultados ? "lg:w-[300px] lg:shrink-0" : "items-center"
           }`}
         >
-          <div
-            className={`flex flex-col gap-4 ${
-              mostrarResultados ? "items-start" : "items-center"
-            }`}
-          >
-            <p
-              className={`text-xl font-medium text-black ${
-                mostrarResultados ? "text-left" : "text-center"
-              }`}
-            >
+          <div className={`flex flex-col gap-4 ${mostrarResultados ? "items-start" : "items-center"}`}>
+            <p className={`text-xl font-medium text-black ${mostrarResultados ? "text-left" : "text-center"}`}>
               Seleccione un estado del país
             </p>
             <select
@@ -446,25 +379,15 @@ export function CoberturaCTA() {
               ))}
             </select>
           </div>
-          <div
-            className={`flex flex-col gap-4 ${
-              mostrarResultados ? "items-start" : "items-center"
-            }`}
-          >
-            <p
-              className={`text-xl font-medium text-black ${
-                mostrarResultados ? "text-left" : "text-center"
-              }`}
-            >
+          <div className={`flex flex-col gap-4 ${mostrarResultados ? "items-start" : "items-center"}`}>
+            <p className={`text-xl font-medium text-black ${mostrarResultados ? "text-left" : "text-center"}`}>
               Seleccione una ciudad del estado
             </p>
             <select
               aria-label="Ciudad de la sucursal"
               value={kCiudad}
               disabled={kEstado === ""}
-              onChange={(e) =>
-                setKCiudad(e.target.value === "" ? "" : Number(e.target.value))
-              }
+              onChange={(e) => setKCiudad(e.target.value === "" ? "" : Number(e.target.value))}
               className={`flex h-[53px] w-full items-center justify-between rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium shadow-card outline-none disabled:opacity-50 sm:w-[259px] ${
                 kCiudad !== "" ? "text-primary" : "text-black"
               }`}
@@ -482,11 +405,9 @@ export function CoberturaCTA() {
         {mostrarResultados && (
           <div className="flex w-full flex-col gap-6">
             <p className="font-display text-2xl font-bold text-black sm:text-[30px]">
-              Cobertura en{" "}
-              <span className="underline">{estadoSeleccionado?.D_Estado}:</span>{" "}
+              Cobertura en <span className="underline">{estadoSeleccionado?.D_Estado}:</span>{" "}
               <span className="text-primary">
-                {resultados.length}{" "}
-                {resultados.length === 1 ? "destino" : "destinos"}
+                {resultados.length} {resultados.length === 1 ? "destino" : "destinos"}
               </span>
             </p>
 
@@ -506,9 +427,7 @@ export function CoberturaCTA() {
 
                 <div className="flex flex-col divide-y divide-neutral-line">
                   {resultados.length === 0 && (
-                    <p className="px-6 py-6 text-sm text-black/60">
-                      No encontramos sucursales con esos filtros.
-                    </p>
+                    <p className="px-6 py-6 text-sm text-black/60">No encontramos sucursales con esos filtros.</p>
                   )}
                   {resultados.map((s) => (
                     <FilaCobertura key={s.K_Oficina} sucursal={s} />

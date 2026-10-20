@@ -70,9 +70,12 @@ export function validarDomicilio(
 ): { ok: true } | { ok: false; mensaje: string } {
   if (!datos.alias.trim()) return { ok: false, mensaje: "Ponle un nombre a esta dirección (ej. Casa, Oficina)." };
   if (!datos.calle.trim()) return { ok: false, mensaje: "La calle es obligatoria." };
-  if (!datos.cp.trim() || datos.cp.trim().length !== 5) return { ok: false, mensaje: "Ingresa un código postal válido de 5 dígitos." };
-  if (!datos.ciudad.trim() || !datos.estado.trim()) return { ok: false, mensaje: "Falta estado o ciudad — verifica el código postal." };
-  if (datos.telefono.replace(/\D/g, "").length < 10) return { ok: false, mensaje: "Escribe un teléfono de contacto de 10 dígitos." };
+  if (!datos.cp.trim() || datos.cp.trim().length !== 5)
+    return { ok: false, mensaje: "Ingresa un código postal válido de 5 dígitos." };
+  if (!datos.ciudad.trim() || !datos.estado.trim())
+    return { ok: false, mensaje: "Falta estado o ciudad — verifica el código postal." };
+  if (datos.telefono.replace(/\D/g, "").length < 10)
+    return { ok: false, mensaje: "Escribe un teléfono de contacto de 10 dígitos." };
   return { ok: true };
 }
 
@@ -85,7 +88,7 @@ export async function guardarDomicilio(
 
   await esperarMock();
 
-  const listaActual = leerListaLocal(usuario) ?? (MOCK_DOMICILIOS[usuario.trim().toUpperCase()] ?? []);
+  const listaActual = leerListaLocal(usuario) ?? MOCK_DOMICILIOS[usuario.trim().toUpperCase()] ?? [];
   const final: Domicilio = { ...domicilio, id: domicilio.id ?? crypto.randomUUID() };
 
   let siguienteLista = domicilio.id
@@ -103,13 +106,13 @@ export async function guardarDomicilio(
   return { ok: true, domicilio: final };
 }
 
-export async function eliminarDomicilio(
-  usuario: string,
-  id: string,
-): Promise<{ ok: boolean; mensaje?: string }> {
+export async function eliminarDomicilio(usuario: string, id: string): Promise<{ ok: boolean; mensaje?: string }> {
   await esperarMock();
-  const listaActual = leerListaLocal(usuario) ?? (MOCK_DOMICILIOS[usuario.trim().toUpperCase()] ?? []);
-  const guardado = escribirListaLocal(usuario, listaActual.filter((d) => d.id !== id));
+  const listaActual = leerListaLocal(usuario) ?? MOCK_DOMICILIOS[usuario.trim().toUpperCase()] ?? [];
+  const guardado = escribirListaLocal(
+    usuario,
+    listaActual.filter((d) => d.id !== id),
+  );
   if (!guardado) {
     return { ok: false, mensaje: "No pudimos eliminar la dirección. Intenta de nuevo." };
   }

@@ -4,7 +4,8 @@ import { paginaMeta } from "@/lib/seo";
 
 export const metadata: Metadata = paginaMeta({
   titulo: "Cotizar envío",
-  descripcion: "Cotiza tu envío en línea: ingresa códigos postales, tipo de entrega y medidas del paquete y conoce el costo y la fecha estimada.",
+  descripcion:
+    "Cotiza tu envío en línea: ingresa códigos postales, tipo de entrega y medidas del paquete y conoce el costo y la fecha estimada.",
   ruta: "/cotizar",
 });
 

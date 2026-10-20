@@ -2,7 +2,16 @@ import { describe, expect, it } from "vitest";
 import { leerBorradorCotizacion, leerContactos, leerDatosFacturacion, leerDomicilios } from "./almacen-schemas";
 
 const contacto = {
-  id: "1", nombre: "Ana", cp: "64060", ciudad: "MTY", colonia: "C", direccion: "Calle", numExt: "1", numInt: "", telefono: "8112345678", email: "",
+  id: "1",
+  nombre: "Ana",
+  cp: "64060",
+  ciudad: "MTY",
+  colonia: "C",
+  direccion: "Calle",
+  numExt: "1",
+  numInt: "",
+  telefono: "8112345678",
+  email: "",
 };
 
 describe("lecturas tolerantes del almacenamiento local", () => {
@@ -26,17 +35,40 @@ describe("lecturas tolerantes del almacenamiento local", () => {
     expect(leerDatosFacturacion({ rfc: "A" })).toBeNull();
     expect(leerDatosFacturacion([])).toBeNull();
     expect(
-      leerDatosFacturacion({ rfc: "A", regimenFiscal: "601", cp: "1", estado: "", ciudad: "", colonia: "", coloniaEspecificada: "", direccion: "", telefono: "", correo: "" }),
+      leerDatosFacturacion({
+        rfc: "A",
+        regimenFiscal: "601",
+        cp: "1",
+        estado: "",
+        ciudad: "",
+        colonia: "",
+        coloniaEspecificada: "",
+        direccion: "",
+        telefono: "",
+        correo: "",
+      }),
     ).not.toBeNull();
   });
 
   it("borrador de cotización: valida forma y rangos", () => {
     const ok = {
-      entrega: "domicilio", envio: "paquete", origen: { cp: "64060", ciudad: "M", colonia: "" }, destino: { cp: "01000", ciudad: "C", colonia: "" },
+      entrega: "domicilio",
+      envio: "paquete",
+      origen: { cp: "64060", ciudad: "M", colonia: "" },
+      destino: { cp: "01000", ciudad: "C", colonia: "" },
       paquetes: [{ id: "a", cantidad: 1, peso: "5", alto: "1", largo: "1", ancho: "1" }],
     };
     expect(leerBorradorCotizacion(ok)).not.toBeNull();
-    for (const malo of [null, [], "x", {}, { ...ok, entrega: "otro" }, { ...ok, paquetes: [] }, { ...ok, paquetes: "x" }, { ...ok, paquetes: [{ ...ok.paquetes[0], cantidad: 9999 }] }]) {
+    for (const malo of [
+      null,
+      [],
+      "x",
+      {},
+      { ...ok, entrega: "otro" },
+      { ...ok, paquetes: [] },
+      { ...ok, paquetes: "x" },
+      { ...ok, paquetes: [{ ...ok.paquetes[0], cantidad: 9999 }] },
+    ]) {
       expect(leerBorradorCotizacion(malo)).toBeNull();
     }
   });

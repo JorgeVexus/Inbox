@@ -43,7 +43,14 @@ const DATOS_ESTRUCTURADOS = {
   logo: `${SITE_URL}/images/logo-blanco-horizontal.png`,
   description: DESCRIPCION_BASE,
   areaServed: "MX",
-  contactPoint: [{ "@type": "ContactPoint", contactType: "customer service", telephone: "+52-800-713-1000", availableLanguage: "es" }],
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      telephone: "+52-800-713-1000",
+      availableLanguage: "es",
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

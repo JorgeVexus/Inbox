@@ -60,8 +60,7 @@ export function RastreoCard({
               </>
             ) : (
               <>
-                No encontramos información para la guía{" "}
-                <span className="font-bold">{guia}</span>.
+                No encontramos información para la guía <span className="font-bold">{guia}</span>.
               </>
             )}
           </p>
@@ -75,11 +74,7 @@ export function RastreoCard({
                 Reintentar
               </button>
             )}
-            <button
-              type="button"
-              onClick={onQuitar}
-              className="px-2 py-2 text-xs font-medium text-primary underline"
-            >
+            <button type="button" onClick={onQuitar} className="px-2 py-2 text-xs font-medium text-primary underline">
               Quitar
             </button>
           </div>
@@ -95,9 +90,7 @@ export function RastreoCard({
   // guias ya entregadas. "Codigo de rastreo" sigue sin existir en la API: se
   // muestra la guia misma hasta que backend aclare si hay otro dato.
   const codigoRastreo = resultado.Guia;
-  const fechaProgramada = resultado.F_Promesa_Entrega
-    ? formatFechaCorta(resultado.F_Promesa_Entrega)
-    : "Por confirmar";
+  const fechaProgramada = resultado.F_Promesa_Entrega ? formatFechaCorta(resultado.F_Promesa_Entrega) : "Por confirmar";
 
   return (
     <div className="flex w-full flex-col items-center gap-4 rounded-md border border-secondary-dark/20 bg-white p-6 shadow-card-sm sm:p-8">
@@ -131,42 +124,42 @@ export function RastreoCard({
           // En el estado final (Entregado) el último paso también está completo.
           const hecho = i < paso || (paso === PASOS.length - 1 && i === paso);
           return (
-          <div key={p.label} aria-current={i === paso ? "step" : undefined} className="flex flex-1 items-center last:flex-none">
-            <div className="flex flex-col items-center gap-2">
-              <span
-                className={`flex size-[64px] items-center justify-center rounded-full border-2 p-3 sm:size-[80px] ${
-                  hecho
-                    ? "border-primary bg-primary"
-                    : i === paso
-                      ? "border-primary bg-white"
-                      : "border-secondary-dark/50 bg-white"
-                }`}
-              >
-                <Image
-                  src={p.icon}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className={hecho ? "invert" : ""}
+            <div
+              key={p.label}
+              aria-current={i === paso ? "step" : undefined}
+              className="flex flex-1 items-center last:flex-none"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <span
+                  className={`flex size-[64px] items-center justify-center rounded-full border-2 p-3 sm:size-[80px] ${
+                    hecho
+                      ? "border-primary bg-primary"
+                      : i === paso
+                        ? "border-primary bg-white"
+                        : "border-secondary-dark/50 bg-white"
+                  }`}
+                >
+                  <Image src={p.icon} alt="" width={40} height={40} className={hecho ? "invert" : ""} />
+                </span>
+                <p
+                  className={`max-w-[110px] text-center text-xs font-medium sm:text-sm ${
+                    i <= paso ? "text-black" : "text-[#707372]"
+                  }`}
+                >
+                  {p.label}
+                  <span className="sr-only">
+                    {hecho ? " (completado)" : i === paso ? " (paso actual)" : " (pendiente)"}
+                  </span>
+                </p>
+              </div>
+              {i < PASOS.length - 1 && (
+                <div
+                  className={`mx-1 h-0.5 flex-1 border-t-2 border-dashed sm:mx-2 ${
+                    i < paso ? "border-primary" : "border-secondary-dark/40"
+                  }`}
                 />
-              </span>
-              <p
-                className={`max-w-[110px] text-center text-xs font-medium sm:text-sm ${
-                  i <= paso ? "text-black" : "text-[#707372]"
-                }`}
-              >
-                {p.label}
-                <span className="sr-only">{hecho ? " (completado)" : i === paso ? " (paso actual)" : " (pendiente)"}</span>
-              </p>
+              )}
             </div>
-            {i < PASOS.length - 1 && (
-              <div
-                className={`mx-1 h-0.5 flex-1 border-t-2 border-dashed sm:mx-2 ${
-                  i < paso ? "border-primary" : "border-secondary-dark/40"
-                }`}
-              />
-            )}
-          </div>
           );
         })}
       </div>
@@ -179,9 +172,7 @@ export function RastreoCard({
         {detalleAbierto ? "Ver menos" : "Ver detalles"}
         <svg
           viewBox="0 0 24 24"
-          className={`h-4 w-4 fill-primary transition-transform ${
-            detalleAbierto ? "rotate-90" : "-rotate-90"
-          }`}
+          className={`h-4 w-4 fill-primary transition-transform ${detalleAbierto ? "rotate-90" : "-rotate-90"}`}
           aria-hidden
         >
           <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z" />
@@ -190,16 +181,14 @@ export function RastreoCard({
 
       {detalleAbierto && (
         <div className="flex w-full flex-col gap-3 border-t border-neutral-line pt-4">
-          {cargandoDetalle && (
-            <p className="text-sm text-black/60">Cargando historial…</p>
-          )}
+          {cargandoDetalle && <p className="text-sm text-black/60">Cargando historial…</p>}
           {errorDetalle && (
-            <p role="alert" className="text-sm text-red-600">{errorDetalle}</p>
+            <p role="alert" className="text-sm text-red-600">
+              {errorDetalle}
+            </p>
           )}
           {!cargandoDetalle && !errorDetalle && detalle?.length === 0 && (
-            <p className="text-sm text-black/60">
-              Sin historial detallado disponible para esta guía.
-            </p>
+            <p className="text-sm text-black/60">Sin historial detallado disponible para esta guía.</p>
           )}
           {detalle?.map((evento) => (
             <div
@@ -209,13 +198,9 @@ export function RastreoCard({
               <div className="flex flex-col">
                 <span className="font-bold text-black">{evento.Estatus}</span>
                 <span className="text-black/70">{evento.OficinaEstatus}</span>
-                {evento.Observaciones && (
-                  <span className="text-xs text-black/50">{evento.Observaciones}</span>
-                )}
+                {evento.Observaciones && <span className="text-xs text-black/50">{evento.Observaciones}</span>}
               </div>
-              <span className="text-xs font-medium text-[#707372]">
-                {formatFechaCorta(evento.F_Estatus)}
-              </span>
+              <span className="text-xs font-medium text-[#707372]">{formatFechaCorta(evento.F_Estatus)}</span>
             </div>
           ))}
         </div>

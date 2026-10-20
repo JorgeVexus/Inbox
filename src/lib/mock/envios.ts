@@ -15,11 +15,9 @@ const DEFINICIONES_ENVIO = [
   { guia: "4157067169", nombre: "Pkt mamá", fechaProgramada: "03/08/2026" },
 ] as const;
 
-export const MOCK_ENVIOS: EnvioPerfil[] = DEFINICIONES_ENVIO.map(
-  ({ guia, nombre, fechaProgramada }) => ({
-    guia,
-    nombre,
-    fechaProgramada,
-    rastreo: { ...MOCK_RASTREOS[guia] },
-  }),
-);
+export const MOCK_ENVIOS: EnvioPerfil[] = DEFINICIONES_ENVIO.map(({ guia, nombre, fechaProgramada }) => ({
+  guia,
+  nombre,
+  fechaProgramada,
+  rastreo: { ...MOCK_RASTREOS[guia] },
+}));

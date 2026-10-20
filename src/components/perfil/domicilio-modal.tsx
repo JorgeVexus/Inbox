@@ -23,9 +23,7 @@ export function DomicilioModal({
   const panelRef = useRef<HTMLDivElement>(null);
   useModalA11y(panelRef, onClose);
 
-  const [datos, setDatos] = useState<Omit<Domicilio, "id"> & { id?: string }>(
-    domicilio ?? domicilioVacio(),
-  );
+  const [datos, setDatos] = useState<Omit<Domicilio, "id"> & { id?: string }>(domicilio ?? domicilioVacio());
   const [buscandoCP, setBuscandoCP] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,10 +70,7 @@ export function DomicilioModal({
     datos.telefono.replace(/\D/g, "").length >= 10;
 
   return (
-    <div
-      className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8" onClick={onClose}>
       <div
         ref={panelRef}
         role="dialog"
@@ -101,44 +96,52 @@ export function DomicilioModal({
 
         <div className="flex flex-col gap-3">
           <Row label="Nombre">
-            <input autoComplete="off"
+            <input
+              autoComplete="off"
               type="text"
               value={datos.alias}
               onChange={(e) => set("alias", e.target.value)}
-              aria-label="Alias de la dirección" placeholder="Ej. Casa, Oficina"
+              aria-label="Alias de la dirección"
+              placeholder="Ej. Casa, Oficina"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
 
           <Row label="Contacto">
-            <input autoComplete="off"
+            <input
+              autoComplete="off"
               type="text"
               value={datos.contacto}
               onChange={(e) => set("contacto", e.target.value)}
-              aria-label="Nombre de quien recibe" placeholder="Nombre de quien recibe"
+              aria-label="Nombre de quien recibe"
+              placeholder="Nombre de quien recibe"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
 
           <Row label="Teléfono">
-            <input autoComplete="tel"
+            <input
+              autoComplete="tel"
               type="tel"
               value={datos.telefono}
               onChange={(e) => set("telefono", e.target.value)}
-              aria-label="Teléfono de contacto" placeholder="Ingrese número celular"
+              aria-label="Teléfono de contacto"
+              placeholder="Ingrese número celular"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
 
           <Row label="C.P">
-            <input autoComplete="postal-code"
+            <input
+              autoComplete="postal-code"
               type="text"
               inputMode="numeric"
               maxLength={5}
               value={datos.cp}
               onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
               onBlur={handleCpBlur}
-              aria-label="Código postal" placeholder="Ingrese código postal"
+              aria-label="Código postal"
+              placeholder="Ingrese código postal"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
@@ -160,25 +163,29 @@ export function DomicilioModal({
               type="text"
               value={datos.colonia}
               onChange={(e) => set("colonia", e.target.value)}
-              aria-label="Colonia" placeholder="Colonia"
+              aria-label="Colonia"
+              placeholder="Colonia"
               className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
           </Row>
 
           <Row label="Calle y número">
             <div className="flex w-full gap-3">
-              <input autoComplete="address-line1"
+              <input
+                autoComplete="address-line1"
                 type="text"
                 value={datos.calle}
                 onChange={(e) => set("calle", e.target.value)}
-                aria-label="Calle" placeholder="Calle"
+                aria-label="Calle"
+                placeholder="Calle"
                 className="h-[53px] w-full min-w-0 flex-1 rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
               <input
                 type="text"
                 value={datos.numero}
                 onChange={(e) => set("numero", e.target.value)}
-                aria-label="Número exterior" placeholder="Núm."
+                aria-label="Número exterior"
+                placeholder="Núm."
                 className="h-[53px] w-[100px] shrink-0 rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
               />
             </div>
@@ -188,7 +195,8 @@ export function DomicilioModal({
             <textarea
               value={datos.referencias}
               onChange={(e) => set("referencias", e.target.value)}
-              aria-label="Referencias" placeholder="Color de casa, entre calles, punto de referencia…"
+              aria-label="Referencias"
+              placeholder="Color de casa, entre calles, punto de referencia…"
               rows={2}
               className="w-full resize-none rounded-md border border-secondary-dark/50 bg-white px-6 py-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
@@ -226,9 +234,7 @@ export function DomicilioModal({
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-      <span className="w-full shrink-0 text-xs font-medium text-[#707372] sm:w-[110px]">
-        {label}
-      </span>
+      <span className="w-full shrink-0 text-xs font-medium text-[#707372] sm:w-[110px]">{label}</span>
       {children}
     </div>
   );

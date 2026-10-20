@@ -11,21 +11,45 @@ import {
 
 // Filas REALES (apitest, 2026-10-12).
 const oficinaConCoords = {
-  K_Oficina: "7", D_Oficina: "ALDAMA", C_Oficina: "ALD", C_Pais: "MEX", K_Estado: "28", C_Estado: "TAM",
-  K_Ciudad: "39", D_Ciudad: "ALDAMA", K_Colonia: "28", D_Colonia: "ALDAMA",
-  Calle: "CARR. EST. MANUEL- SOTO LA MARINA KM 36", Codigo_Postal: "89670", Telefono: "836 274 0862",
-  B_Ocurre: "SI", B_Frontera: "NO", Contacto_Oficina: "X", Latitud: "22.92272138", Longitud: "-98.0819544",
+  K_Oficina: "7",
+  D_Oficina: "ALDAMA",
+  C_Oficina: "ALD",
+  C_Pais: "MEX",
+  K_Estado: "28",
+  C_Estado: "TAM",
+  K_Ciudad: "39",
+  D_Ciudad: "ALDAMA",
+  K_Colonia: "28",
+  D_Colonia: "ALDAMA",
+  Calle: "CARR. EST. MANUEL- SOTO LA MARINA KM 36",
+  Codigo_Postal: "89670",
+  Telefono: "836 274 0862",
+  B_Ocurre: "SI",
+  B_Frontera: "NO",
+  Contacto_Oficina: "X",
+  Latitud: "22.92272138",
+  Longitud: "-98.0819544",
   Observaciones: "Lunes a Viernes 09:00 a 18:00",
 };
 const oficinaSinCoords = {
-  ...oficinaConCoords, K_Oficina: "17", D_Oficina: "ABASOLO", Telefono: "", B_Ocurre: "NO",
-  Latitud: null, Longitud: null, Observaciones: "",
+  ...oficinaConCoords,
+  K_Oficina: "17",
+  D_Oficina: "ABASOLO",
+  Telefono: "",
+  B_Ocurre: "NO",
+  Latitud: null,
+  Longitud: null,
+  Observaciones: "",
 };
 
 describe("ListadoOficinas", () => {
   it("el request siempre es el payload fijo del servidor (el navegador no manda nada)", () => {
     expect(oficinasRequestSchema.parse({ K_Estado: "1", cualquier: "cosa" })).toMatchObject({
-      K_Oficina: "", K_Estado: "", CP: "", NombreDispositivo: "web", B_Operadores: false,
+      K_Oficina: "",
+      K_Estado: "",
+      CP: "",
+      NombreDispositivo: "web",
+      B_Operadores: false,
     });
   });
 
@@ -67,12 +91,9 @@ describe("código postal de entrada", () => {
   it.each(["64060", " 64060 ", "01000"])("acepta %j", (cp) => {
     expect(codigoPostalSchema.safeParse(cp).success).toBe(true);
   });
-  it.each(["", "abc", "6406", "640601", "64 060", "00000", "99999", "64060;DROP", "6406a"])(
-    "rechaza %j",
-    (cp) => {
-      expect(codigoPostalSchema.safeParse(cp).success).toBe(false);
-    },
-  );
+  it.each(["", "abc", "6406", "640601", "64 060", "00000", "99999", "64060;DROP", "6406a"])("rechaza %j", (cp) => {
+    expect(codigoPostalSchema.safeParse(cp).success).toBe(false);
+  });
 });
 
 describe("BusquedaCP", () => {
@@ -82,10 +103,25 @@ describe("BusquedaCP", () => {
   });
 
   const fila = (cp: number, colonia: string, k = 1776, ciudad = "MONTERREY") => ({
-    K_Pais: 1, C_Pais: "MEX", D_Pais: "MEXICO", K_Estado: 19, C_Estado: "NL", D_Estado: "NUEVO LEON",
-    K_Ciudad: 7, D_Ciudad: ciudad, K_Colonia: k, D_Colonia: colonia, CodigoPostal: cp,
-    K_Tipo_Cobertura: 1, D_Tipo_Cobertura: "PROPIA", B_Coberturaresora: false, B_Frontera: false,
-    Ocurre: "True", EAD: "True", EntregaGarantizada: null, K_Oficina_corresponde: null,
+    K_Pais: 1,
+    C_Pais: "MEX",
+    D_Pais: "MEXICO",
+    K_Estado: 19,
+    C_Estado: "NL",
+    D_Estado: "NUEVO LEON",
+    K_Ciudad: 7,
+    D_Ciudad: ciudad,
+    K_Colonia: k,
+    D_Colonia: colonia,
+    CodigoPostal: cp,
+    K_Tipo_Cobertura: 1,
+    D_Tipo_Cobertura: "PROPIA",
+    B_Coberturaresora: false,
+    B_Frontera: false,
+    Ocurre: "True",
+    EAD: "True",
+    EntregaGarantizada: null,
+    K_Oficina_corresponde: null,
   });
 
   it("agrupa las colonias de un CP válido", () => {
@@ -125,9 +161,18 @@ describe("ObtenerHorariosPorCP", () => {
   it("mapea la respuesta real al tipo HorarioRecoleccion", () => {
     const [h] = horariosResponseSchema.parse([
       {
-        K_Oficina: 721, D_Oficina: "MONTERREY-5 CONSTITUYENTES", Hora_Minima: "14:00", Hora_Maxima: "19:00",
-        Hora_Limite_Captura: "13:30", B_Lunes: true, B_Martes: true, B_Miercoles: true, B_Jueves: true,
-        B_Viernes: true, B_Sabado: false, B_Domingo: false,
+        K_Oficina: 721,
+        D_Oficina: "MONTERREY-5 CONSTITUYENTES",
+        Hora_Minima: "14:00",
+        Hora_Maxima: "19:00",
+        Hora_Limite_Captura: "13:30",
+        B_Lunes: true,
+        B_Martes: true,
+        B_Miercoles: true,
+        B_Jueves: true,
+        B_Viernes: true,
+        B_Sabado: false,
+        B_Domingo: false,
       },
     ]);
     expect(h).toEqual({

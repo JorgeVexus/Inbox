@@ -16,6 +16,4 @@ import type { ContactoEnvio } from "@/types/cotizacion";
  */
 export type ContactoGuardado = ContactoEnvio & { id: string };
 
-export type GuardarContactoResult =
-  | { ok: true; contacto: ContactoGuardado }
-  | { ok: false; mensaje: string };
+export type GuardarContactoResult = { ok: true; contacto: ContactoGuardado } | { ok: false; mensaje: string };

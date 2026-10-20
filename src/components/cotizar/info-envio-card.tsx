@@ -28,9 +28,7 @@ export function InfoEnvioCard({
 }) {
   return (
     <div className="flex w-full max-w-[279px] flex-col gap-5 rounded-md bg-white p-6 shadow-card">
-      <p className="text-right font-display text-sm text-primary">
-        Información de envío
-      </p>
+      <p className="text-right font-display text-sm text-primary">Información de envío</p>
       <div className="flex flex-col gap-2.5 pl-1.5 text-sm text-black">
         <p>Origen: {origenLabel}</p>
         <p>Destino: {destinoLabel}</p>
@@ -61,9 +59,7 @@ export function InfoEnvioCard({
           type="button"
           onClick={onToggleSeguro}
           className={`flex items-center justify-between gap-2 rounded-md border-2 py-3 pl-3 pr-3 font-display text-sm font-bold ${
-            seguro
-              ? "border-primary bg-primary text-white"
-              : "border-primary bg-white text-black"
+            seguro ? "border-primary bg-primary text-white" : "border-primary bg-white text-black"
           }`}
         >
           <span className="flex items-center gap-3">
@@ -79,8 +75,7 @@ export function InfoEnvioCard({
       <div className="flex items-center justify-between gap-2">
         <p className="font-display text-sm font-bold text-black">Total</p>
         <p className="font-sans text-2xl font-bold text-black">
-          {formatMXN(total)}{" "}
-          <span className="text-sm font-medium">MXN</span>
+          {formatMXN(total)} <span className="text-sm font-medium">MXN</span>
         </p>
       </div>
 

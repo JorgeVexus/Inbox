@@ -72,9 +72,7 @@ export const MAX_CONSTANCIA_BYTES = 5 * 1024 * 1024;
  * (multipart POST to a parsing endpoint) once one exists; the modal only
  * depends on getting back a `Partial<DatosFacturacion>`.
  */
-export async function extraerDatosConstanciaFiscal(
-  file: File,
-): Promise<Partial<DatosFacturacion>> {
+export async function extraerDatosConstanciaFiscal(file: File): Promise<Partial<DatosFacturacion>> {
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (extension !== "pdf" && extension !== "xml") {
     throw new Error("Solo se aceptan archivos PDF o XML.");

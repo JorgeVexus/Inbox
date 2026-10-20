@@ -26,12 +26,7 @@ const DESCRIPCION_BASE =
  * la página (lo reemplaza completo), así que cada página declara el suyo con
  * esta función: título y descripción propios, canonical y vista previa al compartir.
  */
-export function paginaMeta(opts: {
-  titulo: string;
-  descripcion?: string;
-  ruta: string;
-  indexar?: boolean;
-}): Metadata {
+export function paginaMeta(opts: { titulo: string; descripcion?: string; ruta: string; indexar?: boolean }): Metadata {
   const descripcion = opts.descripcion ?? DESCRIPCION_BASE;
   return {
     title: opts.titulo,
