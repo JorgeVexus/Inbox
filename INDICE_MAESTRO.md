@@ -276,6 +276,8 @@ npx tsc --noEmit && npm run lint && npm test
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
 
+- **2026-10-20 — B1 reverificado: SIGUE BLOQUEADO.** Cliente avisó que hicieron un cambio en Cloudflare. Desde la IP `187.189.155.14` (confirmada vigente): `curl` pasa (HTTP 200, Ray `a4d8f1c9dcfab476-DFW`), Node `fetch` y `https.request` reciben 403 `cf-mitigated: challenge` (Ray `a4d8f1e4ba24e93e-DFW`), 4 de 4 intentos; `api.inbox.com.mx` (producción) igual. La regla no aplica al cliente Node o no está en la zona/host correcto. Mensaje de seguimiento al cliente redactado en la conversación.
+
 - **2026-10-12 (sesión 3, parte 5 — QA analista, ronda 4)** — Reporte completo en `docs/REPORTE_QA.md` (51 hallazgos, 49 corregidos). Nuevo: axe-core (0 violaciones), SEO (metadatos por página, Open Graph, JSON-LD, respaldo de `SITE_URL` con variables de Vercel), `autocomplete` en todos los formularios, `prefers-reduced-motion`, moneda `$1,234.50`, "Último estado" y Reintentar en rastreo, `/rastreo` con contenido sin JavaScript. Brechas frente al plan: etiqueta PDF, catálogo SAT, historial de recolecciones, sucursal más cercana, sesión expirada, rate limiting, Sentry. Figma no verificado (requiere Dev Mode). E2E: 360 casos, 356 pasan.
 
 - **2026-10-12 (sesión 3, parte 4 — E2E y robustez)** — Suite Playwright en `e2e/` (`npm run build && npm run test:e2e`): 248 pasan en 4 navegadores. Encontró y se corrigió: desbordes a 320 px y a 1280 px (con barra de scroll), y datos locales corruptos / almacenamiento bloqueado que tumbaban /perfil y /cotizar (`src/lib/almacen-schemas.ts`). Carga del BFF: 3000 peticiones/300 simultáneas sin caídas, **sin límite de peticiones (pendiente)**. Reporte completo en `docs/REPORTE_SESION_2026-10-12.md`.
