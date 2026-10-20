@@ -42,7 +42,7 @@ const domicilioSchema: z.ZodType<Domicilio> = z.object({
   predeterminado: z.boolean(),
 });
 
-export const datosFacturacionSchema: z.ZodType<DatosFacturacion> = z.object({
+const datosFacturacionSchema: z.ZodType<DatosFacturacion> = z.object({
   rfc: texto(20),
   regimenFiscal: texto(20),
   cp: texto(10),

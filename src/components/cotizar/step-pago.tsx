@@ -238,7 +238,9 @@ function DatosPrincipales({
       <div className="flex w-full flex-col items-start gap-6 rounded-md bg-white p-6 shadow-card">
         <div className="flex w-full flex-wrap gap-8">
           <div className="flex w-full max-w-[303px] flex-col gap-2">
-            <label htmlFor="pago-email" className="text-xs font-medium text-black">Email</label>
+            <label htmlFor="pago-email" className="text-xs font-medium text-black">
+              Email
+            </label>
             <input
               autoComplete="email"
               type="email"
@@ -251,7 +253,9 @@ function DatosPrincipales({
             />
           </div>
           <div className="flex w-full max-w-[303px] flex-col gap-2">
-            <label htmlFor="pago-telefono" className="text-xs font-medium text-black">Teléfono</label>
+            <label htmlFor="pago-telefono" className="text-xs font-medium text-black">
+              Teléfono
+            </label>
             <input
               autoComplete="tel"
               type="tel"

@@ -160,8 +160,3 @@ export function estadoHorario(observaciones: string | null | undefined, ahora: D
   );
   return abierto ? "abierto" : "cerrado";
 }
-
-/** Compatibilidad: `true` solo cuando se sabe que esta abierto. */
-export function estaAbiertoAhora(observaciones: string | null | undefined): boolean {
-  return estadoHorario(observaciones) === "abierto";
-}

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/auth-provider";
+import { PantallaSinSesion, useAbrirLoginSinSesion } from "@/components/auth/pantalla-sin-sesion";
 import { EnvioHistorial } from "@/components/envio/envio-historial";
 import { EnvioResumen } from "@/components/envio/envio-resumen";
 import { EnviosLista } from "@/components/envio/envios-lista";
@@ -32,8 +33,7 @@ const LISTA_INICIAL: ListaState = {
 };
 
 export function EnviosView() {
-  const { session, isLoginOpen, openLogin } = useAuth();
-  const aperturaSolicitadaRef = useRef(false);
+  const { session } = useAuth();
   const listaRequestRef = useRef(0);
   const detalleRequestRef = useRef<Record<string, number>>({});
   const guardadoRequestRef = useRef(0);
@@ -58,17 +58,7 @@ export function EnviosView() {
     };
   }, [usuario]);
 
-  useEffect(() => {
-    if (usuario) {
-      aperturaSolicitadaRef.current = false;
-      return;
-    }
-
-    if (!aperturaSolicitadaRef.current && !isLoginOpen) {
-      aperturaSolicitadaRef.current = true;
-      openLogin();
-    }
-  }, [isLoginOpen, openLogin, usuario]);
+  useAbrirLoginSinSesion(Boolean(usuario));
 
   useEffect(() => {
     const cambioIdentidad = identidadVistaRef.current !== usuario;
@@ -208,22 +198,11 @@ export function EnviosView() {
 
   if (!session) {
     return (
-      <div className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
-        <section className="w-full max-w-xl rounded-md border border-neutral-line bg-white px-6 py-12 text-center shadow-card-sm sm:px-12">
-          <p className="font-display text-sm font-bold text-primary">MIS ENVÍOS</p>
-          <h1 className="mt-3 font-display text-3xl font-bold text-black sm:text-4xl">
-            Inicia sesión para consultar tus envíos
-          </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-black/70 sm:text-base">
-            Tu historial, datos de guía y movimientos están protegidos y solo se muestran dentro de tu cuenta.
-          </p>
-          {!isLoginOpen && (
-            <Button type="button" onClick={openLogin} className="mt-7">
-              Iniciar sesión
-            </Button>
-          )}
-        </section>
-      </div>
+      <PantallaSinSesion
+        etiqueta="MIS ENVÍOS"
+        titulo="Inicia sesión para consultar tus envíos"
+        descripcion="Tu historial, datos de guía y movimientos están protegidos y solo se muestran dentro de tu cuenta."
+      />
     );
   }
 

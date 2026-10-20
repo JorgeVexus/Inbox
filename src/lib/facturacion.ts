@@ -61,7 +61,7 @@ export async function guardarDatosFacturacion(
 }
 
 /** Tope de tamaño de la constancia (misma regla de 5 MB que los demás uploads del proyecto). */
-export const MAX_CONSTANCIA_BYTES = 5 * 1024 * 1024;
+const MAX_CONSTANCIA_BYTES = 5 * 1024 * 1024;
 
 /**
  * Seam 2 of 2 — "sube tu constancia fiscal y te llenamos el formulario".

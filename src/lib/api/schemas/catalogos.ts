@@ -59,7 +59,7 @@ const coordenada = z.union([z.string(), z.number(), z.null()]).transform((v) => 
   return Number.isFinite(n) ? n : null;
 });
 
-export const oficinaSchema = z
+const oficinaSchema = z
   .object({
     K_Oficina: entero,
     D_Oficina: z.string(),

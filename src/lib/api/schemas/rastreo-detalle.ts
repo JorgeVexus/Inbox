@@ -9,7 +9,7 @@ export const rastreoDetalleRequestSchema = rastreoRequestSchema;
  * (2026-10-02). Ojo: `F_Estatus` es "31-OCT-2007  09:03" (doble espacio) y
  * `F_Historia` es otro formato ("31/10/2007 09:03:00 a. m.") -- no mezclarlos.
  */
-export const rastreoEventoSchema = z.object({
+const rastreoEventoSchema = z.object({
   OficinaEstatus: z.string().nullable(),
   F_Estatus: z.string(),
   Estatus: z.string(),
@@ -29,7 +29,7 @@ export const rastreoEventoSchema = z.object({
  * seguridad 3 y 7 de CLAUDE.md). Confirmar con el cliente si alguna
  * observacion esta pensada para ser publica antes de reabrirla.
  */
-export const rastreoEventoPublicoSchema = rastreoEventoSchema.transform((e) => ({
+const rastreoEventoPublicoSchema = rastreoEventoSchema.transform((e) => ({
   ...e,
   Recibio: null,
   Observaciones: null,

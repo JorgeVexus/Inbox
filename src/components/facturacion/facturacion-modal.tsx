@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ModalShell } from "@/components/ui/modal-shell";
 import { useModalA11y } from "@/components/ui/use-modal-a11y";
 import { buscarCodigoPostal } from "@/lib/codigo-postal";
 import { extraerDatosConstanciaFiscal, guardarDatosFacturacion } from "@/lib/facturacion";
@@ -126,236 +127,218 @@ export function FacturacionModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-8"
-      role="presentation"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+    <ModalShell
+      onClose={onClose}
+      panelRef={panelRef}
+      label="Datos de facturación"
+      className="relative flex max-h-[90vh] w-full max-w-[612px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-5 pt-10 sm:px-10"
+      backdropClassName="px-4 py-8"
     >
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Datos de facturación"
-        className="relative flex max-h-[90vh] w-full max-w-[612px] flex-col gap-6 overflow-y-auto rounded-md bg-neutral-bg px-6 pb-5 pt-10 sm:px-10"
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-black/50 hover:bg-black/5 hover:text-black"
+      <p className="text-center font-display text-2xl font-bold text-black">Datos de facturación</p>
+
+      <div className="flex flex-col gap-4">
+        <p className="text-sm font-medium text-black">Constancia fiscal</p>
+        <div
+          role="presentation"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            const file = e.dataTransfer.files?.[0];
+            if (file) handleArchivo(file);
+          }}
+          className={`flex flex-col items-center gap-2.5 rounded-md border-2 border-dashed bg-white px-8 py-3 text-center transition-colors ${
+            dragOver ? "border-primary bg-primary/5" : "border-primary"
+          }`}
         >
-          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden>
-            <path d="M18.3 5.71 12 12.01l-6.3-6.3-1.41 1.41 6.3 6.3-6.3 6.29 1.41 1.41 6.3-6.29 6.3 6.29 1.41-1.41-6.3-6.29 6.3-6.3z" />
-          </svg>
-        </button>
-
-        <p className="text-center font-display text-2xl font-bold text-black">Datos de facturación</p>
-
-        <div className="flex flex-col gap-4">
-          <p className="text-sm font-medium text-black">Constancia fiscal</p>
-          <div
-            role="presentation"
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragOver(true);
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragOver(false);
-              const file = e.dataTransfer.files?.[0];
+          <Image src="/icons/add-photo-alternate.svg" alt="" width={62} height={62} />
+          {extrayendo ? (
+            <p className="text-sm font-medium text-black">Leyendo tu archivo…</p>
+          ) : archivoNombre ? (
+            <p className="text-sm font-medium text-black">
+              {archivoNombre} —{" "}
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary underline">
+                cambiar archivo
+              </button>
+            </p>
+          ) : (
+            <p className="max-w-xs text-sm font-medium text-black">
+              Arrastra aquí tu imagen o{" "}
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary underline">
+                explora archivos
+              </button>{" "}
+              para rellenar información
+            </p>
+          )}
+          <p className="text-xs text-[#707372]">Archivos aceptados: PDF y XML</p>
+          {errorArchivo && (
+            <p role="alert" className="text-xs font-medium text-red-600">
+              {errorArchivo}
+            </p>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.xml"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
               if (file) handleArchivo(file);
+              e.target.value = "";
             }}
-            className={`flex flex-col items-center gap-2.5 rounded-md border-2 border-dashed bg-white px-8 py-3 text-center transition-colors ${
-              dragOver ? "border-primary bg-primary/5" : "border-primary"
-            }`}
-          >
-            <Image src="/icons/add-photo-alternate.svg" alt="" width={62} height={62} />
-            {extrayendo ? (
-              <p className="text-sm font-medium text-black">Leyendo tu archivo…</p>
-            ) : archivoNombre ? (
-              <p className="text-sm font-medium text-black">
-                {archivoNombre} —{" "}
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary underline">
-                  cambiar archivo
-                </button>
-              </p>
-            ) : (
-              <p className="max-w-xs text-sm font-medium text-black">
-                Arrastra aquí tu imagen o{" "}
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="text-primary underline">
-                  explora archivos
-                </button>{" "}
-                para rellenar información
-              </p>
-            )}
-            <p className="text-xs text-[#707372]">Archivos aceptados: PDF y XML</p>
-            {errorArchivo && (
-              <p role="alert" className="text-xs font-medium text-red-600">
-                {errorArchivo}
-              </p>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.xml"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleArchivo(file);
-                e.target.value = "";
-              }}
-            />
-          </div>
+          />
         </div>
+      </div>
 
-        <div className="flex flex-col gap-3">
-          <Row label="RFC">
-            <input
-              autoComplete="off"
-              type="text"
-              value={datos.rfc}
-              onChange={(e) => set("rfc", e.target.value.toUpperCase())}
-              aria-label="RFC"
-              placeholder="Ejem: VECJ880326XXX"
-              maxLength={13}
-              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-            />
-          </Row>
+      <div className="flex flex-col gap-3">
+        <Row label="RFC">
+          <input
+            autoComplete="off"
+            type="text"
+            value={datos.rfc}
+            onChange={(e) => set("rfc", e.target.value.toUpperCase())}
+            aria-label="RFC"
+            placeholder="Ejem: VECJ880326XXX"
+            maxLength={13}
+            className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+          />
+        </Row>
 
-          <Row label="Régimen fiscal">
+        <Row label="Régimen fiscal">
+          <select
+            aria-label="Régimen fiscal"
+            value={datos.regimenFiscal}
+            onChange={(e) => set("regimenFiscal", e.target.value)}
+            className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none"
+          >
+            <option value="">Seleccione una opción</option>
+            {REGIMENES_FISCALES.map((r) => (
+              <option key={r.clave} value={r.clave}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </Row>
+
+        <Row label="C.P">
+          <input
+            autoComplete="postal-code"
+            type="text"
+            inputMode="numeric"
+            maxLength={5}
+            value={datos.cp}
+            onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
+            onBlur={handleCpBlur}
+            aria-label="Código postal"
+            placeholder="Ingrese código postal"
+            className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+          />
+        </Row>
+
+        <Row label="Estado">
+          <div className="flex h-[53px] w-full items-center rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card">
+            {buscandoCP ? "Buscando…" : datos.estado || "Se completa con el C.P"}
+          </div>
+        </Row>
+
+        <Row label="Ciudad">
+          <div className="flex h-[53px] w-full items-center rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card">
+            {buscandoCP ? "Buscando…" : datos.ciudad || "Se completa con el C.P"}
+          </div>
+        </Row>
+
+        <div className="flex flex-col gap-2">
+          <Row label="Colonia">
             <select
-              aria-label="Régimen fiscal"
-              value={datos.regimenFiscal}
-              onChange={(e) => set("regimenFiscal", e.target.value)}
-              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none"
+              aria-label="Colonia"
+              value={datos.colonia}
+              onChange={(e) => set("colonia", e.target.value)}
+              disabled={colonias.length === 0}
+              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none disabled:opacity-50"
             >
-              <option value="">Seleccione una opción</option>
-              {REGIMENES_FISCALES.map((r) => (
-                <option key={r.clave} value={r.clave}>
-                  {r.label}
+              <option value="">{colonias.length === 0 ? "Ingrese un C.P primero" : "Seleccione una opción"}</option>
+              {colonias.map((c) => (
+                <option key={c} value={c}>
+                  {c}
                 </option>
               ))}
             </select>
           </Row>
-
-          <Row label="C.P">
+          <div className="flex items-center gap-2 pl-[137px]">
+            <span className="shrink-0 text-xs font-medium text-[#707372]">Especificar colonia</span>
             <input
-              autoComplete="postal-code"
+              autoComplete="off"
               type="text"
-              inputMode="numeric"
-              maxLength={5}
-              value={datos.cp}
-              onChange={(e) => set("cp", e.target.value.replace(/\D/g, "").slice(0, 5))}
-              onBlur={handleCpBlur}
-              aria-label="Código postal"
-              placeholder="Ingrese código postal"
-              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+              value={datos.coloniaEspecificada}
+              onChange={(e) => set("coloniaEspecificada", e.target.value)}
+              aria-label="Especificar colonia"
+              placeholder="Colonia"
+              className="h-[34px] w-[144px] rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
             />
-          </Row>
-
-          <Row label="Estado">
-            <div className="flex h-[53px] w-full items-center rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card">
-              {buscandoCP ? "Buscando…" : datos.estado || "Se completa con el C.P"}
-            </div>
-          </Row>
-
-          <Row label="Ciudad">
-            <div className="flex h-[53px] w-full items-center rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card">
-              {buscandoCP ? "Buscando…" : datos.ciudad || "Se completa con el C.P"}
-            </div>
-          </Row>
-
-          <div className="flex flex-col gap-2">
-            <Row label="Colonia">
-              <select
-                aria-label="Colonia"
-                value={datos.colonia}
-                onChange={(e) => set("colonia", e.target.value)}
-                disabled={colonias.length === 0}
-                className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black shadow-card outline-none disabled:opacity-50"
-              >
-                <option value="">{colonias.length === 0 ? "Ingrese un C.P primero" : "Seleccione una opción"}</option>
-                {colonias.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </Row>
-            <div className="flex items-center gap-2 pl-[137px]">
-              <span className="shrink-0 text-xs font-medium text-[#707372]">Especificar colonia</span>
-              <input
-                autoComplete="off"
-                type="text"
-                value={datos.coloniaEspecificada}
-                onChange={(e) => set("coloniaEspecificada", e.target.value)}
-                aria-label="Especificar colonia"
-                placeholder="Colonia"
-                className="h-[34px] w-[144px] rounded-md border border-secondary-dark/50 bg-white px-4 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-              />
-            </div>
           </div>
-
-          <Row label="Dirección">
-            <input
-              autoComplete="address-line1"
-              type="text"
-              value={datos.direccion}
-              onChange={(e) => set("direccion", e.target.value)}
-              aria-label="Calle y número"
-              placeholder="Calle y número"
-              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-            />
-          </Row>
-
-          <Row label="Teléfono">
-            <input
-              autoComplete="tel"
-              type="tel"
-              value={datos.telefono}
-              onChange={(e) => set("telefono", e.target.value)}
-              aria-label="Teléfono"
-              placeholder="Ingrese número celular"
-              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-            />
-          </Row>
-
-          <Row label="Correo">
-            <input
-              autoComplete="email"
-              type="email"
-              value={datos.correo}
-              onChange={(e) => set("correo", e.target.value)}
-              aria-label="Correo electrónico"
-              placeholder="Ingrese correo electrónico"
-              className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
-            />
-          </Row>
         </div>
 
-        {errorGuardar && (
-          <p role="alert" className="text-center text-sm font-medium text-red-600">
-            {errorGuardar}
-          </p>
-        )}
+        <Row label="Dirección">
+          <input
+            autoComplete="address-line1"
+            type="text"
+            value={datos.direccion}
+            onChange={(e) => set("direccion", e.target.value)}
+            aria-label="Calle y número"
+            placeholder="Calle y número"
+            className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+          />
+        </Row>
 
-        {motivo && (
-          <p role="status" className="text-center text-xs font-medium text-black/60">
-            {motivo}
-          </p>
-        )}
+        <Row label="Teléfono">
+          <input
+            autoComplete="tel"
+            type="tel"
+            value={datos.telefono}
+            onChange={(e) => set("telefono", e.target.value)}
+            aria-label="Teléfono"
+            placeholder="Ingrese número celular"
+            className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+          />
+        </Row>
 
-        <Button
-          onClick={handleAceptar}
-          disabled={!canSubmit || guardando}
-          className="mx-auto disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {guardando ? "Guardando…" : "Aceptar"}
-        </Button>
+        <Row label="Correo">
+          <input
+            autoComplete="email"
+            type="email"
+            value={datos.correo}
+            onChange={(e) => set("correo", e.target.value)}
+            aria-label="Correo electrónico"
+            placeholder="Ingrese correo electrónico"
+            className="h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-6 text-xs font-medium text-black placeholder:text-secondary-dark shadow-card outline-none"
+          />
+        </Row>
       </div>
-    </div>
+
+      {errorGuardar && (
+        <p role="alert" className="text-center text-sm font-medium text-red-600">
+          {errorGuardar}
+        </p>
+      )}
+
+      {motivo && (
+        <p role="status" className="text-center text-xs font-medium text-black/60">
+          {motivo}
+        </p>
+      )}
+
+      <Button
+        onClick={handleAceptar}
+        disabled={!canSubmit || guardando}
+        className="mx-auto disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {guardando ? "Guardando…" : "Aceptar"}
+      </Button>
+    </ModalShell>
   );
 }
 

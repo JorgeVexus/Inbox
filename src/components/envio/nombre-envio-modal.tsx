@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ModalShell } from "@/components/ui/modal-shell";
 import { useModalA11y } from "@/components/ui/use-modal-a11y";
 
 type NombreEnvioModalProps = {
@@ -61,62 +62,55 @@ function NombreEnvioForm({
   }
 
   return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4"
-      role="presentation"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCerrar();
-      }}
+    <ModalShell
+      onClose={onCerrar}
+      panelRef={panelRef}
+      labelledBy="nombre-envio-titulo"
+      className="w-full max-w-[504px] rounded-md bg-neutral-bg px-8 py-9 shadow-card sm:px-12"
+      conBotonCerrar={false}
     >
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="nombre-envio-titulo"
-        className="w-full max-w-[504px] rounded-md bg-neutral-bg px-8 py-9 shadow-card sm:px-12"
-      >
-        <h2 id="nombre-envio-titulo" className="text-center font-display text-2xl font-bold text-black">
-          Asigna un nombre a tu envío
-        </h2>
+      <h2 id="nombre-envio-titulo" className="text-center font-display text-2xl font-bold text-black">
+        Asigna un nombre a tu envío
+      </h2>
 
-        <form onSubmit={handleSubmit} className="mt-7 flex flex-col">
-          <label htmlFor="nombre-envio" className="text-sm font-medium text-black">
-            ¿Cómo quieres identificar este envío?
-          </label>
-          <input
-            id="nombre-envio"
-            type="text"
-            value={nombre}
-            onChange={(event) => setNombre(event.target.value)}
-            placeholder="Ejem. Paquete de ropa"
-            maxLength={60}
-            aria-describedby={error ? "nombre-envio-error nombre-envio-contador" : "nombre-envio-contador"}
-            aria-invalid={Boolean(error)}
-            className="mt-2 h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-5 text-sm font-medium text-black shadow-card outline-none placeholder:text-black/60 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          />
+      <form onSubmit={handleSubmit} className="mt-7 flex flex-col">
+        <label htmlFor="nombre-envio" className="text-sm font-medium text-black">
+          ¿Cómo quieres identificar este envío?
+        </label>
+        <input
+          id="nombre-envio"
+          type="text"
+          value={nombre}
+          onChange={(event) => setNombre(event.target.value)}
+          placeholder="Ejem. Paquete de ropa"
+          maxLength={60}
+          aria-describedby={error ? "nombre-envio-error nombre-envio-contador" : "nombre-envio-contador"}
+          aria-invalid={Boolean(error)}
+          className="mt-2 h-[53px] w-full rounded-md border border-secondary-dark/50 bg-white px-5 text-sm font-medium text-black shadow-card outline-none placeholder:text-black/60 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        />
 
-          <div className="mt-1 flex min-h-5 items-start justify-between gap-4">
-            {error ? (
-              <p id="nombre-envio-error" role="alert" className="text-sm font-medium text-red-600">
-                {error}
-              </p>
-            ) : (
-              <span />
-            )}
-            <span id="nombre-envio-contador" className="shrink-0 text-xs text-black/70">
-              {nombre.length}/60
-            </span>
-          </div>
+        <div className="mt-1 flex min-h-5 items-start justify-between gap-4">
+          {error ? (
+            <p id="nombre-envio-error" role="alert" className="text-sm font-medium text-red-600">
+              {error}
+            </p>
+          ) : (
+            <span />
+          )}
+          <span id="nombre-envio-contador" className="shrink-0 text-xs text-black/70">
+            {nombre.length}/60
+          </span>
+        </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={guardando || solicitudEnviada}
-            className="mx-auto mt-5 h-[43px] min-w-[116px] text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {guardando ? "Guardando…" : "Aceptar"}
-          </Button>
-        </form>
-      </div>
-    </div>
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={guardando || solicitudEnviada}
+          className="mx-auto mt-5 h-[43px] min-w-[116px] text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {guardando ? "Guardando…" : "Aceptar"}
+        </Button>
+      </form>
+    </ModalShell>
   );
 }

@@ -1,46 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/auth-provider";
+import { PantallaSinSesion, useAbrirLoginSinSesion } from "@/components/auth/pantalla-sin-sesion";
 import { ContactosGuardados } from "@/components/perfil/contactos-guardados";
 import { DireccionesGuardadas } from "@/components/perfil/direcciones-guardadas";
 import { FacturacionGuardada } from "@/components/perfil/facturacion-guardada";
 import { Button } from "@/components/ui/button";
 
 export function PerfilView() {
-  const { session, isLoginOpen, openLogin, logout } = useAuth();
-  const aperturaSolicitadaRef = useRef(false);
+  const { session, logout } = useAuth();
 
-  useEffect(() => {
-    if (session) {
-      aperturaSolicitadaRef.current = false;
-      return;
-    }
-    if (!aperturaSolicitadaRef.current && !isLoginOpen) {
-      aperturaSolicitadaRef.current = true;
-      openLogin();
-    }
-  }, [isLoginOpen, openLogin, session]);
+  useAbrirLoginSinSesion(Boolean(session));
 
   if (!session) {
     return (
-      <div className="flex min-h-[62vh] items-center justify-center bg-neutral-bg px-5 py-20">
-        <section className="w-full max-w-xl rounded-md border border-neutral-line bg-white px-6 py-12 text-center shadow-card-sm sm:px-12">
-          <p className="font-display text-sm font-bold text-primary">MI PERFIL</p>
-          <h1 className="mt-3 font-display text-3xl font-bold text-black sm:text-4xl">
-            Inicia sesión para ver tu perfil
-          </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-black/70 sm:text-base">
-            Tus direcciones guardadas y datos de facturación están protegidos y solo se muestran dentro de tu cuenta.
-          </p>
-          {!isLoginOpen && (
-            <Button type="button" onClick={openLogin} className="mt-7">
-              Iniciar sesión
-            </Button>
-          )}
-        </section>
-      </div>
+      <PantallaSinSesion
+        etiqueta="MI PERFIL"
+        titulo="Inicia sesión para ver tu perfil"
+        descripcion="Tus direcciones guardadas y datos de facturación están protegidos y solo se muestran dentro de tu cuenta."
+      />
     );
   }
 

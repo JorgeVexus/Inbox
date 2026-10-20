@@ -33,7 +33,7 @@ export type CotizacionInput = {
 };
 
 /** Step 2 — one row of ObtieneDetalleCostos-shaped output. */
-export type CostoDetalleLinea = { label: string; precio: number };
+type CostoDetalleLinea = { label: string; precio: number };
 
 export type CostoOpcion = {
   id: string;

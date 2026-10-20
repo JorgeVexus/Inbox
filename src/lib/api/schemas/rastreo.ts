@@ -15,15 +15,13 @@ const guiaSchema = z
 /** Request de wsRastreo -- ver PDF de API seccion 5. */
 export const rastreoRequestSchema = z.object({ Guia: guiaSchema });
 
-export type RastreoRequest = z.infer<typeof rastreoRequestSchema>;
-
 /**
  * Un registro de la respuesta de wsRastreo, ajustado contra la API real
  * (2026-10-02): el PDF no lista `F_Promesa_Entrega` pero la API sí lo
  * regresa, y varios campos vienen `null` en guías reales (p.ej. guías
  * internas/canceladas no tienen estado/ciudad de origen o destino).
  */
-export const rastreoRegistroSchema = z.object({
+const rastreoRegistroSchema = z.object({
   Guia: z.string(),
   F_Documentacion: z.string().nullable(),
   OficinaEstatus: z.string().nullable(),
@@ -47,8 +45,6 @@ export const rastreoRegistroSchema = z.object({
   F_Promesa_Entrega: z.string().nullable(),
 });
 
-export type RastreoRegistro = z.infer<typeof rastreoRegistroSchema>;
-
 /**
  * Version PUBLICA del registro: lo que el BFF puede devolver al navegador.
  *
@@ -61,7 +57,7 @@ export type RastreoRegistro = z.infer<typeof rastreoRegistroSchema>;
  * Si algun dia se necesitan, deben salir por un endpoint autenticado que
  * verifique que la guia pertenece al cliente.
  */
-export const rastreoRegistroPublicoSchema = rastreoRegistroSchema.transform((r) => ({
+const rastreoRegistroPublicoSchema = rastreoRegistroSchema.transform((r) => ({
   ...r,
   Remitente: null,
   Destinatario: null,

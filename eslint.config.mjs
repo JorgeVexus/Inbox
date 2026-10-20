@@ -40,7 +40,16 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/consistent-type-imports": "warn",
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "test-results/**", "playwright-report/**"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "test-results/**",
+    "playwright-report/**",
+    "coverage/**",
+    "docs/qa-baseline/**",
+  ]),
 ]);
 
 export default eslintConfig;
