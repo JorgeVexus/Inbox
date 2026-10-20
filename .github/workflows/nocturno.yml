@@ -22,7 +22,7 @@ jobs:
       - run: npx playwright install --with-deps
       - run: npm run build
       - run: npx playwright test --workers=2
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-nocturno
