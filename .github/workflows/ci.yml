@@ -45,7 +45,7 @@ jobs:
       - run: npx playwright install --with-deps chrome
       - run: npm run build
       - run: npx playwright test --project=chrome --workers=2
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -76,7 +76,7 @@ jobs:
           npx next start -p 3500 &
           until curl -sf http://localhost:3500/ > /dev/null; do sleep 1; done
           npm run qa:lighthouse
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: lighthouse
