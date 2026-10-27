@@ -57,9 +57,15 @@ Hoy **no hay** servicio de captura de errores externo. Los errores del servidor 
 
 ## R2. Cloudflare bloquea al servidor (reto 403)
 
-**Síntoma:** todas las consultas de rastreo fallan con 503 "El servicio no está disponible por el momento"; en los registros: `Cloudflare bloqueo la peticion a /Login (reto anti-bot)`. Es el bloqueo **B1** que existe hoy.
-**Confirmar:** `curl` con los mismos encabezados **pasa** y Node/`fetch` **no** (huella TLS). Anotar el **Ray ID** del encabezado `cf-ray` de la respuesta bloqueada.
-**Hacer:** pedir al administrador de Cloudflare del cliente una regla WAF personalizada con acción *Skip* (o IP Access Rule *Allow*) para la IP de salida del servidor y los hosts `apitest.inbox.com.mx` / `api.inbox.com.mx`; el modo "Bot Fight" no se puede saltar con una regla de IP. Mensaje listo en `docs/mensajes/2026-10-12-cliente.md`. Recordar que en Vercel la IP de salida **cambia** salvo con IPs estáticas o proxy propio (B5): si la IP cambió, la regla deja de funcionar.
+**Síntoma:** todas las consultas de rastreo fallan con 503 "El servicio no está disponible por el momento"; en los registros: `Cloudflare bloqueo la peticion a /Login (reto anti-bot)`.
+**Causa más probable (la que fue el bloqueo B1, resuelto el 2026-10-27): la petición salió por una IP que no está autorizada** — en particular una **IPv6**, o la IPv4 equivocada. Cloudflare autoriza por IP y trata el resto como tráfico automatizado. *(Hasta el 2026-10-27 creímos que era la "huella TLS" de Node: era incorrecto.)*
+**Confirmar:**
+1. Anotar el **Ray ID** (`cf-ray`) de la respuesta bloqueada y pedir al administrador de Cloudflare que diga **por qué dirección IP** salió esa petición (lo ven en el evento de seguridad).
+2. Probar desde Node forzando la familia de direcciones: con `https.request({ family: 4 })` debe dar 200 y con `family: 6` 403 si es este caso. (Script de ejemplo en la conversación del 2026-10-27; `npm run qa:simulacro` prueba el escenario real.)
+**Hacer:**
+- El servidor ya prefiere IPv4 (`src/instrumentation.ts`). Verificar que ese arranque se ejecuta (la línea de registro no debe mostrar IPv6).
+- Pedir al cliente que **autorice la IPv4 de salida** del servidor para `apitest.inbox.com.mx` y `api.inbox.com.mx` (regla WAF *Skip*/IP Access *Allow*). **No** pedirles que mantengan IPv6: las "temporales" cambian solas.
+- En Vercel la IP de salida **cambia** salvo con IPs estáticas o proxy propio (B5): si la IPv4 cambió, la regla deja de aplicar.
 **Decir:** igual que R1.
 
 ## R3. Rotar la credencial de servicio de SIBOX

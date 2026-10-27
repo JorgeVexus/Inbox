@@ -41,7 +41,7 @@ Quién: administrador de GitHub y de Vercel. Tiempo: ~1 hora.
 4. **Región**: ya está en `vercel.json` (`dfw1`, Dallas). Confirmar con Sistemas de Inbox dónde está su servidor.
 5. **Proteger los previews**: Settings → Deployment Protection → *Vercel Authentication* (o contraseña) para Preview. Para que el cliente los vea sin cuenta: contraseña compartida o *Shareable Links*.
 6. **Primer despliegue** y comprobar: `/api/salud` → `{"estado":"ok",…}`; las 6 páginas públicas; `/sitemap.xml` y `/robots.txt` con el dominio correcto.
-7. **IP de salida** (B5): decidir entre Vercel Static IPs (~$100 USD/mes), proxy propio o servidor propio; pasar la IP a Sistemas de Inbox para el whitelist **y** resolver B1 (Cloudflare) para esa IP.
+7. **IP de salida** (B5): decidir entre Vercel Static IPs (~$100 USD/mes), proxy propio o servidor propio; pasar la **IPv4** a Sistemas de Inbox para el whitelist (solo IPv4: el servidor ya prefiere IPv4 y las IPv6 cambian). Verificar con `/api/salud` y una consulta real que Cloudflare deja pasar esa IP; B1 se resolvió en pruebas el 2026-10-27, pero es otra IP y otro host (`api.inbox.com.mx`).
 8. **GitHub**: proteger `main` (PR obligatorio, CI en verde, sin *force push*), activar *secret scanning*, Dependabot y CodeQL (ver Fase 2).
 9. **Monitoreo**: configurar los monitores de `docs/RUNBOOKS.md` §2.
 10. **Analítica**: activar Speed Insights / Web Analytics (decisión pendiente, Fase 5 §4).
@@ -64,7 +64,7 @@ Marcar cada punto con fecha y responsable. **No se cambia el DNS hasta que todos
   - **No →** seguir §5.2 y §5.4.
 
 ### 5.2 Antes (comunes)
-- [ ] B1 resuelto: rastreo real funcionando desde el servidor (Cloudflare permite la IP de salida).
+- [ ] Rastreo real funcionando desde el servidor **de producción** (B1 se resolvió para pruebas el 2026-10-27; falta confirmar la IPv4 de producción y `api.inbox.com.mx`).
 - [ ] B2–B4 resueltos o **ocultos** (B9: login, envíos, perfil, recolección, cotizador y pago son demo; no lanzar mostrándolos como reales).
 - [ ] B8 resuelto: los formularios de contacto envían a un destino real (o se quitan).
 - [ ] B10/B13: contenido real (FAQ, pie, redes, correos, teléfonos) y **aviso de privacidad y términos publicados** y revisados por Legal.

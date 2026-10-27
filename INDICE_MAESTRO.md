@@ -8,9 +8,9 @@
 
 | | |
 |---|---|
-| **Última actualización** | 2026-10-20 (revisión 360°, cierre: acta Go / No-Go) |
-| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 208 tests unitarios + suite E2E Playwright (484 casos en Chrome/Firefox/WebKit/móvil); revisión 360° en `docs/PLAN_REVISION_360.md` y `docs/fases/REVISION_360_FASES.md` (fases 0, 1, 2, 5 hechas; 6 preparada; 3 y 4 esperan a terceros); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
-| **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada** (solo rastreo) y **bloqueada** por Cloudflare |
+| **Última actualización** | 2026-10-27 (B1 resuelto: era IPv6; Next 16.4.3) |
+| **Estado del código** | `main` en GitHub (`JorgeVexus/Inbox`), build/tsc/eslint limpios, 210 tests unitarios + suite E2E Playwright (484 casos en Chrome/Firefox/WebKit/móvil); revisión 360° en `docs/PLAN_REVISION_360.md` y `docs/fases/REVISION_360_FASES.md` (fases 0, 1, 2, 5 hechas; 6 preparada; 3 y 4 esperan a terceros); ver `docs/QA_MODULO_POR_MODULO.md` y `docs/REPORTE_SESION_2026-10-12.md` |
+| **Fase real** | Frontend completo con datos simulados; integración con SIBOX **iniciada**: el **rastreo real funciona de punta a punta** desde Node (B1 resuelto 2026-10-27); el resto sigue en mock |
 
 ---
 
@@ -59,9 +59,9 @@ la vea automáticamente.
   `/api/rastreo/detalle`). **Por defecto corre en MODO DEMO** (datos simulados
   + aviso visible) para que el sitio funcione aunque SIBOX no sea alcanzable;
   se activa lo real con `NEXT_PUBLIC_SIBOX_REAL=1` (ver §7 y `.env.example`).
-- **Pero ni eso se puede ver funcionando desde la app todavía**: **Cloudflare
-  bloquea las llamadas hechas desde Node** (el BFF) aunque la IP ya está en el
-  whitelist del cliente. Con `curl` sí pasa. Ver §5, bloqueo B1.
+- **Y ya funciona** (2026-10-27): el bloqueo de Cloudflare **no era la huella TLS de Node sino la
+  IPv6** (el cliente solo autorizó la IPv4). El BFF ahora sale por IPv4 y el rastreo real responde
+  con las guías de prueba. Ver §5, B1 (resuelto).
 - **Lo que depende del cliente/backend** (§5): regla en Cloudflare, endpoints de
   registro/login de usuario final, un bug de su ambiente de pruebas que rompe el
   cotizador, endpoints de pago, y varias confirmaciones.
@@ -111,8 +111,7 @@ inicio 2026-08-04) asumía una demo semanal en un link de Vercel. Estado real:
 Base de pruebas: `https://apitest.inbox.com.mx` · Producción: `https://api.inbox.com.mx`
 (sin acceso ni credenciales todavía). Sobre universal de respuesta:
 `{"resp":{"result":0|1,"data":...}}` (excepción: el token de `Login` viene en
-`resp.token`, hermano de `data`). Las pruebas se hicieron con `curl` (Node está
-bloqueado, B1).
+`resp.token`, hermano de `data`). Las pruebas hasta 2026-10-20 se hicieron con `curl`; desde 2026-10-27 el BFF (Node) también pasa (B1 resuelto, solo IPv4).
 
 | Endpoint | Probado real | Conectado al BFF | Resultado / notas |
 |---|---|---|---|
@@ -138,11 +137,11 @@ bloqueado, B1).
 
 | # | Bloqueo | Depende de | Impacto | Estado |
 |---|---|---|---|---|
-| **B1** | **Cloudflare reta (403 `cf-mitigated: challenge`) a las peticiones desde Node** aunque la IP `187.189.155.14` ya está en el whitelist; `curl` desde la misma IP pasa. Es huella TLS, no headers. El whitelist se aplicó en su firewall, no en Cloudflare. | Cliente / sistemas (regla WAF *Skip* o IP Access *Allow* en Cloudflare) | **Nada del BFF funciona** (ni en dev ni en Vercel) | Mensaje listo en `docs/mensajes/2026-10-12-cliente.md`. **Por enviar.** |
+| ~~**B1**~~ | ~~Cloudflare reta (403) a las peticiones desde Node~~ **RESUELTO 2026-10-27.** Causa real: la petición salía por **IPv6** (no autorizada) y el cliente solo había autorizado la IPv4 `187.189.155.14`; `curl` usaba IPv4. Nuestro diagnóstico previo ("huella TLS") era erróneo. Arreglo: `src/instrumentation.ts` fuerza IPv4 primero. | — | — | ✅ Verificado: Login, wsRastreo y BusquedaCP 200 desde Node; rastreo real en la UI. **Pendiente derivado:** autorizar la IPv4 del servidor de producción (B5) y confirmar que `api.inbox.com.mx` (producción) también deja pasar. |
 | **B2** | **Registro/login de usuario final y su `K_Cliente`**. El cliente confirmó (2026-10-07): registro obligatorio para recolecciones; con sesión ve sus envíos, recolecciones y contactos. El `K_Cliente` del `Login` (63105) es de la cuenta de servicio, no de cada persona. | Backend | `/recoleccion`, `/envio`, `/perfil`, `/cuenta/crear` siguen en mock | Preguntas en el mensaje al cliente. |
 | **B3** | `ObtieneDetalleCostos` falla en pruebas (falta el stored procedure `GP_Valida_OrigenCotizacion`). | Backend | Cotizador real | En el mensaje al cliente. |
 | **B4** | Endpoints de **pago**, webhooks, sandbox. | Backend | Checkout productivo (`procesarPago` queda simulado) | Plan semana 3; sin novedades. |
-| **B5** | **IP fija para producción**. Vercel no da IP de salida fija (Static IPs = $100/mes, descartado). Plan: proxy en VPS barato (~$5–8, Vultr/Hetzner). **Ojo**: el proxy solo resuelve la IP; **igual hace falta B1** para esa IP. | Decisión del jefe + provisionar VPS | Producción | Resumen técnico para el otro dev: artifact "IP Fija SIBOX" (`.scratch/ip-fija-sibox.html`). |
+| **B5** | **IP fija para producción**. Vercel no da IP de salida fija (Static IPs = $100/mes, descartado). Plan: proxy en VPS barato (~$5–8, Vultr/Hetzner). **Ojo**: el proxy solo resuelve la IP; **igual hace falta que Cloudflare autorice esa IPv4**. | Decisión del jefe + provisionar VPS | Producción | Resumen técnico para el otro dev: artifact "IP Fija SIBOX" (`.scratch/ip-fija-sibox.html`). |
 | **B6** | Sin URL/credenciales de **producción** (`api.inbox.com.mx`) ni confirmar que tenga la misma protección. | Cliente | Lanzamiento | Pendiente de preguntar. |
 | **B8** | **Los formularios de contacto no envían nada**: el de `/soporte` y el del chat (`src/lib/soporte.ts`) solo simulan éxito. En producción un cliente creería que su mensaje llegó. Hay que decidir el destino (correo vía Resend, CRM, webhook o widget de terceros). | Producto / cliente | **No lanzar a producción así** (o quitar/ocultar los formularios) | Pendiente de decidir. |
 | **B9** | **Modo demo en producción**: login mock (`INBOX`/`Prueba`), `/envio`, `/perfil`, `/recoleccion`, cotizador y pago son mock y muestran datos de ejemplo. Antes de lanzar: o se conectan (B2/B3/B4) o se ocultan los links del Navbar y se marcan claramente. | Depende de B2–B4 | Producción | Pendiente. |
@@ -158,8 +157,8 @@ bloqueado, B1).
 ## 6. Qué sigue (orden recomendado)
 
 **A. Destrabar (no requiere código, requiere mandar un mensaje)**
-1. Enviar el mensaje de `docs/mensajes/2026-10-12-cliente.md` (B1, B2, B3, B7 + preguntas).
-2. Cuando el cliente confirme la regla de Cloudflare: probar `/rastreo` desde la app con las guías `4159028044`, `4159050421`, `4159021743`, `4003229791`.
+1. Enviar el mensaje de `docs/mensajes/2026-10-27-cliente.md` (confirma B1, pide B2, B3, B7, textos legales y contenido).
+2. ~~Probar `/rastreo` desde la app con las guías reales~~ **[HECHO 2026-10-27]**. Siguiente: **conectar los endpoints de lectura** (sucursales, C.P., horarios) ya que Node pasa, y probar `api.inbox.com.mx` (producción).
 3. Decidir con el jefe lo del VPS (B5) y, si procede, que el otro dev lo levante.
 
 **B. Avanzar ya, sin esperar a nadie**
@@ -207,6 +206,7 @@ las pruebas de conectividad contra `api.inbox.com.mx`.
 | 2026-10-20 | CSP estática con `script-src 'self' 'unsafe-inline'` en lugar de nonce | El HTML de Next trae scripts en línea; el nonce obliga a generar todas las páginas en cada visita (sin CDN). Se reevalúa en la Fase 5 |
 | 2026-10-20 | El BFF rechaza (403/415) peticiones con `Origin` ajeno o que no sean JSON, y campos extra (400) | Defensa entre sitios y contra colar `K_Cliente`; barato y sin efectos para el sitio |
 | 2026-10-20 | Región de Vercel `dfw1` (Dallas) y presupuestos de Lighthouse bloqueantes en CI solo tras unas semanas de estabilidad | El borde de Cloudflare de SIBOX está en Dallas; el laboratorio compartido de CI tiene ruido |
+| 2026-10-27 | El BFF resuelve nombres con **IPv4 primero** (`dns.setDefaultResultOrder("ipv4first")` en `instrumentation.ts`) | Cloudflare de SIBOX autoriza por IP y solo está autorizada la IPv4; las IPv6 temporales cambian y no conviene que el cliente las mantenga |
 | siempre | `procesarPago()` **nunca** se conecta a una pasarela sin decisión explícita | Pagos bloqueados por backend |
 
 ---
@@ -287,6 +287,8 @@ npx tsc --noEmit && npm run lint && npm test
 ---
 
 ## 11. Bitácora de sesiones (la más reciente arriba)
+
+- **2026-10-27 — B1 RESUELTO.** El cliente respondió que el Ray ID `a4d8f1e4ba24e93e` salió por una **IPv6** (`2806:2f0:6620:1f45:…`), no por la IPv4 autorizada, y ajustó la regla de `/Login` para ambas. Probado desde Node con `family` forzada: **IPv4 → 200 en Login, wsRastreo y BusquedaCP; IPv6 → 403** (también con la IPv6 actual de esta máquina, distinta de la que ellos vieron, lo que confirma que las IPv6 temporales cambian). **Se corrige un diagnóstico propio erróneo** ("huella TLS"). Fix: `src/instrumentation.ts` fuerza IPv4 primero (+2 pruebas, escenario R2 del simulacro). Verificado: BFF real con las 4 guías de prueba (200, datos personales anulados; inexistente 404) y `/rastreo` con `NEXT_PUBLIC_SIBOX_REAL=1` mostrando datos reales. **Además:** `npm audit` reportó una vulnerabilidad **crítica nueva en Next 16.4.0** (RCE en el optimizador de imágenes con SVG, DoS en Server Actions, RCE en `use cache`; publicada tras el 20-oct) → actualizado a **16.4.3**, 0 vulnerabilidades. Efecto en el Go / No-Go: B1 ya no es un alto abierto (ver acta). Siguiente: mensaje al cliente (`docs/mensajes/2026-10-27-cliente.md`), conectar endpoints de lectura y probar producción.
 
 - **2026-10-20 — Revisión 360°, Fase 7 (cierre): decisión recomendada GO para demostración protegida / NO-GO para producción** (`docs/GO_NO_GO.md`): re-ejecución completa con el nuevo `npm run qa:todo` (tipos, ESLint 0 errores, 208 pruebas, 0 código muerto, duplicación 1.60 %, 0 vulnerabilidades de producción, semgrep 0, Lighthouse en presupuesto, simulacro 3/3) y **3 corridas seguidas de 484 casos E2E sin reintentos (481 pasan, 0 fallan)**. Tablero: 1 verde, 5 amarillos, 4 rojos (hallazgos altos abiertos B1/B8/B12, contenido y legal, operación sin ensayar, UAT). Fases 3 y 4 **no ejecutadas** (esperan Cloudflare y Figma Dev Mode): la decisión se repite al hacerlas. Camino de 14 pasos a producción en el acta §4. Siguiente: enviar el mensaje al cliente (B1 + textos legales + contenido).
 

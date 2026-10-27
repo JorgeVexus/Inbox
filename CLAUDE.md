@@ -273,7 +273,7 @@ probó por primera vez contra la API real **con respuestas exitosas**:
    Route Handler (hoy la UI sigue leyendo el mock) y el rate limiting (TODO
    en la ruta).
 
-9. **BLOQUEO DE CLOUDFLARE DESDE NODE (hallazgo clave, 2026-10-02).** El mismo
+9. **[CORREGIDO 2026-10-27: la causa NO era la huella TLS sino IPv6 — ver la sección "B1 resuelto" más abajo]** **BLOQUEO DE CLOUDFLARE DESDE NODE (hallazgo clave, 2026-10-02).** El mismo
    request, con los mismos headers y desde la misma IP ya whitelisteada
    (`187.189.155.14`), **pasa con `curl` pero Cloudflare lo reta desde Node**
    (`fetch` y `https.request`: HTTP 403, `cf-mitigated: challenge`, 6/6
@@ -380,6 +380,26 @@ con test); (2) `DomiciliosRecoleccionesCliente` recibe `K_ClienteSIBOX` como
 parámetro: cuando se conecte, el BFF debe tomar ese número de la sesión del
 servidor, **nunca** del navegador, o cualquiera vería domicilios ajenos. El cliente
 SIBOX también tiene ahora un timeout de 20 s por llamada (504 si se agota).
+
+### B1 resuelto: Cloudflare no bloqueaba a Node, bloqueaba la IPv6 (2026-10-27)
+
+El cliente revisó el Ray ID `a4d8f1e4ba24e93e` y encontró que la petición bloqueada **salió por una
+dirección IPv6** (`2806:2f0:…`), no por la IPv4 `187.189.155.14` que sí tenían autorizada; Cloudflare la
+trató como tráfico automatizado (Managed Challenge, 403). Lo comprobamos el mismo día desde Node
+(`https.request` con `family` forzada): **IPv4 → Login, wsRastreo y BusquedaCP responden 200; IPv6 → 403**.
+`curl` pasaba solo porque usaba IPv4. **El diagnóstico anterior ("huella TLS del cliente", puntos 9 y 10 de la
+prueba del 2026-10-02 y el B1 de todo el INDICE) era incorrecto**: lo fue por no haber probado la familia de
+direcciones; se corrige aquí y en `docs/RUNBOOKS.md` R2.
+
+- **Arreglo en el código:** `src/instrumentation.ts` → `register()` llama `dns.setDefaultResultOrder("ipv4first")`.
+  Con eso el BFF sale por IPv4 aunque la máquina tenga IPv6 (con prueba unitaria y el escenario R2 de `npm run qa:simulacro`).
+- **Verificado de punta a punta (2026-10-27):** BFF real con las 4 guías de prueba → 200 con ENTREGADA y nombres/
+  recibió/observaciones anulados; guía inexistente → 404; `/rastreo` con `NEXT_PUBLIC_SIBOX_REAL=1` muestra los
+  datos reales sin aviso de demostración.
+- **Para el cliente:** basta autorizar **IPv4** (la del servidor de producción). Las IPv6 "temporales" del cliente
+  cambian solas y el prefijo cambia con la red: no vale la pena mantenerlas. Nuestro servidor no usará IPv6.
+- **Sigue pendiente (B5):** la IPv4 de producción. Vercel no da IP fija (Static IPs de pago) y la regla del cliente
+  es por IP; el proxy en VPS sigue siendo la opción barata.
 
 ### Producción vs Pruebas — solo tenemos acceso a Pruebas
 

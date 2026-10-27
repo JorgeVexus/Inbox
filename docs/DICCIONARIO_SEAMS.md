@@ -8,9 +8,9 @@ Leyenda: 🟢 real (BFF) · 🟡 mock con endpoint real ya probado · 🔴 mock 
 
 | Seam (archivo) | Función(es) | Hoy | Endpoint SIBOX | Estado | Bloqueo |
 |---|---|---|---|---|---|
-| `rastreo.ts` | `rastrearGuia`, `rastrearGuias`, `rastrearGuiaDetalle` | **BFF** (`/api/rastreo`, `/api/rastreo/detalle`) o mock `mock/rastreo.ts` según `NEXT_PUBLIC_SIBOX_REAL` | `wsRastreo`, `RastreoDetalle` | 🟢 conectado (en demo por B1) | B1 |
-| `sucursales.ts` | `getSucursales`, `getEstados`, `getCiudades` | `mock/sucursales.ts` (muestra) | `ListadoOficinas` (71 oficinas reales; esquema en `api/schemas/catalogos.ts`) | 🟡 | Falta la ruta `/api/sucursales` y B1 |
-| `codigo-postal.ts` | `buscarCodigoPostal` | `mock/codigos-postales.ts` | `BusquedaCP` (esquema listo) | 🟡 | Ruta `/api/codigo-postal` y B1 |
+| `rastreo.ts` | `rastrearGuia`, `rastrearGuias`, `rastrearGuiaDetalle` | **BFF** (`/api/rastreo`, `/api/rastreo/detalle`) o mock `mock/rastreo.ts` según `NEXT_PUBLIC_SIBOX_REAL` | `wsRastreo`, `RastreoDetalle` | 🟢 conectado y **verificado con SIBOX real** (2026-10-27) | Autorizar la IPv4 de producción (B5) |
+| `sucursales.ts` | `getSucursales`, `getEstados`, `getCiudades` | `mock/sucursales.ts` (muestra) | `ListadoOficinas` (71 oficinas reales; esquema en `api/schemas/catalogos.ts`) | 🟡 | Falta la ruta `/api/sucursales` (B1 ya no bloquea) |
+| `codigo-postal.ts` | `buscarCodigoPostal` | `mock/codigos-postales.ts` | `BusquedaCP` (esquema listo) | 🟡 | Ruta `/api/codigo-postal` (B1 ya no bloquea) |
 | `recoleccion.ts` | `obtenerHorariosPorCP`, `programarRecoleccion` (+ funciones puras de fechas) | `mock/recoleccion.ts` | `ObtenerHorariosPorCP` (🟡), `wsGeneracionRecoleccion` (🔴) | Mixto | El `K_Cliente` por persona (B2) |
 | `cotizacion.ts` | `obtenerCotizacion` | `mock/cotizacion.ts` (fórmula de ejemplo) | `ObtieneDetalleCostos` (falla en pruebas) | 🔴 | **B3** |
 | `cotizacion.ts` | `generarGuia` | folio aleatorio | `wsGeneracionGuiaCliente` | 🔴 | ¿Qué `K_Cliente` para invitados? |

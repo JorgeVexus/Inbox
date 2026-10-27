@@ -6,14 +6,23 @@
 
 ---
 
+## 0. Actualización del 27 de octubre de 2026
+
+- **B1 (Cloudflare) quedó resuelto.** La causa no era la huella TLS de Node (diagnóstico nuestro, erróneo) sino que la petición salía por **IPv6**, que el cliente no tenía autorizada. El BFF ahora usa IPv4 primero y **el rastreo real funciona de punta a punta** (probado con las 4 guías de prueba y en la interfaz). Efecto en el tablero: **los hallazgos altos abiertos bajan de 3 a 2** (formularios que no envían, límite por instancia); lo demás no cambia. Falta confirmar lo mismo con la IPv4 de producción y `api.inbox.com.mx`.
+- **Next.js 16.4.0 tenía una vulnerabilidad crítica nueva** (publicada después del 20-oct; RCE en el optimizador de imágenes con SVG, DoS en Server Actions, RCE en `use cache`). Se actualizó a **16.4.3**: `npm audit`: 0 vulnerabilidades. Lección para operación: `npm audit` debe correr en CI **semanalmente** (el flujo `seguridad.yml` ya lo hace) y Dependabot debe estar activo, porque el "0" del 20-oct dejó de ser cierto en una semana.
+- **Re-ejecución tras ambos cambios (`npm run qa:todo -- --e2e --lighthouse --simulacro`): 12/12 comprobaciones correctas** — 210 pruebas unitarias, 0 vulnerabilidades, Lighthouse en presupuesto y **481 casos E2E pasan, 0 fallan** (0 reintentos).
+- **El veredicto no cambia** (GO demo protegida / NO-GO producción), pero el camino se acorta: el paso 1 de §4 pasa de "esperar la regla de Cloudflare" a "autorizar la IPv4 de producción".
+
+---
+
 ## 1. Decisión recomendada
 
 | Destino | Veredicto | En una frase |
 |---|---|---|
 | **Demostración / preview protegida para el cliente y pruebas con usuarios** | ✅ **GO**, con las condiciones de §2 | El sitio es estable, seguro para lo que hace hoy, rápido y accesible; todo lo simulado se ve como simulado |
-| **Producción real** (dominio público, clientes comprando y rastreando de verdad) | ⛔ **NO-GO** | Hay 3 hallazgos de severidad alta abiertos y 7 criterios del plan en rojo, la mayoría por dependencias externas: Cloudflare, backend, textos legales y contenido del cliente |
+| **Producción real** (dominio público, clientes comprando y rastreando de verdad) | ⛔ **NO-GO** | Hay 2 hallazgos de severidad alta abiertos (tras resolver B1) y varios criterios del plan en rojo, la mayoría por dependencias externas: backend, textos legales y contenido del cliente |
 
-**Por qué No-Go para producción, sin rodeos:** hoy el rastreo no funciona desde un servidor real (Cloudflare bloquea a Node, B1); el cotizador, la compra, el pago, el login, los envíos, el perfil y la recolección son **datos de ejemplo**; los formularios de contacto **aparentan enviar y no envían**; el aviso de privacidad y los términos **no existen**; y el contenido (FAQ, pie de página, redes, correos) es provisional. Nada de eso es un error de programación: son decisiones, textos y entregas de otras personas. El código que sí existe pasó todas las verificaciones automáticas.
+**Por qué No-Go para producción, sin rodeos:** el rastreo real ya funciona desde Node (B1 resuelto el 27-oct, falta la IP de producción); el cotizador, la compra, el pago, el login, los envíos, el perfil y la recolección son **datos de ejemplo**; los formularios de contacto **aparentan enviar y no envían**; el aviso de privacidad y los términos **no existen**; y el contenido (FAQ, pie de página, redes, correos) es provisional. Nada de eso es un error de programación: son decisiones, textos y entregas de otras personas. El código que sí existe pasó todas las verificaciones automáticas.
 
 ---
 
@@ -36,8 +45,8 @@ Semáforo: 🟢 cumple · 🟡 cumple en parte / aceptable con plan · 🔴 no c
 
 | Área | Umbral del plan | Estado | Evidencia y brecha |
 |---|---|---|---|
-| **Hallazgos** | 0 Críticos y 0 Altos abiertos; Medios con plan y fecha | 🔴 | **0 críticos.** **3 altos abiertos**: B1 Cloudflare (R-02), formularios que no envían (R-03/B8) y límite de peticiones solo en memoria (R-01/B12, mitigado, no cerrado). Medios abiertos con plan: contraste de marca, contenido provisional, teselas del mapa (§7) |
-| **Seguridad** | 0 vulnerabilidades altas en dependencias; 0 secretos; límite activo y probado; autorización por objeto verificada; ZAP sin altos | 🟡 | Dependencias de **producción: 0** vulnerabilidades. Desarrollo: 5 altas en la cadena del linter (sin ruta al sitio; aceptadas, Fase 2 §3.9). Secretos: **0** en código e historial (semgrep 0 hallazgos en 178 archivos, repetido hoy; historial de git sin contraseña ni claves). Límite activo y probado (30/min, 429) pero **por instancia** (B12). **Autorización por objeto: no aplica aún** (no hay rutas con cuenta; B2). **ZAP no se ejecutó** |
+| **Hallazgos** | 0 Críticos y 0 Altos abiertos; Medios con plan y fecha | 🔴 | **0 críticos.** **2 altos abiertos**: formularios que no envían (R-03/B8) y límite de peticiones solo en memoria (R-01/B12, mitigado, no cerrado). *(B1/R-02 Cloudflare: resuelto el 27-oct.)* Medios abiertos con plan: contraste de marca, contenido provisional, teselas del mapa (§7) |
+| **Seguridad** | 0 vulnerabilidades altas en dependencias; 0 secretos; límite activo y probado; autorización por objeto verificada; ZAP sin altos | 🟡 | Dependencias de **producción: 0** vulnerabilidades (tras actualizar Next a 16.4.3 el 27-oct, que tenía una crítica nueva). Desarrollo: 5 altas en la cadena del linter (sin ruta al sitio; aceptadas, Fase 2 §3.9). Secretos: **0** en código e historial (semgrep 0 hallazgos en 178 archivos, repetido hoy; historial de git sin contraseña ni claves). Límite activo y probado (30/min, 429) pero **por instancia** (B12). **Autorización por objeto: no aplica aún** (no hay rutas con cuenta; B2). **ZAP no se ejecutó** |
 | **Código** | `tsc`/ESLint/Prettier en 0; sin código muerto ni ciclos; cobertura lib ≥ 85 % | 🟡 | `tsc` 0, ESLint **0 errores** (quedan **12 avisos** de complejidad/tamaño, deuda visible), Prettier 0, `knip` 0, ciclos 0, duplicación 1.60 %, cobertura `src/lib` > 93 % |
 | **Pruebas** | Suite completa verde 3 corridas seguidas sin reintentos | 🟢 | **3 corridas seguidas de la suite completa (121 pruebas × 4 navegadores = 484 casos), sin reintentos: 481 pasan, 3 omitidas a propósito, 0 fallan en cada una** (≈ 11 min cada una). La primera serie tuvo 1 fallo intermitente en WebKit (la prueba de Home → `/cotizar` escribía antes de que React hidratara); se corrigió la prueba y se repitió la serie completa. 208 pruebas unitarias en verde |
 | **Rendimiento** | Lighthouse móvil ≥ 90 en rutas públicas; LCP ≤ 2.5 s, CLS ≤ 0.1; carga objetivo sin errores | 🟡 | Lighthouse **93–96** en las 6 rutas, CLS **0**, TBT < 110 ms, carga local 900–1 200 peticiones/s sin errores. **LCP:** 1.8–2.6 s con red y CPU limitadas de verdad (4 de 6 rutas ≤ 2.5 s); 2.9–3.1 s en el laboratorio simulado. Datos de campo pendientes. Carga contra Vercel/SIBOX real: pendiente |
@@ -55,7 +64,7 @@ Semáforo: 🟢 cumple · 🟡 cumple en parte / aceptable con plan · 🔴 no c
 
 | # | Acción | Dueño | Desbloquea |
 |---|---|---|---|
-| 1 | Enviar el mensaje al cliente (`docs/mensajes/2026-10-12-cliente.md`) y obtener la regla de Cloudflare para la IP de salida | Tú → cliente / sistemas | **B1** → rastreo real, y cualquier prueba contra SIBOX |
+| 1 | Enviar el mensaje al cliente (`docs/mensajes/2026-10-27-cliente.md`): confirmar B1, pedir la IPv4 de producción autorizada y probar `api.inbox.com.mx` | Tú → cliente / sistemas | Rastreo real en producción (B1 ya resuelto en pruebas) |
 | 2 | Backend libera registro/login de usuario final y su `K_Cliente`, `ObtieneDetalleCostos` corregido, endpoints de guía/etiqueta/pago | Backend de SIBOX | **B2, B3, B4** → quitar el modo demo de cotizar, pagar, envíos, perfil y recolección (B9) |
 | 3 | Decidir el destino de los formularios de contacto (correo, CRM, webhook o chat de terceros) y conectarlo | Cliente + desarrollo | **B8** |
 | 4 | Legal aprueba aviso de privacidad y términos; cliente da razón social, domicilio, contacto de privacidad; se publican | Cliente + Legal | Área "Contenido y legal" |
@@ -105,7 +114,7 @@ Orden recomendado de dependencias: **1 → (2, 3, 4, 5 en paralelo) → 6–9 �
 | ID | Sev. | Descripción | Estado |
 |---|---|---|---|
 | R-01 | A | Límite de peticiones | **Mitigado** (429 en memoria); falta almacén compartido — B12 |
-| R-02 | A | Cloudflare bloquea a Node | Abierto — B1, reverificado el 20-oct |
+| R-02 | A | Cloudflare bloquea a Node | **Resuelto 27-oct** (era IPv6; el BFF usa IPv4) — falta IP de producción |
 | R-03 | A | Formularios de contacto no envían | Abierto — B8 |
 | R-04 | M | Contraste de marca 3.02:1 | Abierto — decisión de marca |
 | R-05 | M | Contenido provisional y textos legales | Abierto — B10/B13; borradores listos |
